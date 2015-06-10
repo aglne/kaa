@@ -102,7 +102,9 @@ struct RedirectionRule {
   2: shared.Long ruleId
   3: probability initRedirectProbability
   4: probability sessionRedirectProbability
-  5: shared.Long ruleTTL
+  5: shared.Integer initRedirectMaxCount
+  6: shared.Integer sessionRedirectMaxCount
+  7: shared.Long ruleTTL
 }
 
 struct EventClassFamilyVersion {
