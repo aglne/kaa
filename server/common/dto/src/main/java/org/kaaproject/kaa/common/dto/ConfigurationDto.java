@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,57 +19,86 @@ package org.kaaproject.kaa.common.dto;
 
 public class ConfigurationDto extends AbstractStructureDto {
 
-    private static final long serialVersionUID = 1766336602276590007L;
+  private static final long serialVersionUID = 1766336602276590007L;
 
-    private String protocolSchema;
-    
-    public ConfigurationDto() {
-        super();
+  private int schemaVersion;
+  private String schemaId;
+  private String protocolSchema;
+
+  public ConfigurationDto() {
+    super();
+  }
+
+  /**
+   * Instantiates a new ConfigurationDto.
+   * @param other the ConfigurationDto object
+   */
+  public ConfigurationDto(ConfigurationDto other) {
+    super(other);
+    this.schemaId = other.schemaId;
+    this.schemaVersion = other.getSchemaVersion();
+    this.protocolSchema = other.protocolSchema;
+  }
+
+  public String getProtocolSchema() {
+    return protocolSchema;
+  }
+
+  public void setProtocolSchema(String protocolSchema) {
+    this.protocolSchema = protocolSchema;
+  }
+
+  public String getSchemaId() {
+    return schemaId;
+  }
+
+  public void setSchemaId(String schemaId) {
+    this.schemaId = schemaId;
+  }
+
+  public int getSchemaVersion() {
+    return schemaVersion;
+  }
+
+  public void setSchemaVersion(int schemaVersion) {
+    this.schemaVersion = schemaVersion;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
     }
-    
-    public ConfigurationDto(ConfigurationDto other) {
-        super(other);
-        this.protocolSchema = other.protocolSchema;
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    if (!super.equals(obj)) {
+      return false;
     }
 
-    public String getProtocolSchema() {
-        return protocolSchema;
+    ConfigurationDto that = (ConfigurationDto) obj;
+
+    if (schemaId != null ? !schemaId.equals(that.schemaId) : that.schemaId != null) {
+      return false;
     }
+    return protocolSchema != null ? protocolSchema.equals(that.protocolSchema) :
+            that.protocolSchema == null;
 
-    public void setProtocolSchema(String protocolSchema) {
-        this.protocolSchema = protocolSchema;
-    }
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (schemaId != null ? schemaId.hashCode() : 0);
+    result = 31 * result + (protocolSchema != null ? protocolSchema.hashCode() : 0);
+    return result;
+  }
 
-        ConfigurationDto that = (ConfigurationDto) o;
-
-        if (protocolSchema != null ? !protocolSchema.equals(that.protocolSchema) : that.protocolSchema != null) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (protocolSchema != null ? protocolSchema.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "ConfigurationDto{" + super.toString()+"}";
-    }
+  @Override
+  public String toString() {
+    return "ConfigurationDto{"
+           + "schemaId='" + schemaId + '\''
+           + ", protocolSchema='" + protocolSchema + '\''
+           + '}';
+  }
 }

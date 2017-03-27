@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +18,34 @@ package org.kaaproject.kaa.common.dto;
 
 public enum ChangeType {
 
-    UPDATE,
-    DELETE,
-    INSERT,
-    ADD_TOPIC,
-    REMOVE_TOPIC,
-    UPDATE_WEIGHT,
-    ADD_CONF,
-    REMOVE_CONF,
-    ADD_PROF,
-    REMOVE_PROF,
-    REMOVE_GROUP,
-    REMOVE_CONF_VERSION,
-    REMOVE_PROF_VERSION,
-    REMOVE_NOTIFICATION_VERSION;
+  UPDATE,
+  DELETE,
+  INSERT,
+  ADD_TOPIC,
+  REMOVE_TOPIC,
+  UPDATE_WEIGHT,
+  ADD_CONF,
+  REMOVE_CONF,
+  ADD_PROF,
+  REMOVE_PROF,
+  REMOVE_GROUP,
+  REMOVE_CONF_VERSION,
+  REMOVE_PROF_VERSION,
+  REMOVE_NOTIFICATION_VERSION;
 
 
-    public static ChangeType typeFromString(String stringType) {
-        for (ChangeType type : ChangeType.values()) {
-            if (type.name().equalsIgnoreCase(stringType)) {
-                return type;
-            }
-        }
-        return null;
+  /**
+   * Returns the ChangeType from a string.
+   *
+   * @param stringType string type value
+   * @return           change type
+   */
+  public static ChangeType typeFromString(String stringType) {
+    for (ChangeType type : ChangeType.values()) {
+      if (type.name().equalsIgnoreCase(stringType)) {
+        return type;
+      }
     }
+    return null;
+  }
 }

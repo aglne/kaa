@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,16 @@
 #define MOCKBOOTSTRAPMANAGER_HPP_
 
 #include "kaa/bootstrap/IBootstrapManager.hpp"
+#include "kaa/failover/IFailoverStrategy.hpp"
 
 namespace kaa {
 
 class MockBootstrapManager: public IBootstrapManager {
     virtual void receiveOperationsServerList() {}
     virtual void setFailoverStrategy(IFailoverStrategyPtr strategy) {}
-    virtual void useNextOperationsServer(const TransportProtocolId& protocolId) {}
+    virtual void onOperationsServerFailed(const TransportProtocolId& protocolId,
+                                          KaaFailoverReason reason = KaaFailoverReason::NO_CONNECTIVITY) {}
+
     virtual void useNextOperationsServerByAccessPointId(std::int32_t id) {}
 
     virtual void setTransport(IBootstrapTransport* transport) {}

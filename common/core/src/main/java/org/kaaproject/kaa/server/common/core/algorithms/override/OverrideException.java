@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,41 +22,43 @@ package org.kaaproject.kaa.server.common.core.algorithms.override;
  */
 public class OverrideException extends Exception {
 
-    /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = 4195926751373854423L;
+  /**
+   * The Constant serialVersionUID.
+   */
+  private static final long serialVersionUID = 4195926751373854423L;
 
-    /**
-     * Instantiates a new merge exception.
-     */
-    public OverrideException() {
-        super();
-    }
+  /**
+   * Instantiates a new merge exception.
+   */
+  public OverrideException() {
+    super();
+  }
 
-    /**
-     * Instantiates a new merge exception.
-     *
-     * @param message the message
-     */
-    public OverrideException(String message) {
-        super(message);
-    }
+  /**
+   * Instantiates a new merge exception.
+   *
+   * @param message the message
+   */
+  public OverrideException(String message) {
+    super(message);
+  }
 
-    /**
-     * Instantiates a new merge exception.
-     *
-     * @param message the message
-     * @param cause the cause
-     */
-    public OverrideException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  /**
+   * Instantiates a new merge exception.
+   *
+   * @param message the message
+   * @param cause   the cause
+   */
+  public OverrideException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    /**
-     * Instantiates a new merge exception.
-     *
-     * @param cause the cause
-     */
-    public OverrideException(Throwable cause) {
-        super(cause);
-    }
+  /**
+   * Instantiates a new merge exception.
+   *
+   * @param cause the cause
+   */
+  public OverrideException(Throwable cause) {
+    super(cause);
+  }
 }

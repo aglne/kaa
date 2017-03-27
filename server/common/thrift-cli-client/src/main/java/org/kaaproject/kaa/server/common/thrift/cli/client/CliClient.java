@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,13 @@ import org.kaaproject.kaa.server.common.thrift.gen.cli.CliThriftService;
  */
 public class CliClient extends CliThriftService.Client {
 
-    /**
-     * Instantiates a new cli client.
-     * 
-     * @param prot
-     *            the Trift Protocol
-     */
-    public CliClient(TProtocol prot) {
-        super(prot, prot);
-    }
+  /**
+   * Instantiates a new cli client.
+   *
+   * @param prot the Trift Protocol
+   */
+  public CliClient(TProtocol prot) {
+    super(prot, prot);
+  }
 
 }

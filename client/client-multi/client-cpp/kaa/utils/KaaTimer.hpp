@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include "kaa/KaaThread.hpp"
 #include "kaa/logging/Log.hpp"
+#include "kaa/common/exception/KaaException.hpp"
 
 namespace kaa {
 
@@ -35,8 +36,8 @@ public:
     KaaTimer(const std::string& timerName) :
         timerName_(timerName), isThreadRun_(false), isTimerRun_(false), callback_([]{})
     {
-
     }
+
     ~KaaTimer()
     {
         /*
@@ -56,12 +57,10 @@ public:
 
     void start(std::size_t seconds, const Function& callback)
     {
-
-        KAA_LOG_TRACE(boost::format("Timer[%1%] scheduling for %2% sec ...") % timerName_ % seconds );
-
-        KAA_MUTEX_LOCKING("timerGuard_");
+        if (!callback) {
+            throw KaaException("Bad timer callback");
+        }
         std::unique_lock<std::mutex> timerLock(timerGuard_);
-        KAA_MUTEX_LOCKED("timerGuard_");
 
         if (!isThreadRun_) {
             isThreadRun_ = true;
@@ -78,11 +77,7 @@ public:
 
     void stop()
     {
-        KAA_LOG_TRACE(boost::format("Timer[%1%] stopping ...") % timerName_);
-
-        KAA_MUTEX_LOCKING("timerGuard_");
         std::unique_lock<std::mutex> timerLock(timerGuard_);
-        KAA_MUTEX_LOCKED("timerGuard_");
 
         if (isTimerRun_) {
             isTimerRun_ = false;
@@ -93,40 +88,26 @@ public:
 private:
     void run()
     {
-        KAA_LOG_TRACE(boost::format("Timer[%1%] starting thread ...") % timerName_);
-
-        KAA_MUTEX_LOCKING("timerGuard_");
         std::unique_lock<std::mutex> timerLock(timerGuard_);
-        KAA_MUTEX_LOCKED("timerGuard_");
 
         while (isThreadRun_) {
-
             if (isTimerRun_) {
                 auto now = TimerClock::now();
                 if (now >= endTS_) {
-                    KAA_LOG_TRACE(boost::format("Timer[%1%] executing callback ...") % timerName_);
                     isTimerRun_ = false;
 
                     auto currentCallback = callback_;
 
-                    KAA_MUTEX_UNLOCKING("timerGuard_");
                     timerLock.unlock();
-                    KAA_MUTEX_UNLOCKED("timerGuard_");
 
                     currentCallback();
 
-                    KAA_MUTEX_LOCKING("timer_mutex_");
                     timerLock.lock();
-                    KAA_MUTEX_LOCKED("timer_mutex_");
                 } else {
-                    KAA_MUTEX_UNLOCKING("timerGuard_");
                     condition_.wait_for(timerLock, (endTS_ - now));
-                    KAA_MUTEX_LOCKED("timerGuard_");
                 }
             } else {
-                KAA_MUTEX_UNLOCKING("timerGuard_");
                 condition_.wait(timerLock);
-                KAA_MUTEX_LOCKED("timerGuard_");
             }
         }
     }

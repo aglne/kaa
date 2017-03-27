@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,22 +22,19 @@ package org.kaaproject.kaa.client.logging;
  * <p>Retrieves information about current status of the log storage. Used by
  * a log upload strategy on each adding of new log record in order to check
  * whether to send logs to the server or clean up local storage.</p>
- *
- * <p>Reference implementation is present and use by default
- * ({@link MemoryLogStorage}).</p>
  */
 public interface LogStorageStatus {
-    /**
-     * Retrieves current log storage size used by added records.
-     *
-     * @return Amount of bytes consumed by added records
-     */
-    long getConsumedVolume();
+  /**
+   * Retrieves current log storage size used by added records.
+   *
+   * @return Amount of bytes consumed by added records
+   */
+  long getConsumedVolume();
 
-    /**
-     * Retrieves current number of added records.
-     *
-     * @return Number of records in a local storage
-     */
-    long getRecordCount();
+  /**
+   * Retrieves current number of added records.
+   *
+   * @return Number of records in a local storage
+   */
+  long getRecordCount();
 }

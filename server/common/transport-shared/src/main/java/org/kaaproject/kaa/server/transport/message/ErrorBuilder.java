@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transport.message;
 
 /**
  * Converts an exception into objects specific to the corresponding transport
  * channel.
- * 
- * @author Andrew Shvayka
  *
+ * @author Andrew Shvayka
  */
 public interface ErrorBuilder {
 
-    /**
-     * Convert the exception into objects specific to the corresponding
-     * transport channel.
-     * 
-     * @param e
-     *            the exception to convert
-     * @return result the result of conversion
-     */
-    Object[] build(Exception e);
+  /**
+   * Convert the exception into objects specific to the corresponding
+   * transport channel.
+   *
+   * @param exception the exception to convert
+   * @return result the result of conversion
+   */
+  Object[] build(Exception exception);
 }

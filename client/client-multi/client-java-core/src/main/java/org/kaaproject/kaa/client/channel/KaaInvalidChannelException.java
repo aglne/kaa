@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package org.kaaproject.kaa.client.channel;
 
 public class KaaInvalidChannelException extends Exception {
 
-    private static final long serialVersionUID = -8871850288946945423L;
+  private static final long serialVersionUID = -8871850288946945423L;
 
-    public KaaInvalidChannelException(String message) {
-        super(message);
-    }
+  public KaaInvalidChannelException(String message) {
+    super(message);
+  }
 }

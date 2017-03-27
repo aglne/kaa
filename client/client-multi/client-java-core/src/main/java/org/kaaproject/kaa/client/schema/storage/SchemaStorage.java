@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,26 +44,24 @@ import java.nio.ByteBuffer;
  * kaaClient.getSchemaPersistenceManager().setSchemaStorage(schemaStorage);
  * }
  * </pre>
+ *
  * @author Yaroslav Zeygerman
  * @see SchemaPersistenceManager
- *
  */
 public interface SchemaStorage {
 
-    /**
-     * Saves schema
-     *
-     * @param buffer buffer with schema
-     *
-     */
-    void saveSchema(ByteBuffer buffer);
+  /**
+   * Saves schema.
+   *
+   * @param buffer buffer with schema
+   */
+  void saveSchema(ByteBuffer buffer);
 
-    /**
-     * Loads schema
-     *
-     * @return buffer with loaded schema, or null if schema is empty
-     *
-     */
-    ByteBuffer loadSchema();
+  /**
+   * Loads schema.
+   *
+   * @return buffer with loaded schema, or null if schema is empty
+   */
+  ByteBuffer loadSchema();
 
 }

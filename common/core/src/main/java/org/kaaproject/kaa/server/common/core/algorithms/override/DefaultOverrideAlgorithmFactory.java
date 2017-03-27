@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,10 @@ package org.kaaproject.kaa.server.common.core.algorithms.override;
  */
 public class DefaultOverrideAlgorithmFactory implements OverrideAlgorithmFactory {
 
-    /* (non-Javadoc)
-     * @see org.kaaproject.kaa.server.operations.service.delta.merge.ConfigurationMergerFactory#createConfigurationMerger()
-     */
-    @Override
-    public OverrideAlgorithm createConfigurationOverrideAlgorithm() {
-        return new DefaultOverrideAlgorithm();
-    }
+  /* (non-Javadoc)
+   */
+  @Override
+  public OverrideAlgorithm createConfigurationOverrideAlgorithm() {
+    return new DefaultOverrideAlgorithm();
+  }
 }

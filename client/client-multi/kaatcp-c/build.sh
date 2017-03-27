@@ -1,5 +1,6 @@
+#!/bin/sh
 #
-# Copyright 2014 CyberVision, Inc.
+# Copyright 2014-2016 CyberVision, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +15,7 @@
 # limitations under the License.
 #
 
-#!/bin/bash
-
-RUN_DIR=`pwd`
-
-function help {
+help() {
     echo "Choose one of the following: {build|install|clean}"
     exit 1
 }
@@ -28,10 +25,9 @@ then
     help
 fi
 
-mkdir -p build; cd build; cmake ..; cd ..
+mkdir -p build; (cd build && cmake ..)
 
-for cmd in $@
-do
+for cmd in "$@"; do
 
 case "$cmd" in
     build)
@@ -43,9 +39,9 @@ case "$cmd" in
     ;;
 
     clean)
-    cd build && make clean && cd .. 
+    cd build && make clean && cd ..
     ;;
-    
+
     *)
     help
     ;;

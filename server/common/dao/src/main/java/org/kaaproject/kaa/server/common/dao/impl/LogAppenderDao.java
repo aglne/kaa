@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,21 @@ import java.util.List;
 
 public interface LogAppenderDao<T> extends SqlDao<T> {
 
-    /**
-     *
-     * @param appId
-     * @return
-     */
-    List<T> findByAppId(String appId);
+  /**
+   * Find log appenders by application id.
+   *
+   * @param appId the app id
+   * @return the list of log appenders
+   */
+  List<T> findByAppId(String appId);
 
-    /**
-     * Find log appenders by application id and schema version
-     *
-     * @param appId the application id
-     * @param schemaVersion the log schema version
-     * @return the list of log appenders
-     */
-    List<T> findByAppIdAndSchemaVersion(String appId, int schemaVersion);
+  /**
+   * Find log appenders by application id and schema version.
+   *
+   * @param appId         the application id
+   * @param schemaVersion the log schema version
+   * @return the list of log appenders
+   */
+  List<T> findByAppIdAndSchemaVersion(String appId, int schemaVersion);
 
 }

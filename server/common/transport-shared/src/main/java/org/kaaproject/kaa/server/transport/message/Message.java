@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transport.message;
 
 import org.kaaproject.kaa.server.transport.channel.ChannelAware;
@@ -21,31 +22,30 @@ import org.kaaproject.kaa.server.transport.platform.PlatformAware;
 /**
  * Represents a channel and platform aware message that is produced by transport
  * channels.
- * 
- * @author Andrew Shvayka
  *
+ * @author Andrew Shvayka
  */
 public interface Message extends ChannelAware, PlatformAware {
 
-    /**
-     * Returns the message builder.
-     * 
-     * @return the message builder
-     */
-    MessageBuilder getMessageBuilder();
+  /**
+   * Returns the message builder.
+   *
+   * @return the message builder
+   */
+  MessageBuilder getMessageBuilder();
 
-    /**
-     * Returns the error builder
-     * 
-     * @return the error builder
-     */
-    ErrorBuilder getErrorBuilder();
+  /**
+   * Returns the error builder.
+   *
+   * @return the error builder
+   */
+  ErrorBuilder getErrorBuilder();
 
-    /**
-     * Indicates that the message is encrypted.
-     * 
-     * @return true if the message is encrypted, false otherwise.
-     */
-    boolean isEncrypted();
+  /**
+   * Indicates that the message is encrypted.
+   *
+   * @return true if the message is encrypted, false otherwise.
+   */
+  boolean isEncrypted();
 
 }

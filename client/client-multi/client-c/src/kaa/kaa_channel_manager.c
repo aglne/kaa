@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,19 @@
  * limitations under the License.
  */
 
+#include "kaa_private.h"
+
 #include <stddef.h>
 #include <stdint.h>
 
-#include "platform/stdio.h"
-#include "platform/sock.h"
-#include <string.h>
 #include "kaa_channel_manager.h"
-
-#include "kaa_context.h"
 #include "collections/kaa_list.h"
 #include "utilities/kaa_log.h"
 #include "utilities/kaa_mem.h"
-#include "kaa_common_schema.h"
 #include "kaa_platform_common.h"
-#include "kaa_platform_protocol.h"
 #include "kaa_platform_utils.h"
-#include "platform-impl/posix/posix_kaa_failover_strategy.h"
-
-
-extern kaa_access_point_t *kaa_bootstrap_manager_get_operations_access_point(kaa_bootstrap_manager_t *self
-                                                                        , kaa_transport_protocol_id_t *protocol_info);
-
-extern kaa_access_point_t *kaa_bootstrap_manager_get_bootstrap_access_point(kaa_bootstrap_manager_t *self
-                                                                          , kaa_transport_protocol_id_t *protocol_id);
+// This header conflicts with stdio.h and should be put last
+#include "platform/sock.h"
 
 typedef struct {
     uint32_t                             channel_id;
@@ -52,13 +41,17 @@ typedef struct {
     uint16_t    channel_count;
 } kaa_sync_info_t;
 
-
+typedef struct {
+    kaa_auth_failure_fn callback;
+    void *context;
+} kaa_auth_failure_handler;
 
 struct kaa_channel_manager_t {
-    kaa_list_t         *transport_channels;
-    kaa_context_t      *kaa_context;
-    kaa_logger_t       *logger;
-    kaa_sync_info_t    sync_info;
+    kaa_list_t                  *transport_channels;
+    kaa_context_t               *kaa_context;
+    kaa_logger_t                *logger;
+    kaa_sync_info_t             sync_info;
+    kaa_auth_failure_handler    auth_failure_handler;
 };
 
 
@@ -95,23 +88,32 @@ static bool find_channel_by_protocol_id(/* current channel */void *data, /* chan
     return kaa_transport_protocol_id_equals((kaa_transport_protocol_id_t *)context, &channel_info);
 }
 
-kaa_error_t kaa_channel_manager_create(kaa_channel_manager_t **channel_manager_p
-                                     , kaa_context_t *context)
+kaa_error_t kaa_channel_manager_create(kaa_channel_manager_t **channel_manager_p,
+        kaa_context_t *context)
 {
-    KAA_RETURN_IF_NIL2(channel_manager_p, context, KAA_ERR_BADPARAM);
+    if (!channel_manager_p || !context) {
+        return KAA_ERR_BADPARAM;
+    }
 
-    *channel_manager_p = (kaa_channel_manager_t *) KAA_MALLOC(sizeof(kaa_channel_manager_t));
-    if (!(*channel_manager_p))
+    kaa_channel_manager_t *channel_manager = KAA_MALLOC(sizeof(kaa_channel_manager_t));
+    if (!channel_manager) {
         return KAA_ERR_NOMEM;
+    }
 
-    (*channel_manager_p)->transport_channels      = kaa_list_create();
-    KAA_RETURN_IF_NIL((*channel_manager_p)->transport_channels, KAA_ERR_NOMEM);
+    channel_manager->transport_channels = kaa_list_create();
+    if (!channel_manager->transport_channels) {
+        KAA_FREE(channel_manager);
+        return KAA_ERR_NOMEM;
+    }
 
-    (*channel_manager_p)->kaa_context             = context;
-    (*channel_manager_p)->sync_info.request_id    = 0;
-    (*channel_manager_p)->sync_info.is_up_to_date = false;
-    (*channel_manager_p)->logger                  = context->logger;
+    channel_manager->kaa_context                   = context;
+    channel_manager->sync_info.request_id          = 0;
+    channel_manager->sync_info.is_up_to_date       = false;
+    channel_manager->logger                        = context->logger;
+    channel_manager->auth_failure_handler.callback = NULL;
+    channel_manager->auth_failure_handler.context  = NULL;
 
+    *channel_manager_p = channel_manager;
     return KAA_ERR_NONE;
 }
 
@@ -136,7 +138,7 @@ kaa_error_t kaa_transport_channel_id_calculate(kaa_transport_channel_interface_t
 
     *channel_id = prime * (*channel_id) + (ptrdiff_t)channel->get_supported_services;
     size_t services_count = 0;
-    kaa_service_t *services = NULL;
+    const kaa_extension_id *services = NULL;
     channel->get_supported_services(channel->context, &services, &services_count);
     if (services) {
         size_t i = 0;
@@ -159,7 +161,7 @@ static bool is_bootstrap_service_supported(kaa_transport_channel_interface_t *ch
 {
     KAA_RETURN_IF_NIL(channel, false);
 
-    kaa_service_t *services;
+    const kaa_extension_id *services;
     size_t service_count;
     kaa_error_t error_code = channel->get_supported_services(channel->context
                                                            , &services
@@ -168,7 +170,7 @@ static bool is_bootstrap_service_supported(kaa_transport_channel_interface_t *ch
     if (!error_code) {
         size_t i = 0;
         for (; i < service_count; ++i) {
-            if (services[i] == KAA_SERVICE_BOOTSTRAP) {
+            if (services[i] == KAA_EXTENSION_BOOTSTRAP) {
                 return true;
             }
         }
@@ -316,23 +318,21 @@ kaa_error_t kaa_channel_manager_remove_transport_channel(kaa_channel_manager_t *
 }
 
 kaa_transport_channel_interface_t *kaa_channel_manager_get_transport_channel(kaa_channel_manager_t *self
-                                                                           , kaa_service_t service_type)
+                                                                           , kaa_extension_id service_type)
 {
     KAA_RETURN_IF_NIL(self, NULL);
 
-    kaa_error_t error_code = KAA_ERR_NONE;
-
     kaa_transport_channel_wrapper_t *channel_wrapper;
-    kaa_service_t *services;
+    const kaa_extension_id *services;
     size_t service_count;
 
     kaa_list_node_t *it = kaa_list_begin(self->transport_channels);
     while (it) {
-        channel_wrapper = (kaa_transport_channel_wrapper_t *) kaa_list_get_data(it);
+        channel_wrapper = kaa_list_get_data(it);
 
-        error_code = channel_wrapper->channel.get_supported_services(channel_wrapper->channel.context
-                                                                   , &services
-                                                                   , &service_count);
+        kaa_error_t error_code = channel_wrapper->channel.get_supported_services(channel_wrapper->channel.context,
+                                                                                 &services,
+                                                                                 &service_count);
         if (error_code || !services || !service_count) {
             KAA_LOG_WARN(self->kaa_context->logger, error_code, "Failed to retrieve list of supported services "
                                         "for transport channel [0x%08X]", channel_wrapper->channel_id);
@@ -351,7 +351,7 @@ kaa_transport_channel_interface_t *kaa_channel_manager_get_transport_channel(kaa
         it = kaa_list_next(it);
     }
 
-    KAA_LOG_WARN(self->kaa_context->logger, KAA_ERR_NOT_FOUND,
+    KAA_LOG_DEBUG(self->kaa_context->logger, KAA_ERR_NOT_FOUND,
             "Failed to find transport channel for service %u", service_type);
 
     return NULL;
@@ -396,7 +396,7 @@ kaa_error_t kaa_channel_manager_bootstrap_request_serialize(kaa_channel_manager_
 
     if (self->sync_info.payload_size > 0 && self->sync_info.channel_count > 0) {
         error_code = kaa_platform_message_write_extension_header(writer
-                                                               , KAA_BOOTSTRAP_EXTENSION_TYPE
+                                                               , KAA_EXTENSION_BOOTSTRAP
                                                                , 0
                                                                , self->sync_info.payload_size);
         KAA_RETURN_IF_ERR(error_code);
@@ -404,7 +404,8 @@ kaa_error_t kaa_channel_manager_bootstrap_request_serialize(kaa_channel_manager_
         uint16_t network_order_16;
         uint32_t network_order_32;
 
-        network_order_16 = KAA_HTONS(++self->sync_info.request_id);
+        ++self->sync_info.request_id;
+        network_order_16 = KAA_HTONS(self->sync_info.request_id);
         error_code = kaa_platform_message_write(writer, &network_order_16, sizeof(uint16_t));
         KAA_RETURN_IF_ERR(error_code);
 
@@ -451,13 +452,12 @@ kaa_error_t kaa_channel_manager_on_new_access_point(kaa_channel_manager_t *self
 {
     KAA_RETURN_IF_NIL3(self, protocol_id, access_point, KAA_ERR_BADPARAM);
 
-    kaa_transport_channel_wrapper_t *channel_wrapper;
     kaa_list_node_t *channel_it = kaa_list_find_next(kaa_list_begin(self->transport_channels)
                                                    , &find_channel_by_protocol_id
                                                    , protocol_id);
 
     while (channel_it) {
-        channel_wrapper = kaa_list_get_data(channel_it);
+        kaa_transport_channel_wrapper_t *channel_wrapper = kaa_list_get_data(channel_it);
         if (channel_wrapper->server_type == server_type) {
             KAA_LOG_TRACE(self->kaa_context->logger, KAA_ERR_NONE, "Set new %s access point [0x%08X] for channel [0x%08X] "
                                  "(protocol: id=0x%08X, version=%u)"
@@ -473,4 +473,25 @@ kaa_error_t kaa_channel_manager_on_new_access_point(kaa_channel_manager_t *self
     }
 
     return KAA_ERR_NONE;
+}
+
+void kaa_channel_manager_set_auth_failure_handler(kaa_channel_manager_t *self,
+        kaa_auth_failure_fn handler, void *context)
+{
+    if (!self) {
+        return;
+    }
+
+    self->auth_failure_handler.callback = handler;
+    self->auth_failure_handler.context  = context;
+}
+
+void kaa_channel_manager_process_auth_failure(kaa_channel_manager_t *self,
+        kaa_auth_failure_reason reason)
+{
+    if (!self || !self->auth_failure_handler.callback) {
+        return;
+    }
+
+    self->auth_failure_handler.callback(reason, self->auth_failure_handler.context);
 }

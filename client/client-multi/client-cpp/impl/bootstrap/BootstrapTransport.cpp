@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@
 
 namespace kaa {
 
-BootstrapTransport::BootstrapTransport(IKaaChannelManager& channelManager, IBootstrapManager &bootstrapManager)
-    : AbstractKaaTransport(channelManager)
+BootstrapTransport::BootstrapTransport(IKaaChannelManager& channelManager, IBootstrapManager &bootstrapManager, IKaaClientContext &context)
+    : AbstractKaaTransport(channelManager, context)
     , requestId_(0)
     , bootstrapManager_(bootstrapManager)
 {

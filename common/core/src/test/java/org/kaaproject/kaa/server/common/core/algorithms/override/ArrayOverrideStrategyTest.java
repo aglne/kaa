@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,15 @@ import org.junit.Test;
 
 public class ArrayOverrideStrategyTest {
 
-    @Test
-    public void testGetByNameSuccessForCorrectName() {
-        ArrayOverrideStrategy arrayMergeStrategy = ArrayOverrideStrategy.getByName(ArrayOverrideStrategy.APPEND.getName());
-        Assert.assertTrue(ArrayOverrideStrategy.APPEND == arrayMergeStrategy);
-    }
+  @Test
+  public void testGetByNameSuccessForCorrectName() {
+    ArrayOverrideStrategy arrayMergeStrategy = ArrayOverrideStrategy.getByName(ArrayOverrideStrategy.APPEND.getName());
+    Assert.assertTrue(ArrayOverrideStrategy.APPEND == arrayMergeStrategy);
+  }
 
-    @Test
-    public void testGetByNameFailsForIncorrectName() {
-        ArrayOverrideStrategy arrayMergeStrategy = ArrayOverrideStrategy.getByName("incorrect_name");
-        Assert.assertNull(arrayMergeStrategy);
-    }
+  @Test
+  public void testGetByNameFailsForIncorrectName() {
+    ArrayOverrideStrategy arrayMergeStrategy = ArrayOverrideStrategy.getByName("incorrect_name");
+    Assert.assertNull(arrayMergeStrategy);
+  }
 }

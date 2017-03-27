@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package org.kaaproject.kaa.server.common.dao.schema;
 
 public class EventSchemaException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public EventSchemaException(String message) {
-        super(message);
-    }
+  public EventSchemaException(String message) {
+    super(message);
+  }
 
-    public EventSchemaException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public EventSchemaException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

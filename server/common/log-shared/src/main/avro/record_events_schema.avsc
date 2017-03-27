@@ -46,6 +46,15 @@
                                 },
                                 "null"
                             ]
+                        },
+                        {
+                            "name":"logSchemaVersion",
+                            "type":[
+                                {
+                                    "type":"int"
+                                },
+                                "null"
+                            ]
                         }
                     ]
                 },
@@ -70,6 +79,42 @@
                     "type":"bytes"
                 }
             }
+        },
+        {
+            "name":"clientProfileBody",
+            "type":[
+                {
+                    "type":"string"
+                },
+                "null"
+            ]
+        },
+        {
+            "name":"clientSchemaId",
+            "type":[
+                {
+                    "type":"string"
+                },
+                "null"
+            ]
+        },
+        {
+            "name":"serverProfileBody",
+            "type":[
+                {
+                    "type":"string"
+                },
+                "null"
+            ]
+        },
+        {
+            "name":"serverSchemaId",
+            "type":[
+                {
+                    "type":"string"
+                },
+                "null"
+            ]
         }
     ]
 }

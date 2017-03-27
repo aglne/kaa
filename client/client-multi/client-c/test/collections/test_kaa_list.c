@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,37 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <time.h>
 
-#include "../kaa_test.h"
+#include "kaa_test.h"
 #include "collections/kaa_list.h"
 #include "utilities/kaa_log.h"
 #include "utilities/kaa_mem.h"
 
-static kaa_logger_t *logger = NULL;
+typedef struct {
+    uint64_t id;
+} test_list_node_t;
 
-void test_list_create()
+static bool test_kaa_list_predicate(void *node_1, void *node_2)
 {
-    KAA_TRACE_IN(logger);
+    test_list_node_t *wrapper_1 = (test_list_node_t *)node_1;
+    test_list_node_t *wrapper_2 = (test_list_node_t *)node_2;
+    return wrapper_1->id < wrapper_2->id;
+}
 
+static uint64_t test_kaa_list_hash(void *node)
+{
+    test_list_node_t *wrapper = (test_list_node_t *)node;
+    return wrapper->id;
+}
+
+
+static void test_list_create()
+{
     kaa_list_t *list = kaa_list_create();
     ASSERT_NOT_NULL(list);
 
@@ -37,21 +53,17 @@ void test_list_create()
     ASSERT_NULL(kaa_list_back(list));
 
     kaa_list_destroy(list, NULL);
-
-    KAA_TRACE_OUT(logger);
 }
 
-void test_list_push_front()
+static void test_list_push_front()
 {
-    KAA_TRACE_IN(logger);
-
     kaa_list_t *list = kaa_list_create();
     ASSERT_NOT_NULL(list);
 
     int32_t *number;
-    int node_number = 2;
-    for (int i = 0; i < node_number; ++i) {
-        number = (int32_t *)KAA_MALLOC(sizeof(int32_t *));
+    size_t node_number = 2;
+    for (size_t i = 0; i < node_number; ++i) {
+        number = KAA_MALLOC(sizeof(int32_t *));
         ASSERT_NOT_NULL(number);
         *number = rand();
         kaa_list_push_front(list, number);
@@ -65,21 +77,17 @@ void test_list_push_front()
     ASSERT_EQUAL((*(int32_t *)kaa_list_get_data(kaa_list_begin(list))), *number);
 
     kaa_list_destroy(list, NULL);
-
-    KAA_TRACE_OUT(logger);
 }
 
-void test_list_push_back()
+static void test_list_push_back()
 {
-    KAA_TRACE_IN(logger);
-
     kaa_list_t *list = kaa_list_create();
     ASSERT_NOT_NULL(list);
 
     int32_t *number;
     int node_number = 2;
     for (int i = 0; i < node_number; ++i) {
-        number = (int32_t *)KAA_MALLOC(sizeof(int32_t *));
+        number = KAA_MALLOC(sizeof(int32_t *));
         ASSERT_NOT_NULL(number);
         *number = rand();
         kaa_list_push_back(list, number);
@@ -89,26 +97,84 @@ void test_list_push_back()
     ASSERT_EQUAL((*(int32_t *)kaa_list_get_data(kaa_list_back(list))), *number);
 
     kaa_list_destroy(list, NULL);
-
-    KAA_TRACE_OUT(logger);
 }
 
-void test_process_data(int32_t *value, int32_t *new_value)
+static void test_list_sort()
+{
+    kaa_list_t *list = kaa_list_create();
+    ASSERT_NOT_NULL(list);
+
+    uint64_t node_number = 100;
+    for (uint64_t i = 0; i < node_number; ++i) {
+        test_list_node_t *node = KAA_MALLOC(sizeof(test_list_node_t));
+        ASSERT_NOT_NULL(node);
+        node->id = (uint64_t) rand();
+        kaa_list_push_back(list, node);
+    }
+
+    ASSERT_EQUAL(kaa_list_get_size(list), node_number);
+
+    kaa_list_sort(list,&test_kaa_list_predicate);
+    kaa_list_node_t *it,*next;
+    it = kaa_list_begin(list);
+    next = kaa_list_next(it);
+    while (it && next) {
+        ASSERT_TRUE(((test_list_node_t*)kaa_list_get_data(it))->id <=
+                ((test_list_node_t*)kaa_list_get_data(next))->id);
+        it = next;
+        next = kaa_list_next(it);
+    }
+    kaa_list_destroy(list, NULL);
+}
+
+static void test_list_empty_sort()
+{
+    /* Purpose of this test is to show that no crash occur if
+     * list was initially empty.
+     */
+
+    kaa_list_t *list = kaa_list_create();
+    ASSERT_NOT_NULL(list);
+    kaa_list_sort(list, &test_kaa_list_predicate);
+    kaa_list_destroy(list, NULL);
+}
+
+
+static void test_list_hash()
+{
+    kaa_list_t *list = kaa_list_create();
+    ASSERT_NOT_NULL(list);
+
+    uint64_t node_number = 100;
+    for (uint64_t i = 0; i < node_number; ++i) {
+        test_list_node_t *node = KAA_MALLOC(sizeof(test_list_node_t));
+        ASSERT_NOT_NULL(node);
+        node->id = (uint64_t) node_number - i;
+        kaa_list_push_back(list, node);
+    }
+
+    ASSERT_EQUAL(kaa_list_get_size(list), node_number);
+
+    kaa_list_sort(list,&test_kaa_list_predicate);
+
+    ASSERT_EQUAL(kaa_list_hash(list,&test_kaa_list_hash),-974344717);
+
+    kaa_list_destroy(list, NULL);
+}
+
+static void test_process_data(int32_t *value, int32_t *new_value)
 {
     *value = *new_value;
 }
 
-void test_list_for_each()
+static void test_list_for_each()
 {
-    KAA_TRACE_IN(logger);
-
     kaa_list_t *list = kaa_list_create();
     ASSERT_NOT_NULL(list);
 
-    int32_t *number1_ptr;
     int node_number = 4;
     for (int i = 0; i < node_number; ++i) {
-        number1_ptr = (int32_t *)KAA_MALLOC(sizeof(int32_t *));
+        int32_t *number1_ptr = KAA_MALLOC(sizeof(int32_t *));
         ASSERT_NOT_NULL(number1_ptr);
         *number1_ptr = rand();
         kaa_list_push_back(list, number1_ptr);
@@ -124,33 +190,25 @@ void test_list_for_each()
     }
 
     kaa_list_destroy(list, NULL);
-
-    KAA_TRACE_OUT(logger);
 }
 
-int test_init()
+static int test_init(void)
 {
     srand(time(NULL));
-
-    kaa_error_t error = kaa_log_create(&logger, KAA_MAX_LOG_MESSAGE_LENGTH, KAA_MAX_LOG_LEVEL, NULL);
-    if (error || !logger)
-        return error;
-
     return 0;
 }
 
-int test_deinit(void)
+static int test_deinit(void)
 {
-    kaa_log_destroy(logger);
-
     return 0;
 }
 
-KAA_SUITE_MAIN(List, test_init, test_deinit
-        ,
+KAA_SUITE_MAIN(List, test_init, test_deinit,
         KAA_TEST_CASE(list_create, test_list_create)
         KAA_TEST_CASE(list_push_front, test_list_push_front)
         KAA_TEST_CASE(list_push_back, test_list_push_back)
         KAA_TEST_CASE(list_for_each, test_list_for_each)
-
+        KAA_TEST_CASE(list_sort, test_list_sort)
+        KAA_TEST_CASE(list_sort, test_list_empty_sort)
+        KAA_TEST_CASE(list_hash, test_list_hash)
 )

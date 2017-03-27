@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,18 @@ typedef struct {
 typedef struct
 {
     uint32_t        event_seq_n;
-    uint32_t        config_seq_n;
-    uint32_t        notification_seq_n;
-    uint16_t        log_bucket_id;
     bool            is_registered;
     bool            is_attached;
+    bool            is_updated;
     kaa_digest      endpoint_public_key_hash;
     kaa_digest      profile_hash;
+    bool            profile_needs_resync;   /**< Indicates that profile should be resynced */
 
-    kaa_list_t      *topic_states;
-    char *          endpoint_access_token;
+    kaa_list_t      *topic_states;          /**< States of topics received */
+    kaa_list_t      *topics;                /**< Whole set of topics */
+    int32_t         topic_list_hash;        /**< List hash */
+    char            *endpoint_access_token;
+    bool            has_update; /**< Indicates that status was changed on the client size */
 } kaa_status_t;
 
 #endif

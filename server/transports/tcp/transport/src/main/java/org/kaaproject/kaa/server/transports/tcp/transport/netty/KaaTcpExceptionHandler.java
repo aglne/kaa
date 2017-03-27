@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,26 +30,25 @@ import org.slf4j.LoggerFactory;
 /**
  * KaaTcpExceptionHandler Class. Used to generate Kaa Tcp response in case of
  * error during Kaa Tcp request processing.
- *
  */
 public class KaaTcpExceptionHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(KaaTcpExceptionHandler.class);
+  private static final Logger LOG = LoggerFactory
+      .getLogger(KaaTcpExceptionHandler.class);
 
-    @Override
-    public final void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause)
-            throws Exception {
-        LOG.error("Exception caught", cause);
-        DisconnectReason reason = null;
-        if (cause instanceof BadRequestException) {
-            reason = DisconnectReason.BAD_REQUEST;
-        } else {
-            reason = DisconnectReason.INTERNAL_ERROR;
-        }
-        Disconnect message = new Disconnect(reason);
-        ChannelFuture future = ctx.writeAndFlush(message.getFrame().array());
-        future.addListener(ChannelFutureListener.CLOSE);
-        ctx.close();
+  @Override
+  public final void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause)
+      throws Exception {
+    LOG.error("Exception caught", cause);
+    DisconnectReason reason = null;
+    if (cause instanceof BadRequestException) {
+      reason = DisconnectReason.BAD_REQUEST;
+    } else {
+      reason = DisconnectReason.INTERNAL_ERROR;
     }
+    Disconnect message = new Disconnect(reason);
+    ChannelFuture future = ctx.writeAndFlush(message.getFrame().array());
+    future.addListener(ChannelFutureListener.CLOSE);
+    ctx.close();
+  }
 }

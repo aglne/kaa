@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
  */
 
 #include "kaa/configuration/ConfigurationTransport.hpp"
+
+#include <utility>
+
 #include "kaa/configuration/IConfigurationProcessor.hpp"
-#include "kaa/configuration/storage/IConfigurationPersistenceManager.hpp"
 #include "kaa/configuration/IConfigurationHashContainer.hpp"
 
 #ifdef KAA_USE_CONFIGURATION
@@ -25,13 +27,11 @@
 
 namespace kaa {
 
-ConfigurationTransport::ConfigurationTransport(IKaaChannelManager& channelManager, IConfigurationProcessor *configProcessor, IConfigurationHashContainer *hashContainer, IKaaClientStateStoragePtr status)
-    : AbstractKaaTransport(channelManager)
-    , configurationProcessor_(configProcessor)
-    , hashContainer_(hashContainer)
-{
-    setClientState(status);
-}
+ConfigurationTransport::ConfigurationTransport(IKaaChannelManager& channelManager, IKaaClientContext &context)
+    : AbstractKaaTransport(channelManager, context)
+    , configurationProcessor_(nullptr)
+    , hashContainer_(nullptr)
+{}
 
 void ConfigurationTransport::sync()
 {
@@ -40,26 +40,24 @@ void ConfigurationTransport::sync()
 
 std::shared_ptr<ConfigurationSyncRequest> ConfigurationTransport::createConfigurationRequest()
 {
-    if (!clientStatus_) {
-        throw KaaException("Can not generate ConfigurationSyncRequest: Status was not provided");
+    if (!hashContainer_) {
+        throw KaaException("Can not generate ConfigurationSyncRequest: configuration transport is not initialized");
     }
 
     std::shared_ptr<ConfigurationSyncRequest> request(new ConfigurationSyncRequest);
-    request->appStateSeqNumber = clientStatus_->getConfigurationSequenceNumber();
-    request->configurationHash.set_bytes(hashContainer_->getConfigurationHash());
+    request->configurationHash = hashContainer_->getConfigurationHash();
     request->resyncOnly.set_bool(true); // Only full resyncs are currently supported
     return request;
 }
 
 void ConfigurationTransport::onConfigurationResponse(const ConfigurationSyncResponse &response)
 {
+    if (configurationProcessor_ && !response.confDeltaBody.is_null()) {
+        configurationProcessor_->processConfigurationData(response.confDeltaBody.get_bytes()
+                                                        , response.responseStatus == SyncResponseStatus::RESYNC);
+    }
+
     if (response.responseStatus != SyncResponseStatus::NO_DELTA) {
-        clientStatus_->setConfigurationSequenceNumber(response.appStateSeqNumber);
-        if (!response.confDeltaBody.is_null()) {
-            std::vector<std::uint8_t> data = response.confDeltaBody.get_bytes();
-            configurationProcessor_->processConfigurationData(data.data(), data.size()
-                    , response.responseStatus == SyncResponseStatus::RESYNC);
-        }
         syncAck();
     }
 }

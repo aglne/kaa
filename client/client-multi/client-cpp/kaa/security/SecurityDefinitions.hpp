@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@
 
 namespace kaa {
 
-typedef Botan::MemoryVector<std::uint8_t> PublicKey;
+typedef Botan::secure_vector<std::uint8_t> PublicKey;
 typedef std::string                       PrivateKey;
 
 typedef Botan::SymmetricKey               SessionKey;
-typedef Botan::SecureVector<std::uint8_t> EncodedSessionKey;
+typedef Botan::secure_vector<std::uint8_t> EncodedSessionKey;
 
-typedef Botan::SecureVector<std::uint8_t> Signature;
+typedef Botan::secure_vector<std::uint8_t> Signature;
 
 class KeyPair
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,10 @@
 
 #include <chrono>
 #include <memory>
+#include <future>
+#include <list>
 #include <unordered_map>
+#include <cstdint>
 
 #include "kaa/KaaThread.hpp"
 #include "kaa/log/ILogStorage.hpp"
@@ -30,10 +33,13 @@
 #include "kaa/channel/IKaaChannelManager.hpp"
 #include "kaa/log/ILogFailoverCommand.hpp"
 #include "kaa/utils/KaaTimer.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
+class IExecutorContext;
 class LoggingTransport;
+class KaaClientProperties;
 
 typedef std::chrono::system_clock clock_t;
 
@@ -61,17 +67,39 @@ private:
  */
 class LogCollector : public ILogCollector, public ILogProcessor, public ILogFailoverCommand {
 public:
-    LogCollector(IKaaChannelManagerPtr manager);
+    LogCollector(IKaaChannelManagerPtr manager, IKaaClientContext &context);
 
-    virtual void addLogRecord(const KaaUserLogRecord& record);
+    virtual RecordFuture addLogRecord(const KaaUserLogRecord& record);
 
     virtual void setStorage(ILogStoragePtr storage);
     virtual void setUploadStrategy(ILogUploadStrategyPtr strategy);
 
-    virtual std::shared_ptr<LogSyncRequest> getLogUploadRequest();
-    virtual void onLogUploadResponse(const LogSyncResponse& response);
+    virtual void setLogDeliveryListener(ILogDeliveryListenerPtr listener) {
+        logDeliverylistener_ = listener;
+    }
 
-    void setTransport(LoggingTransport* transport);
+    virtual std::shared_ptr<LogSyncRequest> getLogUploadRequest();
+    virtual void onLogUploadResponse(const LogSyncResponse& response, std::size_t deliveryTime);
+
+    void setTransport(LoggingTransport* transport) {
+        transport_ = transport;
+    }
+
+private:
+    typedef std::shared_ptr<std::promise<RecordInfo>> DeliveryFuture;
+
+    struct RecordDeliveryInfo {
+        RecordDeliveryInfo(const DeliveryFuture& f, const RecordInfo& info)
+            : deliveryFuture_(f), recordInfo_(info) {}
+
+        DeliveryFuture deliveryFuture_;
+        RecordInfo     recordInfo_;
+    };
+
+    struct BucketWrapper {
+        BucketInfo                    bucketInfo_;
+        std::list<RecordDeliveryInfo> recordDeliveryInfoStorage_;
+    };
 
 private:
     virtual void retryLogUpload();
@@ -86,18 +114,25 @@ private:
     void addDeliveryTimeout(std::int32_t requestId);
     bool removeDeliveryTimeout(std::int32_t requestId);
 
-    void startTimeoutCheckTimer();
+    void startTimeoutTimer();
+    void startLogUploadCheckTimer();
 
     void processTimeout();
 
+    void rescheduleTimers();
+
+    bool isUploadAllowed();
+
+
+    void updateBucketInfo(const BucketInfo& bucketInfo, const RecordDeliveryInfo& recordInfo);
+    BucketInfo getBucketInfo(std::int32_t);
+    void notifyDeliveryFuturesOnSuccess(std::int32_t bucketId, std::size_t deliveryTime);
+    void removeBucketInfo(std::int32_t);
+
 private:
-    ILogStoragePtr    storage_;
-    KAA_MUTEX_DECLARE(storageGuard_);
-
-    ILogUploadStrategyPtr uploadStrategy_;
-
-    LoggingTransport* transport_;
-    KAA_MUTEX_DECLARE(transportGuard_);
+    ILogStoragePtr           storage_;
+    ILogUploadStrategyPtr    uploadStrategy_;
+    LoggingTransport*        transport_;
 
     IKaaChannelManagerPtr    channelManager_;
 
@@ -106,8 +141,15 @@ private:
     KAA_MUTEX_DECLARE(timeoutsGuard_);
 
     KaaTimer<void ()>        logUploadCheckTimer_;
-    KaaTimer<void ()>        uploadTimer_;
+    KaaTimer<void ()>        scheduledUploadTimer_;
     KaaTimer<void ()>        timeoutTimer_;
+
+    ILogDeliveryListenerPtr logDeliverylistener_;
+
+    std::unordered_map<std::int32_t, BucketWrapper> bucketInfoStorage_;
+    KAA_MUTEX_DECLARE(bucketInfoStorageGuard_);
+
+    IKaaClientContext &context_;
 };
 
 }  // namespace kaa

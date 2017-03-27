@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef KAA_NOTIFICATION_RECEIVER
 #define KAA_NOTIFICATION_RECEIVER
 
-#include "../gen/kaa_notification_definitions.h"
+#include "gen/kaa_notification_definitions.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,77 +18,77 @@ package org.kaaproject.kaa.server.common.dao.schema;
 
 import org.kaaproject.kaa.common.dto.event.EventClassType;
 
-public final class EventSchemaMetadata {
+public class EventSchemaMetadata {
 
-    private String fqn;
-    private EventClassType type;
-    private String schema;
+  private String fqn;
+  private EventClassType type;
+  private String ctlSchemaId;
 
-    public String getFqn() {
-        return fqn;
+  public String getCtlSchemaId() {
+    return ctlSchemaId;
+  }
+
+  public void setCtlSchemaId(String ctlSchemaId) {
+    this.ctlSchemaId = ctlSchemaId;
+  }
+
+  public String getFqn() {
+    return fqn;
+  }
+
+  public void setFqn(String fqn) {
+    this.fqn = fqn;
+  }
+
+  public EventClassType getType() {
+    return type;
+  }
+
+  public void setType(EventClassType type) {
+    this.type = type;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((fqn == null) ? 0 : fqn.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + ((ctlSchemaId == null) ? 0 : ctlSchemaId.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
     }
-
-    public void setFqn(String fqn) {
-        this.fqn = fqn;
+    if (obj == null) {
+      return false;
     }
-
-    public EventClassType getType() {
-        return type;
+    if (getClass() != obj.getClass()) {
+      return false;
     }
-
-    public void setType(EventClassType type) {
-        this.type = type;
+    EventSchemaMetadata other = (EventSchemaMetadata) obj;
+    if (fqn == null) {
+      if (other.fqn != null) {
+        return false;
+      }
+    } else if (!fqn.equals(other.fqn)) {
+      return false;
     }
-
-    public String getSchema() {
-        return schema;
+    if (type != other.type) {
+      return false;
     }
-
-    public void setSchema(String schema) {
-        this.schema = schema;
+    if (ctlSchemaId == null) {
+      if (other.ctlSchemaId != null) {
+        return false;
+      }
+    } else if (!ctlSchemaId.equals(other.ctlSchemaId)) {
+      return false;
     }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((fqn == null) ? 0 : fqn.hashCode());
-        result = prime * result + ((schema == null) ? 0 : schema.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        EventSchemaMetadata other = (EventSchemaMetadata) obj;
-        if (fqn == null) {
-            if (other.fqn != null) {
-                return false;
-            }
-        } else if (!fqn.equals(other.fqn)) {
-            return false;
-        }
-        if (schema == null) {
-            if (other.schema != null) {
-                return false;
-            }
-        } else if (!schema.equals(other.schema)) {
-            return false;
-        }
-        if (type != other.type) {
-            return false;
-        }
-        return true;
-    }
+    return true;
+  }
 
 
 }

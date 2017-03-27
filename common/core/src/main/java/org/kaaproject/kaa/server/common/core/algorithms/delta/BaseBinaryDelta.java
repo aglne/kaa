@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,35 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.common.core.algorithms.delta;
 
 import java.io.IOException;
 
 /**
- * Simple container for resync delta encoded using base schema
- * 
- * @author Andrew Shvayka
+ * Simple container for resync delta encoded using base schema.
  *
+ * @author Andrew Shvayka
  */
-public class BaseBinaryDelta implements RawBinaryDelta{
+public class BaseBinaryDelta implements RawBinaryDelta {
 
-    private static final long serialVersionUID = -3689001649508558531L;
-    
-    private final byte[] data;
-    
-    public BaseBinaryDelta(byte[] data) {
-        super();
-        this.data = data;
-    }
+  private static final long serialVersionUID = -3689001649508558531L;
 
-    @Override
-    public byte[] getData() throws IOException {
-        return data;
-    }
+  private final byte[] data;
 
-    @Override
-    public boolean hasChanges() {
-        return true;
-    }
+  public BaseBinaryDelta(byte[] data) {
+    super();
+    this.data = data;
+  }
+
+  @Override
+  public byte[] getData() throws IOException {
+    return data;
+  }
+
+  @Override
+  public boolean hasChanges() {
+    return true;
+  }
 
 }

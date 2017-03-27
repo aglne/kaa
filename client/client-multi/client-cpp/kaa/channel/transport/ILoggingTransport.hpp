@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,9 @@ public:
      *
      * @param response the response from the server
      * @see LogSyncResponse
-     *
+     * @param deliveryTime The time point the log was delivered at
      */
-    virtual void onLogSyncResponse(const LogSyncResponse& response) = 0;
+    virtual void onLogSyncResponse(const LogSyncResponse& response, std::size_t deliveryTime) = 0;
 
     virtual ~ILoggingTransport() {}
 };

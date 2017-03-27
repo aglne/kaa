@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,34 @@ package org.kaaproject.kaa.server.common;
 import org.apache.commons.codec.binary.Base64;
 import org.kaaproject.kaa.common.dto.EndpointProfileDto;
 
-public abstract class Base64Util {
+public class Base64Util {
 
-    private static final String UNKNOWN = "Unknown";
+  private static final String UNKNOWN = "Unknown";
 
-    public static String encode(byte[] data){
-        return Base64.encodeBase64String(data);
+  private Base64Util() {
+  }
+
+  public static String encode(byte[] data) {
+    return Base64.encodeBase64String(data);
+  }
+
+  /**
+   * Encode endpoint profile to base64.
+   *
+   * @param profile is profile for encoding
+   * @return base64 string
+   */
+  public static String encode(EndpointProfileDto profile) {
+    if (profile != null && profile.getEndpointKeyHash() != null) {
+      return encode(profile.getEndpointKeyHash());
+    } else {
+      return UNKNOWN;
     }
+  }
 
-    public static String encode(EndpointProfileDto profile){
-        if(profile != null && profile.getEndpointKeyHash() != null){
-            return encode(profile.getEndpointKeyHash());
-        }else{
-            return UNKNOWN;
-        }
-    }
-
-    public static byte[] decode(String base64String) {
-        return Base64.decodeBase64(base64String);
-    }
+  public static byte[] decode(String base64String) {
+    return Base64.decodeBase64(base64String);
+  }
 
 
 }

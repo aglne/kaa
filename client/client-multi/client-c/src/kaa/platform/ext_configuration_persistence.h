@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,12 @@ void ext_configuration_read(char **buffer, size_t *buffer_size, bool *needs_deal
  */
 void ext_configuration_store(const char *buffer, size_t buffer_size);
 
+
+/**
+ * @brief Called when Kaa need to remove configuration data.
+ *
+ */
+void ext_configuration_delete(void);
 
 
 #ifdef __cplusplus

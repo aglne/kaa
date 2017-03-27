@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,27 @@ package org.kaaproject.kaa.client.channel;
 /**
  * Demultiplexer is responsible for deserializing of response data and notifying
  * appropriate services.
- *
  * Required in user implementation of any kind of data channel.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface KaaDataDemultiplexer {
 
-    /**
-     * Processes the given response bytes.
-     *
-     * @param response buffer which to be processed.
-     *
-     */
-    void processResponse(byte [] response) throws Exception;
+  /**
+   * Processes the given response bytes.
+   *
+   * @param response buffer which to be processed.
+   * @throws Exception the exception
+   */
+  void processResponse(byte[] response) throws Exception;
 
-    /**
-     * Routines to be executed before response will be processed
-     */
-    void preProcess();
+  /**
+   * Routines to be executed before response will be processed.
+   */
+  void preProcess();
 
-    /**
-     * Define routines to be executed after response is processed.
-     */
-    void postProcess();
+  /**
+   * Define routines to be executed after response is processed.
+   */
+  void postProcess();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@ import org.kaaproject.kaa.server.common.core.schema.KaaSchema;
  */
 public interface SchemaCreator<T extends KaaSchema> {
 
-    /**
-     * Gets protocol schema.
-     *
-     * @param configSchema the config schema
-     * @return the schema
-     * @throws SchemaCreationException the protocol schema exception
-     */
-    T createSchema(DataSchema configSchema) throws SchemaCreationException;
+  /**
+   * Gets protocol schema.
+   *
+   * @param configSchema the config schema
+   * @return the schema
+   * @throws SchemaCreationException the protocol schema exception
+   */
+  T createSchema(DataSchema configSchema) throws SchemaCreationException;
 }

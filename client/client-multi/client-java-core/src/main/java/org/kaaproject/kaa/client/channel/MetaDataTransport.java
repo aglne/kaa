@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,48 +25,42 @@ import org.kaaproject.kaa.common.hash.EndpointObjectHash;
  * Transport for general client's state.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface MetaDataTransport {
 
-    /**
-     * Creates new Meta data request.
-     *
-     * @return new Meta data  request.
-     *
-     */
-    SyncRequestMetaData createMetaDataRequest();
+  /**
+   * Creates new Meta data request.
+   *
+   * @return new Meta data  request.
+   */
+  SyncRequestMetaData createMetaDataRequest();
 
-    /**
-     * Sets the given client's properties.
-     *
-     * @param properties the client's properties to be set.
-     *
-     */
-    void setClientProperties(KaaClientProperties properties);
+  /**
+   * Sets the given client's properties.
+   *
+   * @param properties the client's properties to be set.
+   */
+  void setClientProperties(KaaClientProperties properties);
 
-    /**
-     * Sets the given client's state .
-     *
-     * @param state the client's state to be set.
-     *
-     */
-    void setClientState(KaaClientState state);
+  /**
+   * Sets the given client's state .
+   *
+   * @param state the client's state to be set.
+   */
+  void setClientState(KaaClientState state);
 
-    /**
-     * Sets the given public key hash.
-     *
-     * @param hash the public key hash to be set.
-     *
-     */
-    void setEndpointPublicKeyhash(EndpointObjectHash hash);
+  /**
+   * Sets the given public key hash.
+   *
+   * @param hash the public key hash to be set.
+   */
+  void setEndpointPublicKeyhash(EndpointObjectHash hash);
 
-    /**
-     * Sets the given response timeout.
-     *
-     * @param timeout the response timeout to be set.
-     *
-     */
-    void setTimeout(long timeout);
+  /**
+   * Sets the given response timeout.
+   *
+   * @param timeout the response timeout to be set.
+   */
+  void setTimeout(long timeout);
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package org.kaaproject.kaa.server.common.core.configuration;
 
 import org.kaaproject.kaa.server.common.core.schema.ProtocolSchema;
 
-public class ProtocolData extends AbstractConfigurationData<ProtocolSchema>{
+public class ProtocolData extends AbstractConfigurationData<ProtocolSchema> {
 
-    private static final long serialVersionUID = 9106249492676940634L;
+  private static final long serialVersionUID = 9106249492676940634L;
 
-    public ProtocolData(ProtocolSchema schema, String data) {
-        super(schema, data);
-    }
+  public ProtocolData(ProtocolSchema schema, String data) {
+    super(schema, data);
+  }
 
 
 }

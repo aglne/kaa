@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package org.kaaproject.kaa.client.util;
 
 public interface Base64 {
 
-    byte[] decodeBase64(final byte[] base64Data);
-    
-    byte[] decodeBase64(final String base64String);
-    
-    byte[] encodeBase64(final byte[] binaryData);
+  byte[] decodeBase64(final byte[] base64Data);
+
+  byte[] decodeBase64(final String base64String);
+
+  byte[] encodeBase64(final byte[] binaryData);
 }

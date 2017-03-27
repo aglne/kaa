@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transport.channel;
 
 import java.util.UUID;
@@ -21,29 +22,29 @@ import java.util.UUID;
  * A marker interface indicating that the class has a basic knowledge about the
  * related channel - it's {@link UUID}, {@link ChannelType} and
  * {@link ChannelContext}.
- * 
+ *
  * @author Andrew Shvayka
  */
 public interface ChannelAware {
 
-    /**
-     * Gets the channel {@link UUID}.
-     *
-     * @return the channel uuid
-     */
-    UUID getChannelUuid();
+  /**
+   * Gets the channel {@link UUID}.
+   *
+   * @return the channel uuid
+   */
+  UUID getChannelUuid();
 
-    /**
-     * Gets the {@link ChannelType}.
-     *
-     * @return the channel type
-     */
-    ChannelType getChannelType();
+  /**
+   * Gets the {@link ChannelType}.
+   *
+   * @return the channel type
+   */
+  ChannelType getChannelType();
 
-    /**
-     * Gets the channel context.
-     *
-     * @return the channel context
-     */
-    ChannelContext getChannelContext();
+  /**
+   * Gets the channel context.
+   *
+   * @return the channel context
+   */
+  ChannelContext getChannelContext();
 }

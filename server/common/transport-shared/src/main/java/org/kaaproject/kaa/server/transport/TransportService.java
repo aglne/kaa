@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,40 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transport;
 
 /**
  * Responsible for lookup, initialization and life-cycle management of the
- * available transport implementations
- * 
- * @author Andrew Shvayka
+ * available transport implementations.
  *
+ * @author Andrew Shvayka
  */
 public interface TransportService {
 
-    /**
-     * Look up the available transport implementations and initialize them
-     */
-    void lookupAndInit();
+  /**
+   * Look up the available transport implementations and initialize them.
+   */
+  void lookupAndInit();
 
-    /**
-     * Start all the initialized transports.
-     */
-    void start();
+  /**
+   * Start all the initialized transports.
+   */
+  void start();
 
-    /**
-     * Stop all the initialized transports.
-     */
-    void stop();
+  /**
+   * Stop all the initialized transports.
+   */
+  void stop();
 
-    /**
-     * Adds a listener for the {@link Transport} state updates
-     */
-    boolean addListener(TransportUpdateListener listener);
+  /**
+   * Adds a listener for the {@link Transport} state updates.
+   */
+  boolean addListener(TransportUpdateListener listener);
 
-    /**
-     * Removes the {@link Transport} state updates listener
-     */
-    boolean removeListener(TransportUpdateListener listener);
+  /**
+   * Removes the {@link Transport} state updates listener.
+   */
+  boolean removeListener(TransportUpdateListener listener);
 
 }

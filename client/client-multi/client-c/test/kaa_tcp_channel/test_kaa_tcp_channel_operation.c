@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,31 @@
  * @file test_kaa_tcp_channel_operation.c
  */
 
+#define _POSIX_C_SOURCE 200112L
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <netdb.h>
 #include <string.h>
 
-#include "../kaa_test.h"
+#include "kaa_test.h"
 
 #include "utilities/kaa_log.h"
 #include "utilities/kaa_mem.h"
 #include "platform/ext_transport_channel.h"
 #include "platform/ext_tcp_utils.h"
-#include "platform-impl/kaa_tcp_channel.h"
+#include "platform/ext_key_utils.h"
+#include "platform/ext_encryption_utils.h"
+#include "platform-impl/common/kaa_tcp_channel.h"
 #include "kaa_protocols/kaa_tcp/kaatcp_request.h"
+#include "extensions/bootstrap/kaa_bootstrap_manager.h"
+#include <kaa_common.h>
 
 #define ACCESS_POINT_SOCKET_FD 5
+#define EXPECTED_KEEPALIVE              200
+#define EXPECTED_PROTOCOL_ID            0x0231ad61
+#define EXPECTED_PROTOCOL_VERSION       1
 
-#define KEEPALIVE 1000
 
 typedef struct {
     bool        gethostbyaddr_requested; //
@@ -70,27 +77,29 @@ static void reset_access_point_test_info()
 
 static kaa_logger_t *logger = NULL;
 
-static char CONNACK[] = {0x20, 0x02, 0x00, 0x01};
+static uint8_t CONNACK[] = {0x20, 0x02, 0x00, 0x01};
 
-static char DISCONNECT_NONE[] = {0xE0, 0x02, 0x00, 0x00};
+static uint8_t DISCONNECT_NONE[] = {0xE0, 0x02, 0x00, 0x00};
 
-static char KAASYNC_OP_SERV[] = {0xf0, 0x0e, 0x00, 0x06, 'K', 'a','a','t','c','p',
-                                 0x01, 0x00, 0x00, 0x11, 0x34, 0x45};
-
-static char KAASYNC_OP[] = {0xF0, 0x13, 0x00, 0x06, 'K', 'a','a','t','c','p',
+static uint8_t KAASYNC_OP[] = {0xF0, 0x13, 0x00, 0x06, 'K', 'a','a','t','c','p',
                                    0x01, 0x00, 0x01, 0x10, 'K', 'a','a','t','c','p', 0x00};
 
 static char *KAASYNC_OP_MESSAGE = "Kaatcp";
 
-static char DISCONNECT_MESSAGE[] = {0xE0, 0x02, 0x00, 0x00};
+static uint8_t DISCONNECT_MESSAGE[] = {0xE0, 0x02, 0x00, 0x00};
 
-static char CONNECT_HEAD[] = {0x35, 0x46};
-static char CONNECT_PACK[] = {0x34, 0x45};
+static uint8_t CONNECT_HEAD[] = {0x35, 0x46};
+static uint8_t CONNECT_PACK[] = {0x34, 0x45};
 
-static char DESTINATION_SOCKADDR[]   = {0x02, 0x00, 0x26, 0xa0, 0xc0, 0xa8, 0x4d, 0x02,
+#ifdef __APPLE__
+static uint8_t DESTINATION_SOCKADDR[]   = {0x10, 0x02, 0x26, 0xa0, 0xc0, 0xa8, 0x4d, 0x02,
                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+#else
+static uint8_t DESTINATION_SOCKADDR[]   = {0x02, 0x00, 0x26, 0xa0, 0xc0, 0xa8, 0x4d, 0x02,
+                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+#endif
 
-static char CONNECTION_DATA[]   = { 0x00, 0x00, 0x01, 0x26, 0x30, 0x82, 0x01, 0x22,
+static uint8_t CONNECTION_DATA[]   = { 0x00, 0x00, 0x01, 0x26, 0x30, 0x82, 0x01, 0x22,
                                     0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86,
                                     0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00, 0x03,
                                     0x82, 0x01, 0x0F, 0x00, 0x30, 0x82, 0x01, 0x0A,
@@ -130,6 +139,28 @@ static char CONNECTION_DATA[]   = { 0x00, 0x00, 0x01, 0x26, 0x30, 0x82, 0x01, 0x
                                     0x00, 0x01, 0x00, 0x00, 0x00, 0x0C, 0x31, 0x39,
                                     0x32, 0x2E, 0x31, 0x36, 0x38, 0x2E, 0x37, 0x37,
                                     0x2E, 0x32, 0x00, 0x00, 0x26, 0xA0};
+                                    
+                                    
+#ifdef KAA_ENCRYPTION
+                             
+static uint8_t KAASYNC_OP_SERV_ENCRYPTED[] = { 
+    0xF0, 0x1C, 0x00, 0x06,  'K',  'a',  'a',  't',  'c',  'p', 0x01, 0x00, 0x00, 0x15, 0x34, 
+    0x45, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+#define KAASYNC_OP_SERV_DATA_OFFSET     14
+#define KAASYNC_OP_SERV_DATA_SIZE       2
+
+#else //KAA_ENCRYPTION
+
+static uint8_t KAASYNC_OP_SERV[] = { 0xf0, 0x0e, 0x00, 0x06, 'K', 'a','a','t','c','p', 0x01, 0x00, 0x00, 0x11, 0x34, 0x45 };
+
+#endif //KAA_ENCRYPTION                                    
+                                    
+static uint8_t *g_connect_sync_request;
+static size_t g_connect_sync_request_size;
+static uint8_t *g_kaasync_op_serv;
+static size_t g_kaasync_op_serv_size;
 
 kaa_error_t kaa_tcp_channel_event_callback_fn(void *context, kaa_tcp_channel_event_t event_type, kaa_fd_t fd);
 void test_set_access_point(kaa_transport_channel_interface_t *channel);
@@ -151,20 +182,20 @@ void test_sync_exchange(kaa_transport_channel_interface_t *channel);
 /*
  * Test channel creation and destroy.
  */
-void test_create_kaa_tcp_channel()
+void test_create_kaa_tcp_channel(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
 
     kaa_transport_channel_interface_t *channel = NULL;
     channel = KAA_CALLOC(1,sizeof(kaa_transport_channel_interface_t));
 
-    kaa_service_t operation_services[] = {
-            KAA_SERVICE_PROFILE,
-            KAA_SERVICE_USER,
-            KAA_SERVICE_EVENT,
-            KAA_SERVICE_LOGGING};
+    kaa_extension_id operation_services[] = {
+            KAA_EXTENSION_PROFILE,
+            KAA_EXTENSION_USER,
+            KAA_EXTENSION_EVENT,
+            KAA_EXTENSION_LOGGING};
 
     error_code = kaa_tcp_channel_create(channel, logger, operation_services, 4);
 
@@ -185,22 +216,20 @@ void test_create_kaa_tcp_channel()
     ASSERT_EQUAL(protocol_info.id, 0x56c8ff92);
     ASSERT_EQUAL(protocol_info.version, 1);
 
-    kaa_service_t *r_supported_services;
+    const kaa_extension_id *r_supported_services = NULL;
     size_t r_supported_service_count = 0;
     error_code = channel->get_supported_services(channel->context, &r_supported_services, &r_supported_service_count);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
     ASSERT_EQUAL(r_supported_service_count, 4);
-    ASSERT_EQUAL(r_supported_services[0], KAA_SERVICE_PROFILE);
-    ASSERT_EQUAL(r_supported_services[1], KAA_SERVICE_USER);
-    ASSERT_EQUAL(r_supported_services[2], KAA_SERVICE_EVENT);
-    ASSERT_EQUAL(r_supported_services[3], KAA_SERVICE_LOGGING);
+    ASSERT_EQUAL(r_supported_services[0], KAA_EXTENSION_PROFILE);
+    ASSERT_EQUAL(r_supported_services[1], KAA_EXTENSION_USER);
+    ASSERT_EQUAL(r_supported_services[2], KAA_EXTENSION_EVENT);
+    ASSERT_EQUAL(r_supported_services[3], KAA_EXTENSION_LOGGING);
 
     channel->destroy(channel->context);
 
     KAA_FREE(channel);
-
-    KAA_TRACE_OUT(logger);
 }
 
 
@@ -210,20 +239,20 @@ void test_create_kaa_tcp_channel()
  *  2. Authorize, send CONNECT and receive CONACK
  *  3. Receive Disconnect message, check connection drop and notify Bootstrap of AP failure
  */
-void test_kaa_tcp_channel_success_flow()
+void test_kaa_tcp_channel_success_flow(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
 
     kaa_transport_channel_interface_t *channel = NULL;
     channel = KAA_CALLOC(1,sizeof(kaa_transport_channel_interface_t));
 
-    kaa_service_t operation_services[] = {
-            KAA_SERVICE_PROFILE,
-            KAA_SERVICE_USER,
-            KAA_SERVICE_EVENT,
-            KAA_SERVICE_LOGGING};
+    kaa_extension_id operation_services[] = {
+            KAA_EXTENSION_PROFILE,
+            KAA_EXTENSION_USER,
+            KAA_EXTENSION_EVENT,
+            KAA_EXTENSION_LOGGING};
 
     error_code = kaa_tcp_channel_create(channel, logger, operation_services, 4);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
@@ -237,8 +266,6 @@ void test_kaa_tcp_channel_success_flow()
     channel->destroy(channel->context);
 
     KAA_FREE(channel);
-
-    KAA_TRACE_OUT(logger);
 }
 
 /**
@@ -248,20 +275,20 @@ void test_kaa_tcp_channel_success_flow()
  *  3. Call Sync for EVENT than EVENT,LOGGING, check send SYNC for EVENT,LOGGING, receive SYNC.
  *  4. Receive Disconnect message, check connection drop and notify Bootstrap manager of AP failure
  */
-void test_kaa_tcp_channel_sync_flow()
+void test_kaa_tcp_channel_sync_flow(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
 
     kaa_transport_channel_interface_t *channel = NULL;
     channel = KAA_CALLOC(1,sizeof(kaa_transport_channel_interface_t));
 
-    kaa_service_t operation_services[] = {
-            KAA_SERVICE_PROFILE,
-            KAA_SERVICE_USER,
-            KAA_SERVICE_EVENT,
-            KAA_SERVICE_LOGGING};
+    kaa_extension_id operation_services[] = {
+            KAA_EXTENSION_PROFILE,
+            KAA_EXTENSION_USER,
+            KAA_EXTENSION_EVENT,
+            KAA_EXTENSION_LOGGING};
 
     error_code = kaa_tcp_channel_create(channel, logger, operation_services, 4);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
@@ -271,13 +298,13 @@ void test_kaa_tcp_channel_sync_flow()
     test_check_channel_auth(channel);
 
     //Call sync
-    kaa_service_t services1[] = {KAA_SERVICE_PROFILE, KAA_SERVICE_USER};
+    kaa_extension_id services1[] = {KAA_EXTENSION_PROFILE, KAA_EXTENSION_USER};
     channel->sync_handler(channel->context, services1, 2);
 
-    kaa_service_t services2[] = {KAA_SERVICE_PROFILE, KAA_SERVICE_EVENT};
+    kaa_extension_id services2[] = {KAA_EXTENSION_PROFILE, KAA_EXTENSION_EVENT};
     channel->sync_handler(channel->context, services2, 2);
 
-    kaa_service_t services3[] = {KAA_SERVICE_LOGGING};
+    kaa_extension_id services3[] = {KAA_EXTENSION_LOGGING};
     channel->sync_handler(channel->context, services3, 1);
 
     //Check correct RD,WR operation, in this point we waiting for RD operations true
@@ -291,8 +318,6 @@ void test_kaa_tcp_channel_sync_flow()
     channel->destroy(channel->context);
 
     KAA_FREE(channel);
-
-    KAA_TRACE_OUT(logger);
 }
 
 /**
@@ -302,20 +327,20 @@ void test_kaa_tcp_channel_sync_flow()
  *  4. Imitate IO error on read.
  *  5. check disconnect notification
  */
-void test_kaa_tcp_channel_io_error_flow()
+void test_kaa_tcp_channel_io_error_flow(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
 
     kaa_transport_channel_interface_t *channel = NULL;
     channel = KAA_CALLOC(1,sizeof(kaa_transport_channel_interface_t));
 
-    kaa_service_t operation_services[] = {
-            KAA_SERVICE_PROFILE,
-            KAA_SERVICE_USER,
-            KAA_SERVICE_EVENT,
-            KAA_SERVICE_LOGGING};
+    kaa_extension_id operation_services[] = {
+            KAA_EXTENSION_PROFILE,
+            KAA_EXTENSION_USER,
+            KAA_EXTENSION_EVENT,
+            KAA_EXTENSION_LOGGING};
 
     error_code = kaa_tcp_channel_create(channel, logger, operation_services, 4);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
@@ -345,8 +370,6 @@ void test_kaa_tcp_channel_io_error_flow()
     channel->destroy(channel->context);
 
     KAA_FREE(channel);
-
-    KAA_TRACE_OUT(logger);
 }
 
 /**
@@ -355,20 +378,20 @@ void test_kaa_tcp_channel_io_error_flow()
  * 2. Call sync several times before authorization complete, check that CONNECT is generated only once.
  * 3. Disconnect.
  */
-void test_kaa_tcp_channel_auth_double_sync_flow()
+void test_kaa_tcp_channel_auth_double_sync_flow(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
 
     kaa_transport_channel_interface_t *channel = NULL;
     channel = KAA_CALLOC(1, sizeof(kaa_transport_channel_interface_t));
 
-    kaa_service_t operation_services[] = {
-            KAA_SERVICE_PROFILE,
-            KAA_SERVICE_USER,
-            KAA_SERVICE_EVENT,
-            KAA_SERVICE_LOGGING};
+    kaa_extension_id operation_services[] = {
+            KAA_EXTENSION_PROFILE,
+            KAA_EXTENSION_USER,
+            KAA_EXTENSION_EVENT,
+            KAA_EXTENSION_LOGGING};
 
     error_code = kaa_tcp_channel_create(channel, logger, operation_services, 4);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
@@ -400,7 +423,7 @@ void test_kaa_tcp_channel_auth_double_sync_flow()
     access_point_test_info.request_connect           = false;
 
     //Call sync
-    kaa_service_t services1[] = {KAA_SERVICE_PROFILE, KAA_SERVICE_USER};
+    kaa_extension_id services1[] = {KAA_EXTENSION_PROFILE, KAA_EXTENSION_USER};
     channel->sync_handler(channel->context, services1, 2);
     ASSERT_EQUAL(access_point_test_info.fill_connect_message, false);
     ASSERT_EQUAL(access_point_test_info.request_connect, false);
@@ -420,7 +443,7 @@ void test_kaa_tcp_channel_auth_double_sync_flow()
     access_point_test_info.request_connect           = false;
     access_point_test_info.auth_packet_written       = false;
 
-    kaa_service_t services2[] = {KAA_SERVICE_PROFILE, KAA_SERVICE_EVENT};
+    kaa_extension_id services2[] = {KAA_EXTENSION_PROFILE, KAA_EXTENSION_EVENT};
     channel->sync_handler(channel->context, services2, 2);
     ASSERT_EQUAL(access_point_test_info.fill_connect_message, false);
     ASSERT_EQUAL(access_point_test_info.request_connect, false);
@@ -439,7 +462,7 @@ void test_kaa_tcp_channel_auth_double_sync_flow()
     CHECK_SOCKET_RW(channel, true, true);
 
     //Third sync
-    kaa_service_t services3[] = {KAA_SERVICE_LOGGING};
+    kaa_extension_id services3[] = {KAA_EXTENSION_LOGGING};
     channel->sync_handler(channel->context, services3, 1);
 
     //Check correct RD,WR operation, in this point we waiting for RD operations true
@@ -453,8 +476,6 @@ void test_kaa_tcp_channel_auth_double_sync_flow()
     channel->destroy(channel->context);
 
     KAA_FREE(channel);
-
-    KAA_TRACE_OUT(logger);
 }
 
 
@@ -566,15 +587,13 @@ void test_set_access_point(kaa_transport_channel_interface_t *channel)
     kaa_error_t error_code = channel->init(channel->context, &transport_context);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
-    //Keepalive will be tested latter during CONNECT message creation
-    error_code = kaa_tcp_channel_set_keepalive_timeout(channel, KEEPALIVE);
-    ASSERT_EQUAL(error_code, KAA_ERR_NONE);
-
     error_code = kaa_tcp_channel_set_socket_events_callback(channel, kaa_tcp_channel_event_callback_fn, channel);
+    assert_int_equal(KAA_ERR_NONE, error_code);
+
     //Use connection data to destination 192.168.77.2:9888
     kaa_access_point_t access_point;
     access_point.id = 10;
-    access_point.connection_data = CONNECTION_DATA;
+    access_point.connection_data = (char *)CONNECTION_DATA;
     access_point.connection_data_len = sizeof(CONNECTION_DATA);
 
     reset_access_point_test_info();
@@ -605,10 +624,13 @@ void test_set_access_point(kaa_transport_channel_interface_t *channel)
 
 kaa_error_t kaa_bootstrap_manager_on_access_point_failed(kaa_bootstrap_manager_t *self
                                                        , kaa_transport_protocol_id_t *protocol_id
-                                                       , kaa_server_type_t type)
+                                                       , kaa_server_type_t type
+                                                       , kaa_failover_reason failover_reason)
 {
+    (void)self;
+    ASSERT_EQUAL(failover_reason, KAA_CHANNEL_NA);
     ASSERT_EQUAL(protocol_id->id, 0x56c8ff92);
-    ASSERT_EQUAL(protocol_id->version, 1);
+    ASSERT_EQUAL(protocol_id->version, EXPECTED_PROTOCOL_VERSION);
     ASSERT_EQUAL(type, KAA_SERVER_OPERATIONS);
     access_point_test_info.bootstrap_manager_on_access_point_failed  = true;
     return KAA_ERR_NONE;
@@ -616,6 +638,7 @@ kaa_error_t kaa_bootstrap_manager_on_access_point_failed(kaa_bootstrap_manager_t
 
 kaa_error_t kaa_tcp_channel_event_callback_fn(void *context, kaa_tcp_channel_event_t event_type, kaa_fd_t fd)
 {
+    (void)context;
     if (fd != access_point_test_info.fd) {
         return KAA_ERR_BADPARAM;
     }
@@ -643,17 +666,17 @@ kaatcp_error_t kaatcp_get_request_connect(const kaatcp_connect_t *message
     if (message->protocol_version != PROTOCOL_VERSION) {
         return KAATCP_ERR_BAD_PARAM;
     }
-    if (message->next_ptorocol_id != 0x3553c66f) {
+    if (message->next_ptorocol_id != EXPECTED_PROTOCOL_ID) {
         return KAATCP_ERR_BAD_PARAM;
     }
     if (message->connect_flags != KAA_CONNECT_FLAGS) {
         return KAATCP_ERR_BAD_PARAM;
     }
-    if (message->keep_alive != (KEEPALIVE * 1.2)) {
+    if (message->keep_alive != EXPECTED_KEEPALIVE) {
         return KAATCP_ERR_BAD_PARAM;
     }
-    if (message->sync_request && message->sync_request_size == sizeof(CONNECT_PACK)) {
-        if (!memcmp(CONNECT_PACK, message->sync_request, message->sync_request_size)) {
+    if (message->sync_request && message->sync_request_size == g_connect_sync_request_size) {
+        if (!memcmp(g_connect_sync_request, message->sync_request, message->sync_request_size)) {
             *buf_size = 0;
             memcpy(buf, CONNECT_HEAD, sizeof(CONNECT_HEAD));
             *buf_size += sizeof(CONNECT_HEAD);
@@ -672,14 +695,18 @@ kaatcp_error_t kaatcp_fill_connect_message(uint16_t keepalive, uint32_t next_pro
                                          , char *signature, size_t signature_size
                                          , kaatcp_connect_t *message)
 {
-    if (keepalive != (KEEPALIVE * 1.2)) {
+    if (keepalive != EXPECTED_KEEPALIVE) {
         return KAATCP_ERR_BAD_PARAM;
     }
-    if (next_protocol_id != 0x3553c66f) {
+    if (next_protocol_id != EXPECTED_PROTOCOL_ID) {
         return KAATCP_ERR_BAD_PARAM;
     }
-    if (sync_request && sync_request_size == sizeof(CONNECT_PACK)) {
-        if (!memcmp(CONNECT_PACK, sync_request, sync_request_size)) {
+    if (sync_request == NULL) {
+        return KAA_ERR_BADPARAM;
+    }
+        
+    if (sync_request_size == g_connect_sync_request_size) {
+        if (!memcmp(g_connect_sync_request, sync_request, sync_request_size)) {
             memset(message, 0, sizeof(kaatcp_connect_t));
 
             message->protocol_name_length = KAA_TCP_NAME_LENGTH;
@@ -715,9 +742,11 @@ kaatcp_error_t kaatcp_fill_connect_message(uint16_t keepalive, uint32_t next_pro
 }
 
 kaa_error_t kaa_platform_protocol_process_server_sync(kaa_platform_protocol_t *self
-                                                    , const char *buffer
+                                                    , const uint8_t *buffer
                                                     , size_t buffer_size)
 {
+    (void)self;
+    (void)buffer_size;
     KAA_RETURN_IF_NIL(buffer, KAA_ERR_BADPARAM);
 
     if (!memcmp(buffer, KAASYNC_OP_MESSAGE, strlen(KAASYNC_OP_MESSAGE))) {
@@ -727,29 +756,23 @@ kaa_error_t kaa_platform_protocol_process_server_sync(kaa_platform_protocol_t *s
     return KAA_ERR_BADPARAM;
 }
 
-kaa_error_t kaa_platform_protocol_serialize_client_sync(kaa_platform_protocol_t *self
-                                                      , const kaa_serialize_info_t *info
-                                                      , char **buffer
-                                                      , size_t *buffer_size)
+kaa_error_t kaa_platform_protocol_alloc_serialize_client_sync(kaa_platform_protocol_t *self,
+        const kaa_extension_id *services, size_t services_count,
+        uint8_t **buffer, size_t *buffer_size)
 {
-
-    if (info->services_count == 4
-            && info->services[0] == KAA_SERVICE_PROFILE
-            && info->services[1] == KAA_SERVICE_USER
-            && info->services[2] == KAA_SERVICE_EVENT
-            && info->services[3] == KAA_SERVICE_LOGGING) {
-        if (info->allocator && info->allocator_context) {
-            char *alloc_buffer = info->allocator(info->allocator_context, sizeof(CONNECT_PACK));
-            if (alloc_buffer) {
-                memcpy(alloc_buffer, CONNECT_PACK, sizeof(CONNECT_PACK));
-                *buffer = alloc_buffer;
-                *buffer_size = sizeof(CONNECT_PACK);
-                return KAA_ERR_NONE;
-            }
-        }
-
+    (void)self;
+    
+    ASSERT_EQUAL(services_count > 0, true);
+    ASSERT_NOT_NULL(services);
+    
+    uint8_t *alloc_buffer = KAA_MALLOC(sizeof(CONNECT_PACK));
+    if (alloc_buffer) {
+        memcpy(alloc_buffer, CONNECT_PACK, sizeof(CONNECT_PACK));
+        *buffer = alloc_buffer;
+        *buffer_size = sizeof(CONNECT_PACK);
+        return KAA_ERR_NONE;
     }
-
+        
     return KAA_ERR_BADPARAM;
 }
 
@@ -770,8 +793,9 @@ ext_tcp_socket_state_t ext_tcp_utils_tcp_socket_check(kaa_fd_t fd, const kaa_soc
     return KAA_TCP_SOCK_CONNECTED;
 }
 
-ext_tcp_utils_function_return_state_t ext_tcp_utils_gethostbyaddr(kaa_dns_resolve_listener_t *resolve_listener, const kaa_dns_resolve_info_t *resolve_props, kaa_sockaddr_t *result, kaa_socklen_t *result_size)
+ext_tcp_utils_function_return_state_t ext_tcp_utils_getaddrbyhost(kaa_dns_resolve_listener_t *resolve_listener, const kaa_dns_resolve_info_t *resolve_props, kaa_sockaddr_t *result, kaa_socklen_t *result_size)
 {
+    (void)resolve_listener;
     KAA_RETURN_IF_NIL4(resolve_props, resolve_props->hostname, result, result_size, RET_STATE_VALUE_ERROR);
     if (*result_size < sizeof(struct sockaddr_in))
         return RET_STATE_BUFFER_NOT_ENOUGH;
@@ -781,7 +805,7 @@ ext_tcp_utils_function_return_state_t ext_tcp_utils_gethostbyaddr(kaa_dns_resolv
     memcpy(hostname_str, resolve_props->hostname, resolve_props->hostname_length);
     hostname_str[resolve_props->hostname_length] = '\0';
 
-    KAA_LOG_INFO(logger,KAA_ERR_NONE,"gethostbyaddr() Hostname=%s:%d", hostname_str, resolve_props->port);
+    KAA_LOG_INFO(logger,KAA_ERR_NONE,"getaddrbyhost() Hostname=%s:%d", hostname_str, resolve_props->port);
 
 
     struct addrinfo hints;
@@ -829,6 +853,7 @@ kaa_error_t ext_tcp_utils_tcp_socket_close(kaa_fd_t fd)
 
 ext_tcp_socket_io_errors_t ext_tcp_utils_tcp_socket_read(kaa_fd_t fd, char *buffer, size_t buffer_size, size_t *bytes_read)
 {
+    (void)buffer_size;
     KAA_RETURN_IF_NIL(buffer,KAA_TCP_SOCK_IO_ERROR);
 
     if (fd != access_point_test_info.fd) {
@@ -864,23 +889,24 @@ ext_tcp_socket_io_errors_t ext_tcp_utils_tcp_socket_write(kaa_fd_t fd, const cha
     }
 
     if (access_point_test_info.kaasync_read_scenario) {
-        if (!memcmp(buffer, KAASYNC_OP_SERV, sizeof(KAASYNC_OP_SERV))) {
+        if (buffer_size == g_kaasync_op_serv_size
+            && !memcmp(buffer, g_kaasync_op_serv, g_kaasync_op_serv_size)) {
             access_point_test_info.kaasync_write = true;
-            *bytes_written = sizeof(KAASYNC_OP_SERV);
+            *bytes_written = g_kaasync_op_serv_size;
             return KAA_TCP_SOCK_IO_OK;
         }
 
         *bytes_written = buffer_size;
         return KAA_TCP_SOCK_IO_OK;
     } else if (!access_point_test_info.auth_packet_written) {
-        if (buffer_size != (sizeof(CONNECT_HEAD) + sizeof(CONNECT_PACK))) {
+        if (buffer_size != (sizeof(CONNECT_HEAD) + g_connect_sync_request_size)) {
             return KAA_TCP_SOCK_IO_ERROR;
         }
         *bytes_written = 0;
         if (!memcmp(buffer, CONNECT_HEAD, sizeof(CONNECT_HEAD))) {
-            if (!memcmp(buffer+sizeof(CONNECT_HEAD), CONNECT_PACK, sizeof(CONNECT_PACK))) {
+            if (!memcmp(buffer+sizeof(CONNECT_HEAD), g_connect_sync_request, g_connect_sync_request_size)) {
                 access_point_test_info.auth_packet_written = true;
-                *bytes_written = sizeof(CONNECT_HEAD) + sizeof(CONNECT_PACK);
+                *bytes_written = sizeof(CONNECT_HEAD) + g_connect_sync_request_size;
                 return KAA_TCP_SOCK_IO_OK;
             }
         }
@@ -918,13 +944,41 @@ int test_init(void)
     kaa_error_t error = kaa_log_create(&logger, KAA_MAX_LOG_MESSAGE_LENGTH, KAA_MAX_LOG_LEVEL, NULL);
     if (error || !logger)
         return error;
-
-
+    
+#ifdef KAA_ENCRYPTION
+    kaa_init_rsa_keypair();
+    
+    g_connect_sync_request_size = ext_get_encrypted_data_size(sizeof(CONNECT_PACK));
+    g_connect_sync_request = KAA_MALLOC(g_connect_sync_request_size);
+    if (g_connect_sync_request == NULL) {
+        return -1;
+    }
+    ext_encrypt_data(CONNECT_PACK, sizeof(CONNECT_PACK), g_connect_sync_request);
+    
+    g_kaasync_op_serv_size = sizeof(KAASYNC_OP_SERV_ENCRYPTED);
+    g_kaasync_op_serv = KAASYNC_OP_SERV_ENCRYPTED;
+    uint8_t *pdata = KAASYNC_OP_SERV_ENCRYPTED + KAASYNC_OP_SERV_DATA_OFFSET;
+    ext_encrypt_data(pdata, KAASYNC_OP_SERV_DATA_SIZE, pdata);
+#else
+    g_connect_sync_request_size = sizeof(CONNECT_PACK);
+    g_connect_sync_request = CONNECT_PACK;
+    
+    g_kaasync_op_serv_size = sizeof(KAASYNC_OP_SERV);
+    g_kaasync_op_serv = KAASYNC_OP_SERV;
+#endif
+    
     return 0;
 }
 
 int test_deinit(void)
 {
+#ifdef KAA_ENCRYPTION
+    kaa_deinit_rsa_keypair();
+    KAA_FREE(g_connect_sync_request);
+    g_connect_sync_request = NULL;
+    g_connect_sync_request_size = 0;
+#endif
+    
     kaa_log_destroy(logger);
     return 0;
 }

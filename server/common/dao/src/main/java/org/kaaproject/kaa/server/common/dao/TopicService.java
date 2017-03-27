@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.kaaproject.kaa.server.common.dao;
 
+import org.kaaproject.kaa.common.dto.EndpointGroupDto;
 import org.kaaproject.kaa.common.dto.TopicDto;
 import org.kaaproject.kaa.common.dto.TopicTypeDto;
 import org.kaaproject.kaa.common.dto.UpdateNotificationDto;
@@ -27,68 +28,69 @@ import java.util.List;
  */
 public interface TopicService {
 
-    /**
-     * Save topic object.
-     *
-     * @param topicDto the topic dto
-     * @return the topic dto
-     */
-    TopicDto saveTopic(TopicDto topicDto);
+  /**
+   * Save topic object.
+   *
+   * @param topicDto the topic dto
+   * @return the topic dto
+   */
+  TopicDto saveTopic(TopicDto topicDto);
 
-    /**
-     * Find topic by id.
-     *
-     * @param id the id
-     * @return the topic dto
-     */
-    TopicDto findTopicById(String id);
+  /**
+   * Find topic by id.
+   *
+   * @param id the id
+   * @return the topic dto
+   */
+  TopicDto findTopicById(String id);
 
-    /**
-     * Find topics by application id.
-     *
-     * @param appId the application id
-     * @return the list of topics
-     */
-    List<TopicDto> findTopicsByAppId(String appId);
+  /**
+   * Find topics by application id.
+   *
+   * @param appId the application id
+   * @return the list of topics
+   */
+  List<TopicDto> findTopicsByAppId(String appId);
 
-    /**
-     * Find topics by application id and type.
-     *
-     * @param appId the application id
-     * @param typeDto the type dto
-     * @return the list of topics
-     */
-    List<TopicDto> findTopicsByAppIdAndType(String appId, TopicTypeDto typeDto);
+  /**
+   * Find topics by application id and type.
+   *
+   * @param appId   the application id
+   * @param typeDto the type dto
+   * @return the list of topics
+   */
+  List<TopicDto> findTopicsByAppIdAndType(String appId, TopicTypeDto typeDto);
 
-    /**
-     * Find topics by endpoint group id.
-     *
-     * @param endpointGroupId the endpoint group id
-     * @return the list
-     */
-    List<TopicDto> findTopicsByEndpointGroupId(String endpointGroupId);
+  /**
+   * Find topics by endpoint group id.
+   *
+   * @param endpointGroupId the endpoint group id
+   * @return the list
+   */
+  List<TopicDto> findTopicsByEndpointGroupId(String endpointGroupId);
 
-    /**
-     * Find vacant topics by endpoint group id.
-     * Find all topics where aren't attached to current endpoint group
-     *
-     * @param endpointGroupId the endpoint group id
-     * @return the list of topics
-     */
-    List<TopicDto> findVacantTopicsByEndpointGroupId(String endpointGroupId);
+  /**
+   * Find vacant topics by endpoint group id.
+   * Find all topics where aren't attached to current endpoint group
+   *
+   * @param endpointGroupId the endpoint group id
+   * @return the list of topics
+   */
+  List<TopicDto> findVacantTopicsByEndpointGroupId(String endpointGroupId);
 
-    /**
-     * Removes the topic by id.
-     *
-     * @param id the id
-     */
-    List<UpdateNotificationDto> removeTopicById(String id);
+  /**
+   * Removes the topic by id.
+   *
+   * @param id the id
+   * @return the list of update notification dto
+   */
+  List<UpdateNotificationDto<EndpointGroupDto>> removeTopicById(String id);
 
-    /**
-     * Removes the topics by application id.
-     *
-     * @param appId the application id
-     */
-    void removeTopicsByAppId(String appId);
+  /**
+   * Removes the topics by application id.
+   *
+   * @param appId the application id
+   */
+  void removeTopicsByAppId(String appId);
 
 }

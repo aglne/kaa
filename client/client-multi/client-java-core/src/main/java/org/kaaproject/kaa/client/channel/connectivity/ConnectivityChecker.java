@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ package org.kaaproject.kaa.client.channel.connectivity;
  * Interface for a platform-dependent checker of a network connectivity.
  */
 public interface ConnectivityChecker {
-    /**
-     * Check whether network connectivity exists.
-     *
-     * @return True if connection exists, false otherwise.
-     */
-    boolean checkConnectivity();
+  /**
+   * Check whether network connectivity exists.
+   *
+   * @return True if connection exists, false otherwise.
+   */
+  boolean checkConnectivity();
 }

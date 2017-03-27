@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@
 
 #include "kaa/KaaDefaults.hpp"
 
+#include "kaa/IKaaClientStateStorage.hpp"
 #include "kaa/channel/transport/AbstractKaaTransport.hpp"
 #include "kaa/channel/transport/IConfigurationTransport.hpp"
-#include "kaa/IKaaClientStateStorage.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
@@ -29,19 +30,31 @@ class IKaaChannelManager;
 class IConfigurationProcessor;
 class IConfigurationHashContainer;
 
-class ConfigurationTransport : public AbstractKaaTransport<TransportType::CONFIGURATION>, public IConfigurationTransport
-{
+class ConfigurationTransport : public AbstractKaaTransport<TransportType::CONFIGURATION>,
+                               public IConfigurationTransport {
 public:
-    ConfigurationTransport(IKaaChannelManager& channelManager, IConfigurationProcessor *configProcessor, IConfigurationHashContainer *hashContainer, IKaaClientStateStoragePtr status);
+    ConfigurationTransport(IKaaChannelManager& channelManager, IKaaClientContext &context);
 
-    void sync();
+    virtual void sync();
 
     virtual std::shared_ptr<ConfigurationSyncRequest> createConfigurationRequest();
     virtual void onConfigurationResponse(const ConfigurationSyncResponse &response);
 
+    virtual void setConfigurationHashContainer(IConfigurationHashContainer* container)
+    {
+        hashContainer_ = container;
+    }
+
+    virtual void setConfigurationProcessor(IConfigurationProcessor* processor)
+    {
+        configurationProcessor_ = processor;
+    }
+
+    virtual ~ConfigurationTransport() noexcept {}
+
 private:
-    IConfigurationProcessor     *configurationProcessor_;
-    IConfigurationHashContainer *hashContainer_;
+    IConfigurationProcessor        *configurationProcessor_;
+    IConfigurationHashContainer    *hashContainer_;
 };
 
 }  // namespace kaa

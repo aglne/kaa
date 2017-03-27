@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,32 +23,28 @@ import junit.framework.TestSuite;
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
+public class AppTest
+    extends TestCase {
+  /**
+   * Create the test case
+   *
+   * @param testName name of the test case
+   */
+  public AppTest(String testName) {
+    super(testName);
+  }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
+  /**
+   * @return the suite of tests being tested
+   */
+  public static Test suite() {
+    return new TestSuite(AppTest.class);
+  }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+  /**
+   * Rigourous Test :-)
+   */
+  public void testApp() {
+    assertTrue(true);
+  }
 }

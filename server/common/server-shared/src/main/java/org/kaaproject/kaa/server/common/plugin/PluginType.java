@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.kaaproject.kaa.server.common.plugin;
 
 public enum PluginType {
 
-    LOG_APPENDER,
-    USER_VERIFIER
-    
+  LOG_APPENDER,
+  USER_VERIFIER
+
 }

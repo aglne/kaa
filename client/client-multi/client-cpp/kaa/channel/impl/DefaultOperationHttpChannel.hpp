@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,13 @@ namespace kaa {
 
 class DefaultOperationHttpChannel : public AbstractHttpChannel {
 public:
-    DefaultOperationHttpChannel(IKaaChannelManager *channelManager, const KeyPair& clientKeys, IKaaClientStateStoragePtr clientState)
-        : AbstractHttpChannel(channelManager, clientKeys, clientState) { }
-    virtual ~DefaultOperationHttpChannel() { }
+    DefaultOperationHttpChannel(IKaaChannelManager& channelManager,
+                                const KeyPair& clientKeys,
+                                IKaaClientContext& context)
+        : AbstractHttpChannel(channelManager, clientKeys, context)
+    {
+
+    }
 
     virtual const std::string& getId() const { return CHANNEL_ID; }
     virtual const std::map<TransportType, ChannelDirection>& getSupportedTransportTypes() const { return SUPPORTED_TYPES; }

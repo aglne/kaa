@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,28 +26,29 @@ import java.nio.ByteBuffer;
  *
  * @param <T> the type parameter
  */
-public interface EndpointConfigurationDao<T extends EndpointConfiguration> extends Dao<T, ByteBuffer> {
+public interface EndpointConfigurationDao<T extends EndpointConfiguration>
+    extends Dao<T, ByteBuffer> {
 
-    /**
-     * Save endpoint configuration
-     *
-     * @param dto endpoint configuration
-     * @return saved endpoint configuration
-     */
-    T save(EndpointConfigurationDto dto);
+  /**
+   * Save endpoint configuration.
+   *
+   * @param dto endpoint configuration
+   * @return saved endpoint configuration
+   */
+  T save(EndpointConfigurationDto dto);
 
-    /**
-     * Find endpoint configuration by hash.
-     *
-     * @param hash the hash of endpoint key
-     * @return the endpoint configuration
-     */
-    T findByHash(byte[] hash);
+  /**
+   * Find endpoint configuration by hash.
+   *
+   * @param hash the hash of endpoint key
+   * @return the endpoint configuration
+   */
+  T findByHash(byte[] hash);
 
-    /**
-     * Remove endpoint configuration by hash.
-     *
-     * @param hash the hash of endpoint key
-     */
-    void removeByHash(byte[] hash);
+  /**
+   * Remove endpoint configuration by hash.
+   *
+   * @param hash the hash of endpoint key
+   */
+  void removeByHash(byte[] hash);
 }

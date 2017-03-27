@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,51 +27,51 @@ import org.kaaproject.kaa.common.endpoint.gen.ConfigurationSyncResponse;
  * Updates the Configuration manager state.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface ConfigurationTransport extends KaaTransport {
 
-    /**
-     * Creates the configuration request.
-     *
-     * @return the configuration request object.
-     * @see ConfigurationSyncRequest
-     */
-    ConfigurationSyncRequest createConfigurationRequest();
+  /**
+   * Creates the configuration request.
+   *
+   * @return the configuration request object.
+   * @see ConfigurationSyncRequest
+   */
+  ConfigurationSyncRequest createConfigurationRequest();
 
-    /**
-     * Updates the state of the Configuration manager according to the given response.
-     *
-     * @param response the configuration response.
-     * @see ConfigurationSyncResponse
-     */
-    void onConfigurationResponse(ConfigurationSyncResponse response) throws Exception;
+  /**
+   * Updates the state of the Configuration manager according to the given response.
+   *
+   * @param response the configuration response.
+   * @throws Exception the exception
+   * @see ConfigurationSyncResponse
+   */
+  void onConfigurationResponse(ConfigurationSyncResponse response) throws Exception;
 
-    /**
-     * Sets the configuration hash container.
-     *
-     * @param container the container to be set.
-     * @see ConfigurationHashContainer
-     */
-    void setConfigurationHashContainer(ConfigurationHashContainer container);
+  /**
+   * Sets the configuration hash container.
+   *
+   * @param container the container to be set.
+   * @see ConfigurationHashContainer
+   */
+  void setConfigurationHashContainer(ConfigurationHashContainer container);
 
-    /**
-     * Sets the configuration processor.
-     *
-     * @param processor the processor to be set.
-     * @see ConfigurationProcessor
-     */
-    void setConfigurationProcessor(ConfigurationProcessor processor);
+  /**
+   * Sets the configuration processor.
+   *
+   * @param processor the processor to be set.
+   * @see ConfigurationProcessor
+   */
+  void setConfigurationProcessor(ConfigurationProcessor processor);
 
-    /**
-     * Sets the schema processor.
-     *
-     * @param processor the processor which is going to be set.
-     * @see SchemaProcessor
-     */
-    void setSchemaProcessor(SchemaProcessor processor);
-    
-    
-    void setResyncOnly(boolean resyncOnly);
+  /**
+   * Sets the schema processor.
+   *
+   * @param processor the processor which is going to be set.
+   * @see SchemaProcessor
+   */
+  void setSchemaProcessor(SchemaProcessor processor);
+
+
+  void setResyncOnly(boolean resyncOnly);
 
 }

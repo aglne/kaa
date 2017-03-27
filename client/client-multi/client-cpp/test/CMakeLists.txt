@@ -1,5 +1,5 @@
 #
-# Copyright 2014 CyberVision, Inc.
+# Copyright 2014-2016 CyberVision, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DKAA_DEFAULT_OPERATION_HTTP_CHANNEL")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DKAA_DEFAULT_BOOTSTRAP_HTTP_CHANNEL")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DKAA_DEFAULT_CONNECTIVITY_CHECKER")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DKAA_THREADSAFE")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DKAA_MAX_LOG_LEVEL=0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DKAA_MAX_LOG_LEVEL=6")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DKAA_RUNTIME_KEY_GENERATION=ON")
 
 set ( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../Modules/)
 
@@ -45,7 +46,7 @@ add_definitions (-DBOOST_TEST_DYN_LINK -DBOOST_LOG_DYN_LINK -DRESOURCE_DIR="${CM
 find_package (Avro REQUIRED)
 find_package (Botan REQUIRED)
 find_package (Boost 1.54 REQUIRED
-    COMPONENTS unit_test_framework log system)
+    COMPONENTS unit_test_framework log thread system)
 find_package (Sqlite3 REQUIRED)
 
 include_directories (
@@ -53,7 +54,7 @@ include_directories (
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${Boost_INCLUDE_DIRS}
         ${Avro_INCLUDE_DIRS} 
-        ${BOTAN_INCLUDE_DIRS}
+        ${BOTAN_INCLUDE_DIR}
         ${SQLITE3_INCLUDE_DIR}
 
 )
@@ -64,7 +65,8 @@ set ( KAA_TEST_SOURCES
         ../impl/KaaClient.cpp
         ../impl/KaaDefaults.cpp
         ../impl/logging/Log.cpp
-        ../impl/logging/LoggerFactory.cpp
+        ../impl/logging/DefaultLogger.cpp
+        ../impl/logging/LoggingUtils.cpp
         ../impl/http/HttpUrl.cpp
         ../impl/http/MultipartPostHttpRequest.cpp
         ../impl/http/HttpResponse.cpp
@@ -76,10 +78,8 @@ set ( KAA_TEST_SOURCES
         ../impl/transport/HttpDataProcessor.cpp
         ../impl/bootstrap/BootstrapManager.cpp
         ../impl/bootstrap/BootstrapTransport.cpp
-        ../impl/configuration/ConfigurationProcessor.cpp
         ../impl/configuration/ConfigurationTransport.cpp
         ../impl/configuration/manager/ConfigurationManager.cpp
-        ../impl/configuration/storage/ConfigurationPersistenceManager.cpp
         ../impl/configuration/storage/FileConfigurationStorage.cpp
         ../impl/event/registration/EndpointRegistrationManager.cpp
         ../impl/event/registration/UserTransport.cpp
@@ -97,7 +97,8 @@ set ( KAA_TEST_SOURCES
         ../impl/notification/NotificationTransport.cpp
         ../impl/notification/NotificationManager.cpp
         ../impl/log/LogCollector.cpp
-        ../impl/log/LogRecord.cpp
+        ../impl/log/LogStorageConstants.cpp
+        ../impl/log/RecordFuture.cpp
         ../impl/log/DefaultLogUploadStrategy.cpp
         ../impl/log/MemoryLogStorage.cpp
         ../impl/log/SQLiteDBLogStorage.cpp
@@ -107,20 +108,27 @@ set ( KAA_TEST_SOURCES
         ../impl/kaatcp/KaaSyncResponse.cpp
         ../impl/kaatcp/KaaTcpResponseProcessor.cpp
         ../impl/channel/connectivity/IPConnectivityChecker.cpp
+        ../impl/channel/connectivity/PingConnectivityChecker.cpp
         ../impl/channel/TransportProtocolIdConstants.cpp
         ../impl/channel/IPTransportInfo.cpp
         ../impl/failover/DefaultFailoverStrategy.cpp
+        ../impl/utils/ThreadPool.cpp
+        ../impl/context/SimpleExecutorContext.cpp
+        ../impl/context/AbstractExecutorContext.cpp
+        ../impl/KaaClientProperties.cpp
         TestRunner.cpp
+        impl/KaaTestUtils.cpp
+        impl/channel/impl/DefaultBootstrapChannelTest.cpp
         impl/common/EndpointObjectHashTest.cpp
         impl/common/AvroByteArrayConverterTest.cpp
-        impl/configuration/ConfigurationPersistenceTest.cpp
-        impl/configuration/ConfigurationProcessorTest.cpp
+        impl/bootstrap/BootstrapFailoverTest.cpp
         impl/configuration/ConfigurationManagerTest.cpp
         impl/configuration/FileConfigurationStorageTest.cpp
         impl/http/HttpUrlTest.cpp
         impl/http/HttpResponseTest.cpp
         impl/http/HttpRequestTest.cpp
         impl/ClientStatusTest.cpp
+        impl/KaaClientTest.cpp
         impl/event/EndpointRegistrationManagerTest.cpp
         impl/security/KeyUtilsTest.cpp
         impl/event/EventTransportTest.cpp
@@ -134,6 +142,18 @@ set ( KAA_TEST_SOURCES
         impl/log/LogCollectorTest.cpp
         impl/log/SQLiteDBLogStorageTest.cpp
         impl/utils/KaaTimerTest.cpp
+        impl/utils/ThreadPoolTest.cpp
+        impl/log/strategies/RecordCountLogUploadStrategyTest.cpp
+        impl/log/strategies/StorageSizeLogUploadStrategyTest.cpp
+        impl/log/strategies/PeriodicLogUploadStrategyTest.cpp
+        impl/log/strategies/PeriodicLogUploadStrategyTest.cpp
+        impl/log/strategies/RecordCountWithTimeLimitLogUploadStrategyTest.cpp
+        impl/log/strategies/StorageSizeWithTimeLimitLogUploadStrategyTest.cpp
+        impl/profile/ProfileManagerTest.cpp
+        impl/channel/PingConnectivityCheckerTest.cpp
+        impl/KaaClientPropertiesTest.cpp
+        impl/profile/ProfileTransportTest.cpp
+        impl/channel/SyncDataProcessorTest.cpp
     )
 
 add_executable ( kaatest  ${KAA_TEST_SOURCES})

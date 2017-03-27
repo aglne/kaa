@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,13 @@ import org.kaaproject.kaa.server.common.core.schema.KaaSchema;
 import org.kaaproject.kaa.server.common.core.schema.KaaSchemaFactory;
 import org.kaaproject.kaa.server.common.core.schema.KaaSchemaFactoryImpl;
 
-public abstract class AbstractSchemaStrategy<T extends KaaSchema> implements SchemaCreationStrategy<T> {
+public abstract class AbstractSchemaStrategy<T extends KaaSchema> implements
+        SchemaCreationStrategy<T> {
 
-    private final KaaSchemaFactory schemaFactory = new KaaSchemaFactoryImpl();
+  private final KaaSchemaFactory schemaFactory = new KaaSchemaFactoryImpl();
 
-    protected KaaSchemaFactory getSchemaFactory() {
-        return schemaFactory;
-    }
+  protected KaaSchemaFactory getSchemaFactory() {
+    return schemaFactory;
+  }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,22 @@
 #include "kaa/kaatcp/DisconnectMessage.hpp"
 #include "kaa/logging/Log.hpp"
 #include "kaa/logging/LoggingUtils.hpp"
+#include "kaa/context/SimpleExecutorContext.hpp"
+#include "kaa/KaaClientContext.hpp"
+#include "kaa/KaaClientProperties.hpp"
+#include "kaa/logging/DefaultLogger.hpp"
+
+#include "headers/MockKaaClientStateStorage.hpp"
+#include "headers/context/MockExecutorContext.hpp"
 
 namespace kaa
 {
+
+static KaaClientProperties properties;
+static DefaultLogger tmp_logger(properties.getClientId());
+static IKaaClientStateStoragePtr tmp_state(new MockKaaClientStateStorage);
+static MockExecutorContext tmpExecContext;
+static KaaClientContext clientContext(properties, tmp_logger, tmpExecContext, tmp_state);
 
 BOOST_AUTO_TEST_SUITE(KaaTcpTest)
 
@@ -61,7 +74,7 @@ BOOST_AUTO_TEST_CASE(testCreateBasicHeader)
 BOOST_AUTO_TEST_CASE(testTcpParser)
 {
     char buffer[] = { 0x10, 0x01, 0x05 };
-    KaaTcpParser parser;
+    KaaTcpParser parser(clientContext);
     BOOST_CHECK_THROW(parser.parseBuffer(buffer, 3), KaaException);
 
     parser.resetParser();
@@ -135,7 +148,7 @@ private:
 BOOST_AUTO_TEST_CASE(testResponseProcessor)
 {
     ResponseChecker checker;
-    KaaTcpResponseProcessor processor;
+    KaaTcpResponseProcessor processor(clientContext);
     unsigned char connackAndPingMessages[] = { 0x20, 0x02, 0x00, 0x03, 0xD0, 0x00 };
     processor.registerConnackReceiver(
             [&checker](const ConnackMessage& message)
@@ -191,10 +204,10 @@ BOOST_AUTO_TEST_CASE(testKaaSyncRequest)
 
 BOOST_AUTO_TEST_CASE(testConnectMessage)
 {
-    Botan::SecureVector<std::uint8_t> signature(32);
+    Botan::secure_vector<std::uint8_t> signature(32);
     *(signature.end() - 1) = 0x01;
 
-    Botan::SecureVector<std::uint8_t> sessionKey(16);
+    Botan::secure_vector<std::uint8_t> sessionKey(16);
     *(sessionKey.end() - 1) = 0x02;
 
     std::string payload = { (char) 0xFF, 0x01, 0x02, 0x03 };

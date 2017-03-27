@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 package org.kaaproject.kaa.server.common.log.shared.appender;
 
 public class LogEvent {
-    
-    private byte[] logData;
-    
-    public byte[] getLogData() {
-        return logData;
-    }
 
-    public void setLogData(byte[] logData) {
-        this.logData = logData;
-    }
+  private byte[] logData;
+
+  public byte[] getLogData() {
+    return logData;
+  }
+
+  public void setLogData(byte[] logData) {
+    this.logData = logData;
+  }
 }

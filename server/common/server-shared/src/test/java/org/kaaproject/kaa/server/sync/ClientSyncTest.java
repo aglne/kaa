@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,39 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.sync;
-
-import org.junit.Test;
-import org.junit.Assert;
-
-import java.nio.ByteBuffer;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.nio.ByteBuffer;
+
 public class ClientSyncTest {
-    @Test
-    public void isValidProfileHashExistsTest() {
-        ClientSyncMetaData clientSyncMetaData = mock(ClientSyncMetaData.class);
-        when(clientSyncMetaData.getProfileHash()).thenReturn(ByteBuffer.allocate(0));
-        ClientSync clientSync = new ClientSync(0, clientSyncMetaData, null, null, null, null, null, null);
-        Assert.assertEquals(clientSync.isValid(), true);
-    }
 
-    @Test
-    public void isValidProfileHashNullRequestNullTest() {
-        ClientSyncMetaData clientSyncMetaData = mock(ClientSyncMetaData.class);
-        when(clientSyncMetaData.getProfileHash()).thenReturn(null);
-        ClientSync clientSync = new ClientSync(0, clientSyncMetaData, null, null, null, null, null, null);
-        Assert.assertEquals(clientSync.isValid(), false);
-    }
+  @Test
+  public void isValidProfileHashExistsTest() {
+    ClientSyncMetaData clientSyncMetaData = mock(ClientSyncMetaData.class);
+    when(clientSyncMetaData.getProfileHash()).thenReturn(ByteBuffer.allocate(0));
+    ClientSync clientSync = new ClientSync(0, clientSyncMetaData, null, null, null, null, null, null);
+    Assert.assertEquals(clientSync.isValid(), true);
+  }
 
-    @Test
-    public void isValidProfileHashNullEndpointKeyNullTest() {
-        ClientSyncMetaData clientSyncMetaData = mock(ClientSyncMetaData.class);
-        ProfileClientSync profileClientSync = mock(ProfileClientSync.class);
-        when(clientSyncMetaData.getProfileHash()).thenReturn(null);
-        ClientSync clientSync = new ClientSync(0, clientSyncMetaData, profileClientSync, null, null, null, null, null);
-        Assert.assertEquals(clientSync.isValid(), false);
-    }
+  @Test
+  public void isValidProfileHashNullRequestNullTest() {
+    ClientSyncMetaData clientSyncMetaData = mock(ClientSyncMetaData.class);
+    when(clientSyncMetaData.getProfileHash()).thenReturn(null);
+    ClientSync clientSync = new ClientSync(0, clientSyncMetaData, null, null, null, null, null, null);
+    Assert.assertEquals(clientSync.isValid(), false);
+  }
+
+  @Test
+  public void isValidProfileHashNullEndpointKeyNullTest() {
+    ClientSyncMetaData clientSyncMetaData = mock(ClientSyncMetaData.class);
+    ProfileClientSync profileClientSync = mock(ProfileClientSync.class);
+    when(clientSyncMetaData.getProfileHash()).thenReturn(null);
+    ClientSync clientSync = new ClientSync(0, clientSyncMetaData, profileClientSync, null, null, null, null, null);
+    Assert.assertEquals(clientSync.isValid(), false);
+    Assert.assertNotNull(new ClientSyncMetaData().toString());
+  }
 }

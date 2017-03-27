@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,14 @@ namespace kaa {
 
 enum class ConnackReturnCode : std::uint8_t
 {
-    UNKNOWN = 0x00,
-    ACCEPTED = 0x01,
-    REFUSE_BAD_PROTOCOL = 0x02,
-    REFUSE_ID_REJECT = 0x03,
-    REFUSE_SERVER_UNAVAILABLE = 0x04,
-    REFUSE_BAD_CREDENTIALS = 0x05,
-    REFUSE_NO_AUTH = 0x06
+    UNKNOWN                    = 0x00,
+    ACCEPTED                   = 0x01,
+    REFUSE_BAD_PROTOCOL        = 0x02,
+    REFUSE_ID_REJECT           = 0x03,
+    REFUSE_SERVER_UNAVAILABLE  = 0x04,
+    REFUSE_BAD_CREDENTIALS     = 0x05,
+    REFUSE_NO_AUTH             = 0x06,
+    REFUSE_VERIFICATION_FAILED = 0x10,
 };
 
 class ConnackMessage

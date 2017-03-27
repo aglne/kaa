@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.common.log.shared.appender;
 
 /**
@@ -20,12 +21,20 @@ package org.kaaproject.kaa.server.common.log.shared.appender;
  */
 public enum LogDeliveryErrorCode {
 
-    /** There are no appenders configured. */
-    NO_APPENDERS_CONFIGURED,
-    /** The appender internal error. */
-    APPENDER_INTERNAL_ERROR,
-    /** The connection error to log delivery destination system. */
-    REMOTE_CONNECTION_ERROR,
-    /** The internal error of log delivery destination system. */
-    REMOTE_INTERNAL_ERROR
+  /**
+   * There are no appenders configured.
+   */
+  NO_APPENDERS_CONFIGURED,
+  /**
+   * The appender internal error.
+   */
+  APPENDER_INTERNAL_ERROR,
+  /**
+   * The connection error to log delivery destination system.
+   */
+  REMOTE_CONNECTION_ERROR,
+  /**
+   * The internal error of log delivery destination system.
+   */
+  REMOTE_INTERNAL_ERROR
 }

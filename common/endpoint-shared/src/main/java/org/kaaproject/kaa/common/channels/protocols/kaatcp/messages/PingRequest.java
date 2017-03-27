@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.common.channels.protocols.kaatcp.messages;
 
 import org.kaaproject.kaa.common.channels.protocols.kaatcp.KaaTcpProtocolException;
@@ -21,42 +22,44 @@ import org.kaaproject.kaa.common.channels.protocols.kaatcp.KaaTcpProtocolExcepti
  * Kaatcp PingRequest Class.
  * The PINGREQ message is an "are you alive?" message that is sent
  * from a connected client to the server.
- * @author Andrey Panasenko
  *
+ * @author Andrey Panasenko
  */
 public class PingRequest extends MqttFrame {
 
 
-    /**
-     * Default constructor.
-     */
-    public PingRequest() {
-        super();
-        setMessageType(MessageType.PINGREQ);
-        remainingLength = 0;
-    }
+  /**
+   * Default constructor.
+   */
+  public PingRequest() {
+    super();
+    setMessageType(MessageType.PINGREQ);
+    remainingLength = 0;
+  }
 
-    /* (non-Javadoc)
-     * @see org.kaaproject.kaa.common.channels.protocols.kaatcp.messages.mqttFrame#pack()
-     */
-    @Override
-    protected void pack() {
-    }
+  /* (non-Javadoc)
+   * @see org.kaaproject.kaa.common.channels.protocols.kaatcp.messages.mqttFrame#pack()
+   */
+  @Override
+  protected void pack() {
+    // Do nothing
+  }
 
-    /* (non-Javadoc)
-     * @see org.kaaproject.kaa.common.channels.protocols.kaatcp.messages.mqttFrame#decode()
-     */
-    @Override
-    protected void decode() throws KaaTcpProtocolException {
+  /* (non-Javadoc)
+   * @see org.kaaproject.kaa.common.channels.protocols.kaatcp.messages.mqttFrame#decode()
+   */
+  @Override
+  protected void decode() throws KaaTcpProtocolException {
+    // Do nothing
+  }
 
-    }
-
-    /* (non-Javadoc)
-     * @see org.kaaproject.kaa.common.channels.protocols.kaatcp.messages.MqttFrame#isNeedCloseConnection()
-     */
-    @Override
-    public boolean isNeedCloseConnection() {
-        return false;
-    }
+  /* (non-Javadoc)
+   * @see
+   * org.kaaproject.kaa.common.channels.protocols.kaatcp.messages.MqttFrame#isNeedCloseConnection()
+   */
+  @Override
+  public boolean isNeedCloseConnection() {
+    return false;
+  }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,13 @@
 #include "kaa/event/registration/IDetachEndpointCallback.hpp"
 #include "kaa/common/exception/BadCredentials.hpp"
 #include "kaa/common/exception/TransportNotFoundException.hpp"
+#include "kaa/context/IExecutorContext.hpp"
+#include "kaa/utils/IThreadPool.hpp"
 
 namespace kaa {
 
-EndpointRegistrationManager::EndpointRegistrationManager(IKaaClientStateStoragePtr status)
-    : userTransport_(nullptr), status_(status)
-    , attachRequestId_(0), detachRequestId_(0)
+EndpointRegistrationManager::EndpointRegistrationManager(IKaaClientContext &context)
+    : context_(context), userTransport_(nullptr), attachRequestId_(0), detachRequestId_(0)
 {
 }
 
@@ -57,38 +58,41 @@ void EndpointRegistrationManager::onUserAttach(const UserAttachResponse& respons
     KAA_MUTEX_UNLOCKED("userAttachRequestGuard_");
 
     if (response.result == SyncResponseResultType::SUCCESS) {
-        status_->setEndpointAttachStatus(true);
+        context_.getStatus().setEndpointAttachStatus(true);
 
-        KAA_LOG_INFO(boost::format("Current endpoint was attached to '%1%'") % userExternalId);
+        KAA_LOG_INFO(boost::format("Endpoint was successfully attached to '%1%' user") % userExternalId);
 
         if (userAttachResponseListener_) {
-            userAttachResponseListener_->onAttachSuccess();
+            context_.getExecutorContext().getCallbackExecutor().add([this] {userAttachResponseListener_->onAttachSuccess(); } );
         }
     } else {
-        KAA_LOG_ERROR("Failed to attach to user");
+        KAA_LOG_ERROR(boost::format("Failed to attach endpoint to '%1%' user") % userExternalId);
 
         if (userAttachResponseListener_) {
-            userAttachResponseListener_->onAttachFailed(
-                    response.errorCode.is_null() ? UserAttachErrorCode::OTHER : response.errorCode.get_UserAttachErrorCode(),
-                    response.errorReason.is_null() ? "" : response.errorReason.get_string());
+            context_.getExecutorContext().getCallbackExecutor().add([this, response]
+            {
+                userAttachResponseListener_->onAttachFailed(
+                        response.errorCode.is_null() ? UserAttachErrorCode::OTHER : response.errorCode.get_UserAttachErrorCode(),
+                        response.errorReason.is_null() ? "" : response.errorReason.get_string());
+            } );
         }
     }
 }
 
 void EndpointRegistrationManager::onEndpointsAttach(const std::vector<EndpointAttachResponse>& attachResponses)
 {
-    for (const auto& attachResponse : attachResponses) {
-        KAA_MUTEX_LOCKING("attachEndpointGuard_");
-        KAA_MUTEX_UNIQUE_DECLARE(attachEndpointLock, attachEndpointGuard_);
-        KAA_MUTEX_LOCKED("attachEndpointGuard_");
+    KAA_MUTEX_LOCKING("attachEndpointGuard_");
+    KAA_MUTEX_UNIQUE_DECLARE(attachEndpointLock, attachEndpointGuard_);
+    KAA_MUTEX_LOCKED("attachEndpointGuard_");
 
+    for (const auto& attachResponse : attachResponses) {
         auto requestIt = attachEndpointRequests_.find(attachResponse.requestId);
         if (requestIt != attachEndpointRequests_.end()) {
             bool isAttachSuccess = (attachResponse.result == SyncResponseResultType::SUCCESS);
 
             if (isAttachSuccess) {
                 KAA_LOG_INFO(boost::format("Endpoint '%1%' (request id: %2%) was successfully attached")
-                                                                    % requestIt->second % requestIt->first);
+                                                                % requestIt->second % requestIt->first);
             } else {
                 KAA_LOG_ERROR(boost::format("Failed to attach endpoint '%1%' (request id: %2%)")
                                                             % requestIt->second % requestIt->first);
@@ -101,15 +105,15 @@ void EndpointRegistrationManager::onEndpointsAttach(const std::vector<EndpointAt
                 auto callback = listenerIt->second;
                 attachEndpointListeners_.erase(listenerIt);
 
-                KAA_MUTEX_UNLOCKING("attachEndpointGuard_");
-                KAA_UNLOCK(attachEndpointLock);
-                KAA_MUTEX_UNLOCKED("attachEndpointGuard_");
-
                 if (isAttachSuccess) {
-                    callback->onAttachSuccess(attachResponse.endpointKeyHash.is_null() ?
-                                                "" : attachResponse.endpointKeyHash.get_string());
+                    std::string endpointKeyHash = attachResponse.endpointKeyHash.is_null() ?
+                                                    "" : attachResponse.endpointKeyHash.get_string();
+                    context_.getExecutorContext().getCallbackExecutor().add([callback, endpointKeyHash]
+                                                                {
+                                                                    callback->onAttachSuccess(endpointKeyHash);
+                                                                });
                 } else {
-                    callback->onAttachFailed();
+                    context_.getExecutorContext().getCallbackExecutor().add([callback] { callback->onAttachFailed(); });
                 }
             }
         }
@@ -147,9 +151,9 @@ void EndpointRegistrationManager::onEndpointsDetach(const std::vector<EndpointDe
                 KAA_MUTEX_UNLOCKED("detachEndpointGuard_");
 
                 if (isDetachSuccess) {
-                    callback->onDetachSuccess();
+                    context_.getExecutorContext().getCallbackExecutor().add([callback] { callback->onDetachSuccess(); });
                 } else {
-                    callback->onDetachFailed();
+                    context_.getExecutorContext().getCallbackExecutor().add([callback] { callback->onDetachFailed(); });
                 }
             }
         }
@@ -158,24 +162,32 @@ void EndpointRegistrationManager::onEndpointsDetach(const std::vector<EndpointDe
 
 void EndpointRegistrationManager::onCurrentEndpointAttach(const UserAttachNotification& response)
 {
-    status_->setEndpointAttachStatus(true);
+    context_.getStatus().setEndpointAttachStatus(true);
 
     KAA_LOG_INFO(boost::format("Current endpoint was attached to '%1%' by '%2%'")
                                     % response.userExternalId % response.endpointAccessToken);
 
     if (attachStatusListener_) {
-        attachStatusListener_->onAttach(response.userExternalId, response.endpointAccessToken);
+        context_.getExecutorContext().getCallbackExecutor().add([this, response]
+                                                    {
+                                                        attachStatusListener_->onAttach(response.userExternalId,
+                                                                                        response.endpointAccessToken);
+                                                    });
+
     }
 }
 
 void EndpointRegistrationManager::onCurrentEndpointDetach(const UserDetachNotification& response)
 {
-    status_->setEndpointAttachStatus(false);
+    context_.getStatus().setEndpointAttachStatus(false);
 
     KAA_LOG_INFO(boost::format("Current endpoint was detached by '%1%'") % response.endpointAccessToken);
 
     if (attachStatusListener_) {
-        attachStatusListener_->onDetach(response.endpointAccessToken);
+        context_.getExecutorContext().getCallbackExecutor().add([this, response]
+                                                    {
+                                                        attachStatusListener_->onDetach(response.endpointAccessToken);
+                                                    });
     }
 }
 

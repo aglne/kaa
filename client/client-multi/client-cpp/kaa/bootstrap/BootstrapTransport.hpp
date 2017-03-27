@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ class BootstrapTransport : public AbstractKaaTransport<TransportType::BOOTSTRAP>
                          , public IBootstrapTransport
 {
 public:
-    BootstrapTransport(IKaaChannelManager& channelManager, IBootstrapManager &bootstrapManager);
+    BootstrapTransport(IKaaChannelManager& channelManager, IBootstrapManager &bootstrapManager, IKaaClientContext &context);
 
     virtual void sync();
 

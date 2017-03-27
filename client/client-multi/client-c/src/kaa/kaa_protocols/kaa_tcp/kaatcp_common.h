@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 extern "C" {
 #endif
 
-#include "../../platform/defaults.h"
+#include <platform/defaults.h>
 
 #define KAATCP_PROTOCOL_NAME_MAX_SIZE 10
 
@@ -50,6 +50,9 @@ extern "C" {
 
 #define KAA_TCP_NAME        "Kaatcp"
 #define KAA_TCP_NAME_LENGTH 6
+
+#define KAA_PING_MESSAGE_SIZE 2
+#define KAA_DISCONNECT_MESSAGE_SIZE 4
 
 typedef enum {
     KAATCP_ERR_NONE              = 0,
@@ -97,13 +100,14 @@ typedef struct {
 } kaatcp_connect_t;
 
 typedef enum {
-    KAATCP_CONNACK_UNKNOWN                = 0x00,
-    KAATCP_CONNACK_SUCCESS                = 0x01,
-    KAATCP_CONNACK_UNACCEPTABLE_VERSION   = 0x02,
-    KAATCP_CONNACK_IDENTIFIER_REJECTED    = 0x03,
-    KAATCP_CONNACK_SERVER_UNAVAILABLE     = 0x04,
-    KAATCP_CONNACK_REFUSE_BAD_CREDENTIALS = 0x05,
-    KAATCP_CONNACK_NOT_AUTHORIZED         = 0x06
+    KAATCP_CONNACK_UNKNOWN                    = 0x00,
+    KAATCP_CONNACK_SUCCESS                    = 0x01,
+    KAATCP_CONNACK_UNACCEPTABLE_VERSION       = 0x02,
+    KAATCP_CONNACK_IDENTIFIER_REJECTED        = 0x03,
+    KAATCP_CONNACK_SERVER_UNAVAILABLE         = 0x04,
+    KAATCP_CONNACK_REFUSE_BAD_CREDENTIALS     = 0x05,
+    KAATCP_CONNACK_NOT_AUTHORIZED             = 0x06,
+    KAATCP_CONNACK_REFUSE_VERIFICATION_FAILED = 0x10,
 } kaatcp_connack_code_t;
 
 typedef struct {
@@ -111,9 +115,10 @@ typedef struct {
 } kaatcp_connack_t;
 
 typedef enum {
-    KAATCP_DISCONNECT_NONE           = 0x00,
-    KAATCP_DISCONNECT_BAD_REQUEST    = 0x01,
-    KAATCP_DISCONNECT_INTERNAL_ERROR = 0x02,
+    KAATCP_DISCONNECT_NONE                = 0x00,
+    KAATCP_DISCONNECT_BAD_REQUEST         = 0x01,
+    KAATCP_DISCONNECT_INTERNAL_ERROR      = 0x02,
+    KAATCP_DISCONNECT_CREDENTIALS_REVOKED = 0x03,
 } kaatcp_disconnect_reason_t;
 
 typedef struct {

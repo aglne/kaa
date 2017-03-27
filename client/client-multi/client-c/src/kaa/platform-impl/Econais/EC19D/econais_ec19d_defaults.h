@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@
 #define KAA_TCP_CHANNEL_IN_BUFFER_SIZE      246
 #define KAA_TCP_CHANNEL_OUT_BUFFER_SIZE     1015
 
-#define KAA_TCP_CHANNEL_KEEPALIVE           300
+#define KAA_TCP_CHANNEL_MAX_TIMEOUT         200u
+#define KAA_TCP_CHANNEL_PING_TIMEOUT        (KAA_TCP_CHANNEL_MAX_TIMEOUT / 2)
 
 #define KAATCP_PARSER_MAX_MESSAGE_LENGTH    999
 

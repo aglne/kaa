@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,21 @@
 
 package org.kaaproject.kaa.server.common.dao.impl.sql;
 
+import org.kaaproject.kaa.server.common.dao.DBTestRunner;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.kaaproject.kaa.server.common.dao.DBTestRunner;
-
 public class H2DBTestRunner extends DBTestRunner {
 
-    @Override
-    protected PreparedStatement prepareStatement(Connection connection) throws SQLException {
-        return connection.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC'");
-    }
+  @Override
+  protected PreparedStatement prepareStatement(Connection connection) throws SQLException {
+    return connection.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC'");
+  }
 
-    @Override
-    protected String getTrancateSql() {
-        return new StringBuilder("DELETE FROM ").append(FORMATER).toString();
-    }
-
+  @Override
+  protected String getTrancateSql() {
+    return new StringBuilder("SET REFERENTIAL_INTEGRITY FALSE; TRUNCATE TABLE ").append(FORMATER).append("; SET REFERENTIAL_INTEGRITY TRUE;").toString();
+  }
 }

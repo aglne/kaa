@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,10 @@ import org.kaaproject.kaa.server.common.core.schema.RawSchema;
 
 public class RawDataFactory implements KaaDataFactory<RawSchema, RawData> {
 
-    @Override
-    public RawData createData(RawSchema schema, String data) {
-        return new RawData(schema, data);
-    }
-
+  @Override
+  public RawData createData(RawSchema schema, String data) {
+    return new RawData(schema, data);
+  }
 
 
 }

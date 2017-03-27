@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,23 +36,23 @@ public:
         : serverType_(type), accessPointId_(accessPointId)
         , protocolId_(protocolId), connectionData_(connectionData), isFailedState_(false) {}
 
-    virtual ServerType getServerType() {
+    virtual ServerType getServerType() const {
         return serverType_;
     }
 
-    virtual std::int32_t getAccessPointId() {
+    virtual std::int32_t getAccessPointId() const {
         return accessPointId_;
     }
 
-    virtual TransportProtocolId getTransportId() {
+    virtual TransportProtocolId getTransportId() const {
         return protocolId_;
     }
 
-    virtual const std::vector<std::uint8_t>& getConnectionInfo() {
+    virtual const std::vector<std::uint8_t>& getConnectionInfo() const {
         return connectionData_;
     }
 
-    virtual bool isFailedState() {
+    virtual bool isFailedState() const {
         return isFailedState_;
     }
 

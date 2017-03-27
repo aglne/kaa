@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ import org.kaaproject.kaa.server.common.zk.gen.ControlNodeInfo;
  */
 public interface ControlNodeAware {
 
-    /**
-     * Gets the control server info.
-     *
-     * @return the control server info
-     */
-    ControlNodeInfo getControlServerInfo();
+  /**
+   * Gets the control service info.
+   *
+   * @return the control service info
+   */
+  ControlNodeInfo getControlServerInfo();
 
 }

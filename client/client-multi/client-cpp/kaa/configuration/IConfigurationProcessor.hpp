@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,6 @@ namespace kaa {
  */
 class IConfigurationProcessor {
 public:
-    virtual ~IConfigurationProcessor() {}
-
     /**
      * Routine for processing received configuration data.
      *
@@ -42,7 +40,9 @@ public:
      * @param data_length   Size of configuration data.
      * @param full_resunc   Signals if data contains full configuration resync or partial update
      */
-    virtual void processConfigurationData(const std::uint8_t *data, std::size_t dataLength, bool fullResync) = 0;
+    virtual void processConfigurationData(const std::vector<std::uint8_t>& data, bool fullResync) = 0;
+
+    virtual ~IConfigurationProcessor() = default;
 };
 
 typedef std::shared_ptr<IConfigurationProcessor> IConfigurationProcessorPtr;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include "kaa/event/registration/UserTransport.hpp"
 #include "kaa/event/registration/IRegistrationProcessor.hpp"
 #include "kaa/event/registration/IEndpointRegistrationManager.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
@@ -38,11 +39,13 @@ struct EndpointDetachResponse;
 struct UserAttachNotification;
 struct UserDetachNotification;
 
+class IExecutorContext;
+
 class EndpointRegistrationManager : public IEndpointRegistrationManager
                                   , public IRegistrationProcessor
 {
 public:
-    EndpointRegistrationManager(IKaaClientStateStoragePtr status);
+    EndpointRegistrationManager(IKaaClientContext &context);
 
     virtual void attachEndpoint(const std::string&  endpointAccessToken
                               , IAttachEndpointCallbackPtr listener = IAttachEndpointCallbackPtr());
@@ -59,7 +62,7 @@ public:
                           , const std::string& userVerifierToken
                           , IUserAttachCallbackPtr listener = IUserAttachCallbackPtr());
 
-    virtual bool isAttachedToUser() { return status_->getEndpointAttachStatus(); }
+    virtual bool isAttachedToUser() { return context_.getStatus().getEndpointAttachStatus(); }
 
     virtual void setAttachStatusListener(IAttachStatusListenerPtr listener) { attachStatusListener_ = listener; }
 
@@ -89,8 +92,8 @@ private:
 #endif
 
 private:
+    IKaaClientContext         &context_;
     UserTransport*            userTransport_;
-    IKaaClientStateStoragePtr status_;
 
     std::shared_ptr<UserAttachRequest> userAttachRequest_;
     KAA_MUTEX_DECLARE(userAttachRequestGuard_);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,10 @@ typedef sndc_socklen_t kaa_socklen_t;
 
 #define KAA_HTONS(hostshort)        sndc_htons((hostshort))
 #define KAA_HTONL(hostlong)         sndc_htonl((hostlong))
-#define KAA_HTONLL(hostlonglong)    htonll((hostlonglong))
+#define KAA_HTONLL(hostlonglong)    kaa_htonll((hostlonglong))
 
 #define KAA_NTOHS(netshort)     sndc_ntohs((netshort))
 #define KAA_NTOHL(netlong)      sndc_ntohl((netlong))
-#define KAA_NTOHLL(netlonglong) ntohll((netlonglong))
+#define KAA_NTOHLL(netlonglong) kaa_ntohll((netlonglong))
 
 #endif /* ECONAIS_EC19D_SOCK_H_ */

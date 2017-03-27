@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 /**
- * Provides implementation of channel management and stuff 
+ * Provides implementation of channel management and stuff
  * for processing request/response to/from bootstrap and operation servers
  */
 package org.kaaproject.kaa.client.channel.impl;

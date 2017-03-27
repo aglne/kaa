@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,15 @@
 package org.kaaproject.kaa.client.profile;
 
 /**
- * Profile runtime exception
+ * Profile runtime exception.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public class ProfileRuntimeException extends RuntimeException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public ProfileRuntimeException(String message) {
-        super(message);
-    }
+  public ProfileRuntimeException(String message) {
+    super(message);
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 # ifndef KAA_CONFIGURATION_GEN_H_
 # define KAA_CONFIGURATION_GEN_H_
 
-# include "../kaa_common_schema.h"
-# include "../collections/kaa_list.h"
+# include "kaa_common_schema.h"
+# include "collections/kaa_list.h"
 
 # ifdef __cplusplus
 extern "C" {
@@ -31,8 +31,8 @@ extern "C" {
 # define KAA_UNION_NULL_OR_FIXED_BRANCH_0    0
 # define KAA_UNION_NULL_OR_FIXED_BRANCH_1    1
 
-kaa_union_t *kaa_union_null_or_fixed_branch_0_create();
-kaa_union_t *kaa_union_null_or_fixed_branch_1_create();
+kaa_union_t *kaa_union_null_or_fixed_branch_0_create(void);
+kaa_union_t *kaa_union_null_or_fixed_branch_1_create(void);
 
 kaa_union_t *kaa_union_null_or_fixed_deserialize(avro_reader_t reader);
 
@@ -48,7 +48,7 @@ typedef struct {
     destroy_fn   destroy;
 } kaa_configuration_root_record_t;
 
-kaa_configuration_root_record_t *kaa_configuration_root_record_create();
+kaa_configuration_root_record_t *kaa_configuration_root_record_create(void);
 kaa_configuration_root_record_t *kaa_configuration_root_record_deserialize(avro_reader_t reader);
 
 #ifdef __cplusplus

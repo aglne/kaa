@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transports.http.transport.commands;
 
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 
-import org.kaaproject.kaa.common.endpoint.CommonEPConstans;
+import org.kaaproject.kaa.common.endpoint.CommonEpConstans;
 import org.kaaproject.kaa.server.common.server.KaaCommandProcessor;
 
-public class LongSyncCommandFactory extends SyncCommandFactory{
+public class LongSyncCommandFactory extends SyncCommandFactory {
 
-    @Override
-    public String getCommandName() {
-        return CommonEPConstans.LONG_SYNC_COMMAND;
-    }
+  @Override
+  public String getCommandName() {
+    return CommonEpConstans.LONG_SYNC_COMMAND;
+  }
 
-    @Override
-    public KaaCommandProcessor<HttpRequest, HttpResponse> createCommandProcessor() {
-        return setupCommand(new LongSyncCommand());
-    }
+  @Override
+  public KaaCommandProcessor<HttpRequest, HttpResponse> createCommandProcessor() {
+    return setupCommand(new LongSyncCommand());
+  }
 
 }

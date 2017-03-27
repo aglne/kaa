@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define INOTIFICATIONLISTENER_HPP_
 
 #include <string>
+#include <cstdint>
 
 #include "kaa/notification/gen/NotificationDefinitions.hpp"
 
@@ -38,7 +39,7 @@ public:
      * @param[in] notification    The notification data.
      *
      */
-    virtual void onNotification(const std::string& topicId, const KaaNotification& notification) = 0;
+    virtual void onNotification(const std::int64_t topicId, const KaaNotification& notification) = 0;
 
     virtual ~INotificationListener() {}
 };

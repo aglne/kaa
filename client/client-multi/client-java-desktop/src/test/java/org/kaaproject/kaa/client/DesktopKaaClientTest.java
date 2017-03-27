@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,64 +16,81 @@
 
 package org.kaaproject.kaa.client;
 
-import java.io.File;
-
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kaaproject.kaa.client.profile.ProfileContainer;
-import org.kaaproject.kaa.schema.base.Profile;
+import org.kaaproject.kaa.schema.system.EmptyData;
 import org.mockito.Mockito;
+
+import java.io.File;
 
 public class DesktopKaaClientTest {
 
-    @Before
-    public void cleanup() {
-        File stateFile = new File("state.properties");
-        if (stateFile.exists()) {
-            stateFile.delete();
-        }
+  @Before
+  public void cleanup() {
+    File stateFile = new File("state.properties");
+    if (stateFile.exists()) {
+      stateFile.delete();
+    }
+  }
+
+  @After
+  public void cleanupBkpFile() {
+    File stateFile = new File("state.properties");
+    if (stateFile.exists()) {
+      stateFile.delete();
+    }
+  }
+
+  @Test
+  public void testClientInit() throws Exception {
+
+    System.setProperty(KaaClientProperties.KAA_CLIENT_PROPERTIES_FILE, "client-test.properties");
+    KaaClient clientSpy = Mockito.spy(Kaa.newClient(new DesktopKaaPlatformContext(), null, true));
+
+    ProfileContainer profileContainerMock = Mockito.mock(ProfileContainer.class);
+    Mockito.when(profileContainerMock.getProfile()).thenReturn(new EmptyData());
+    clientSpy.setProfileContainer(profileContainerMock);
+
+    try {
+      clientSpy.start();
+    } finally {
+      clientSpy.stop();
     }
 
-    @Test
-    public void testClientInit() throws Exception {
+  }
 
-        System.setProperty(KaaClientProperties.KAA_CLIENT_PROPERTIES_FILE, "client-test.properties");
-        KaaClient clientSpy = Mockito.spy(Kaa.newClient(new DesktopKaaPlatformContext(), null));
+  @Test
+  public void testClientStartBeforeInit() throws Exception {
+    System.setProperty(KaaClientProperties.KAA_CLIENT_PROPERTIES_FILE, "client-test.properties");
+    KaaClient clientSpy = Mockito.spy(Kaa.newClient(new DesktopKaaPlatformContext(), null, true));
 
-        try {
-            clientSpy.start();
-        } finally {
-            clientSpy.stop();
-        }
+    ProfileContainer profileContainerMock = Mockito.mock(ProfileContainer.class);
+    Mockito.when(profileContainerMock.getProfile()).thenReturn(new EmptyData());
+    clientSpy.setProfileContainer(profileContainerMock);
 
-    }
+    // does nothing before initialization;
+    clientSpy.start();
+  }
 
-    @Test
-    public void testClientStartBeforeInit() throws Exception {
-        System.setProperty(KaaClientProperties.KAA_CLIENT_PROPERTIES_FILE, "client-test.properties");
-        KaaClient clientSpy = Mockito.spy(Kaa.newClient(new DesktopKaaPlatformContext(), null));
+  @Test
+  public void testClientStartPollAfterInit() throws Exception {
 
-        // does nothing before initialization;
-        clientSpy.start();
-    }
+    System.setProperty(KaaClientProperties.KAA_CLIENT_PROPERTIES_FILE, "client-test.properties");
 
-    @Test
-    public void testClientStartPollAfterInit() throws Exception {
+    KaaClient clientSpy = Mockito.spy(Kaa.newClient(new DesktopKaaPlatformContext(), null, true));
+    ProfileContainer profileContainerMock = Mockito.mock(ProfileContainer.class);
 
-        System.setProperty(KaaClientProperties.KAA_CLIENT_PROPERTIES_FILE, "client-test.properties");
+    clientSpy.setProfileContainer(profileContainerMock);
 
-        KaaClient clientSpy = Mockito.spy(Kaa.newClient(new DesktopKaaPlatformContext(), null));
-        ProfileContainer profileContainerMock = Mockito.mock(ProfileContainer.class);
+    Mockito.when(profileContainerMock.getProfile()).thenReturn(new EmptyData());
 
-        clientSpy.setProfileContainer(profileContainerMock);
+    clientSpy.start();
 
-        Mockito.when(profileContainerMock.getProfile()).thenReturn(new Profile());
+    Thread.sleep(5000L);
 
-        clientSpy.start();
-
-        Thread.sleep(5000L);
-
-        clientSpy.stop();
-    }
+    clientSpy.stop();
+  }
 
 }

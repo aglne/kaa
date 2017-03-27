@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.client.context;
+
+import org.kaaproject.kaa.client.KaaClient;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
-
-import org.kaaproject.kaa.client.KaaClient;
 
 /**
  * Responsible for creation of {@link ExecutorService executor} instances for
@@ -27,48 +28,47 @@ import org.kaaproject.kaa.client.KaaClient;
  * {@link KaaClient#stop()}, thus {@link ExecutorService executor} instances
  * should not be cached in context or context should check shutdown status
  * before return of cached value.
- * 
- * @author Andrew Shvayka
  *
+ * @author Andrew Shvayka
  */
 public interface ExecutorContext {
 
-    /**
-     * Initialize executors
-     */
-    void init();
+  /**
+   * Initialize executors.
+   */
+  void init();
 
-    /**
-     * Stops executors
-     */
-    void stop();
+  /**
+   * Stops executors.
+   */
+  void stop();
 
-    /**
-     * Executes lifecycle events/commands of Kaa client
-     * 
-     * @return the lifecycle executor
-     */
-    ExecutorService getLifeCycleExecutor();
+  /**
+   * Executes lifecycle events/commands of Kaa client.
+   *
+   * @return the lifecycle executor
+   */
+  ExecutorService getLifeCycleExecutor();
 
-    /**
-     * Executes user API calls to SDK client. For example, serializing of log
-     * records before submit to transport
-     * 
-     * @return the API executor
-     */
-    ExecutorService getApiExecutor();
+  /**
+   * Executes user API calls to SDK client. For example, serializing of log
+   * records before submit to transport.
+   *
+   * @return the API executor
+   */
+  ExecutorService getApiExecutor();
 
-    /**
-     * Executes callback methods provided by SDK client user.
-     * 
-     * @return the callback executor
-     */
-    ExecutorService getCallbackExecutor();
+  /**
+   * Executes callback methods provided by SDK client user.
+   *
+   * @return the callback executor
+   */
+  ExecutorService getCallbackExecutor();
 
-    /**
-     * Executes scheduled tasks(periodically if needed) as log upload
-     *
-     * @return the scheduled executor
-     */
-    ScheduledExecutorService getScheduledExecutor();
+  /**
+   * Executes scheduled tasks(periodically if needed) as log upload.
+   *
+   * @return the scheduled executor
+   */
+  ScheduledExecutorService getScheduledExecutor();
 }

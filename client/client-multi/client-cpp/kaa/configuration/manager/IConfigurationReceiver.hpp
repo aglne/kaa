@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@ namespace kaa {
  */
 class IConfigurationReceiver {
 public:
-    virtual ~IConfigurationReceiver() {};
-
     /**
      * Specific routine to process updated configuration.
      * Will be called by @link IConfigurationManager @endlink
@@ -38,6 +36,8 @@ public:
      * @param configuration Root record containing merged configuration.
      */
     virtual void onConfigurationUpdated(const KaaRootConfiguration &configuration) = 0;
+
+    virtual ~IConfigurationReceiver() = default;
 };
 
 }  // namespace kaa

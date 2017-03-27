@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_array.hpp>
 #include "kaa/kaatcp/KaaTcpCommon.hpp"
+#include "kaa/IKaaClientContext.hpp"
 #include <list>
 
 namespace kaa {
@@ -38,9 +39,9 @@ enum class KaaTcpParserState : std::uint8_t
 class KaaTcpParser : boost::noncopyable
 {
 public:
-    KaaTcpParser() :
+    KaaTcpParser(IKaaClientContext &context) :
             state_(KaaTcpParserState::NONE), messageLength_(0), processedPayloadLength_(0)
-          , lenghtMultiplier_(1), messageType_(KaaTcpMessageType::MESSAGE_UNKNOWN) { }
+          , lenghtMultiplier_(1), messageType_(KaaTcpMessageType::MESSAGE_UNKNOWN), context_(context) { }
     ~KaaTcpParser() { }
 
     void parseBuffer(const char *buffer, std::uint32_t size);
@@ -67,6 +68,7 @@ private:
     KaaTcpMessageType messageType_;
     boost::shared_array<char> messagePayload_;
     MessageRecordList messages_;
+    IKaaClientContext &context_;
 };
 
 }

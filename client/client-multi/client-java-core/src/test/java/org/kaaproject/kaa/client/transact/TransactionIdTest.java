@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@
 package org.kaaproject.kaa.client.transact;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+
 import org.junit.Test;
 
 public class TransactionIdTest {
-    @Test
-    public void testEqualsAndHashCode() {
-        EqualsVerifier.forClass(TransactionId.class).verify();
-    }
+  @Test
+  public void testEqualsAndHashCode() {
+    EqualsVerifier.forClass(TransactionId.class).verify();
+  }
 }

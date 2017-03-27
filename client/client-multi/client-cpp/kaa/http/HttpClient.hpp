@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,18 @@
 
 #include "kaa/KaaThread.hpp"
 
+#include "kaa/IKaaClientContext.hpp"
+
 namespace kaa {
 
 class HttpClient : public IHttpClient
 {
 public:
-    HttpClient() : io_(), sock_(io_) { }
-    ~HttpClient() { }
+    HttpClient(IKaaClientContext &context)
+        : io_(), sock_(io_), context_(context)
+    { }
 
-    virtual std::shared_ptr<IHttpResponse> sendRequest(const IHttpRequest& request);
+    virtual std::shared_ptr<IHttpResponse> sendRequest(const IHttpRequest& request, EndpointConnectionInfo* connection = nullptr);
     virtual void closeConnection();
 
 private:
@@ -44,6 +47,8 @@ private:
     boost::asio::ip::tcp::socket sock_;
 
     KAA_MUTEX_DECLARE(httpClientGuard_);
+
+    IKaaClientContext &context_;
 };
 
 }

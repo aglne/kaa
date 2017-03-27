@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,31 @@
 #ifndef DEFAULTFAILOVERSTRATEGY_HPP_
 #define DEFAULTFAILOVERSTRATEGY_HPP_
 
+#include <cstddef>
+
 #include "kaa/failover/IFailoverStrategy.hpp"
 
 namespace kaa {
 
+class IKaaClientContext;
+
 class DefaultFailoverStrategy: public IFailoverStrategy {
 public:
+    DefaultFailoverStrategy(IKaaClientContext& context, std::size_t retryPeriod = DEFAULT_RETRY_PERIOD)
+        : context_(context), retryPeriod_(retryPeriod)
+    {
 
-	virtual FailoverStrategyDecision onFailover(Failover failover);
+    }
+
+    virtual FailoverStrategyDecision onFailover(KaaFailoverReason failover);
 
 public:
-    static const std::size_t DEFAULT_BOOTSTRAP_SERVERS_RETRY_PERIOD = 2;
+    static const std::size_t DEFAULT_RETRY_PERIOD = 5;
 
-    static const std::size_t DEFAULT_OPERATION_SERVERS_RETRY_PERIOD = 2;
+protected:
+    IKaaClientContext &context_;
 
-    static const std::size_t DEFAULT_NO_OPERATION_SERVERS_RETRY_PERIOD = 2;
-
-    static const std::size_t DEFAULT_NO_CONNECTIVITY_RETRY_PERIOD = 5;
-
-private:
-    std::size_t bootstrapServersRetryPeriod_ = DEFAULT_BOOTSTRAP_SERVERS_RETRY_PERIOD;
-    std::size_t operationServersRetryPeriod_ = DEFAULT_OPERATION_SERVERS_RETRY_PERIOD;
-    std::size_t noOperationServersRetryPeriod_ = DEFAULT_NO_OPERATION_SERVERS_RETRY_PERIOD;
-    std::size_t noConnectivityRetryPeriod_ = DEFAULT_NO_CONNECTIVITY_RETRY_PERIOD;
+    std::size_t retryPeriod_ = DEFAULT_RETRY_PERIOD;
 };
 
 }

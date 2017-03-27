@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 typedef uint32_t kaa_time_t;
 
-kaa_time_t ext_get_systime();
+kaa_time_t ext_get_systime(void);
 
 #define KAA_TIME() ext_get_systime()
 

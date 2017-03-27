@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace kaa {
 /**
  * @typedef The user-defined notification structure.
  */
-typedef kaa_notification::BasicNotification KaaNotification;
+typedef kaa_notification::EmptyData KaaNotification;
 
 typedef std::vector<Topic> Topics;
 typedef std::vector<Notification> Notifications;

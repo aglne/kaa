@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "kaa/log/ILogUploadStrategy.hpp"
 #include "kaa/channel/IKaaChannelManager.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
@@ -51,37 +52,35 @@ namespace kaa {
  */
 class DefaultLogUploadStrategy: public ILogUploadStrategy {
 public:
+    DefaultLogUploadStrategy(IKaaClientContext &context): context_(context) {}
+
     virtual LogUploadStrategyDecision isUploadNeeded(ILogStorageStatus& status);
 
     virtual void onTimeout(ILogFailoverCommand& controller);
     virtual void onFailure(ILogFailoverCommand& controller, LogDeliveryErrorCode code);
 
-    virtual std::size_t getBatchSize() { return batchSize_; }
-    virtual std::size_t getRecordsBatchCount() { return recordsBatchCount_; }
-
     virtual std::size_t getTimeout() { return uploadTimeout_; }
+    void setUploadTimeout(std::size_t timeout) { uploadTimeout_ = timeout; }
 
     virtual std::size_t getTimeoutCheckPeriod() { return timeoutCheckPeriod_; }
+    void setTimeoutCheckPeriod(std::size_t period) { timeoutCheckPeriod_ = period; }
 
     virtual std::size_t getLogUploadCheckPeriod() { return logUploadCheckReriod_;  };
-
-    void setBatchSize(std::size_t size) { batchSize_ = size; }
-    void setRecordsBatchCount(std::size_t count)  { recordsBatchCount_ = count; }
-    void setUploadTimeout(std::size_t timeout) { uploadTimeout_ = timeout; }
-    void setUploadTimeoutCheckPeriod(std::size_t period) { timeoutCheckPeriod_ = period; }
     void setLogUploadCheckPeriod(std::size_t period) { logUploadCheckReriod_ = period; }
 
+    virtual std::size_t getMaxParallelUploads() { return maxParallelUploads_; }
+    void setMaxParallelUploads(std::size_t count) { maxParallelUploads_ = count; }
+
+    std::size_t getRetryPeriod() { return retryReriod_; }
     void setRetryPeriod(std::size_t period) { retryReriod_ = period; }
+
+    std::size_t getVolumeThreshold() const { return uploadVolumeThreshold_; }
     void setVolumeThreshold(std::size_t maxVolume) { uploadVolumeThreshold_ = maxVolume; }
+
+    std::size_t getCountThreshold() const { return uploadCountThreshold_; }
     void setCountThreshold(std::size_t maxCount) { uploadCountThreshold_ = maxCount; }
 
 public:
-    static const std::size_t DEFAULT_BATCH_SIZE = 8 * 1024; /*!< The default value (in bytes) for the maximum size of
-                                                                 the report pack that will be delivered in a single
-                                                                 request to the Operaions server. */
-
-    static const std::size_t DEFAULT_RECORDS_BATCH_COUNT = 256;
-
     static const std::size_t DEFAULT_UPLOAD_TIMEOUT = 2 * 60; /*!< The default value (in seconds) for time to wait
                                                                    the log delivery response. */
 
@@ -98,11 +97,10 @@ public:
     static const std::size_t DEFAULT_UPLOAD_COUNT_THRESHOLD = 64; /*!< The default value for the log count to initiate
                                                                        the log upload. */
 
-private:
-    std::size_t batchSize_ = DEFAULT_BATCH_SIZE;
+    static const std::size_t DEFAULT_MAX_PARALLEL_UPLOADS = INT32_MAX;  /*!< The default value for Max amount of log batches
+                                                                             allowed to be uploaded parallel. */
 
-    std::size_t recordsBatchCount_ = DEFAULT_RECORDS_BATCH_COUNT;
-
+protected:
     std::size_t uploadTimeout_ = DEFAULT_UPLOAD_TIMEOUT;
     std::size_t retryReriod_ = DEFAULT_RETRY_PERIOD;
 
@@ -113,6 +111,11 @@ private:
     std::size_t uploadVolumeThreshold_ = DEFAULT_UPLOAD_VOLUME_THRESHOLD;
     std::size_t uploadCountThreshold_ = DEFAULT_UPLOAD_COUNT_THRESHOLD;
 
+    std::size_t maxParallelUploads_ = DEFAULT_MAX_PARALLEL_UPLOADS;
+
+    IKaaClientContext &context_;
+
+private:
     typedef std::chrono::system_clock Clock;
     std::chrono::time_point<Clock> nextUploadAttemptTS_;
 };

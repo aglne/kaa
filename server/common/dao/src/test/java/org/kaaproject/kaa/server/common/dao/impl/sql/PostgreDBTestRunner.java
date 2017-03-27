@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.common.dao.impl.sql;
+
+import org.kaaproject.kaa.server.common.dao.DBTestRunner;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.kaaproject.kaa.server.common.dao.DBTestRunner;
-
 public class PostgreDBTestRunner extends DBTestRunner {
 
-    @Override
-    protected PreparedStatement prepareStatement(Connection connection) throws SQLException {
-        return connection.prepareStatement("SELECT tablename FROM pg_tables where schemaname = 'public'");
-    }
+  @Override
+  protected PreparedStatement prepareStatement(Connection connection) throws SQLException {
+    return connection.prepareStatement("SELECT tablename FROM pg_tables where schemaname = 'public'");
+  }
 
-    @Override
-    protected String getTrancateSql() {
-        return new StringBuilder("TRUNCATE TABLE ").append(FORMATER).append(" CASCADE").toString();
-    }
+  @Override
+  protected String getTrancateSql() {
+    return new StringBuilder("TRUNCATE TABLE ").append(FORMATER).append(" CASCADE").toString();
+  }
+
 }

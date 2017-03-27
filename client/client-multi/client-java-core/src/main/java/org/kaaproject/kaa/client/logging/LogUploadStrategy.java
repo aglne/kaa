@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,55 +33,50 @@ import org.kaaproject.kaa.common.endpoint.gen.LogDeliveryErrorCode;
  * </p>
  */
 public interface LogUploadStrategy {
-    /**
-     * Retrieves log upload decision based on current storage status and defined
-     * upload configuration.
-     *
-     * @param status
-     *            Log storage status
-     *
-     * @return Upload decision ({@link LogUploadStrategyDecision})
-     */
-    LogUploadStrategyDecision isUploadNeeded(LogStorageStatus status);
+  /**
+   * Retrieves log upload decision based on current storage status and defined
+   * upload configuration.
+   *
+   * @param status Log storage status
+   * @return Upload decision ({@link LogUploadStrategyDecision})
+   */
+  LogUploadStrategyDecision isUploadNeeded(LogStorageStatus status);
 
-    /**
-     * Retrieves maximum size of the report pack 
-     * that will be delivered in single request to server 
-     * @return size of the batch
-     */
-    long getBatchSize();
+  /**
+   * Maximum time to wait log delivery response.
+   *
+   * @return Time in seconds.
+   */
+  int getTimeout();
 
-    /**
-     * Retrieves maximum count of the records in report pack 
-     * that will be delivered in single request to server 
-     * @return size of the batch
-     */
-    int getBatchCount();
+  /**
+   * If there are records in storage we need to periodically check isUploadNeeded method. This is
+   * useful if client want to upload logs on certain timing conditions instead of log storage
+   * checks.
+   *
+   * @return Time in seconds
+   */
+  int getUploadCheckPeriod();
 
-    /**
-     * Maximum time to wait log delivery response.
-     *
-     * @return Time in seconds.
-     */
-    int getTimeout();
-    
-    /**
-     * If there are records in storage we need to periodically check isUploadNeeded method.
-     * This is useful if client want to upload logs on certain timing conditions instead of log storage checks
-     * 
-     * @return Time in seconds
-     */
-    int getUploadCheckPeriod();
+  /**
+   * Returns max parallel upload count.
+   *
+   * @return Max parallel upload count
+   */
+  int getMaxParallelUploads();
 
-    /**
-     * Handles timeout of log delivery
-     * @param controller
-     */
-    void onTimeout(LogFailoverCommand controller);
+  /**
+   * Handles timeout of log delivery.
+   *
+   * @param controller the controller
+   */
+  void onTimeout(LogFailoverCommand controller);
 
-    /**
-     * Handles failure of log delivery
-     * @param controller
-     */
-    void onFailure(LogFailoverCommand controller, LogDeliveryErrorCode code);
+  /**
+   * Handles failure of log delivery.
+   *
+   * @param controller the controller
+   * @param code       the code
+   */
+  void onFailure(LogFailoverCommand controller, LogDeliveryErrorCode code);
 }

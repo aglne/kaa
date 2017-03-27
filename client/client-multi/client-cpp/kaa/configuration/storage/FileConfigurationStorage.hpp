@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,9 @@ public:
     FileConfigurationStorage(const std::string& filename) : filename_(filename) { }
     FileConfigurationStorage(std::string&& filename) : filename_(std::move(filename)) { }
 
-    virtual void saveConfiguration(std::vector<std::uint8_t>&& bytes);
+    virtual void saveConfiguration(const std::vector<std::uint8_t>& bytes);
     virtual std::vector<std::uint8_t> loadConfiguration();
+    virtual void clearConfiguration();
 
 private:
     std::string filename_;

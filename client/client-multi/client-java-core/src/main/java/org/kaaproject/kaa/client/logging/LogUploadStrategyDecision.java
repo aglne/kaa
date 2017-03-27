@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ package org.kaaproject.kaa.client.logging;
  * Describes all possible decisions for a log upload strategy ({@link LogUploadStrategy}).
  */
 public enum LogUploadStrategyDecision {
-    /**
-     * Do nothing except adding log record to a storage.
-     */
-    NOOP,
-    /**
-     * Kaa SDK should initiate log upload on the Operation server.
-     */
-    UPLOAD
+  /**
+   * Do nothing except adding log record to a storage.
+   */
+  NOOP,
+  /**
+   * Kaa SDK should initiate log upload on the Operation server.
+   */
+  UPLOAD
 }

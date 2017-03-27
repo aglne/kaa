@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,24 +25,24 @@ import org.kaaproject.kaa.common.dto.EventClassFamilyVersionStateDto;
 
 public class EndpointClassFamilyVersionStateTest {
 
-    @Test
-    public void basicTest() {
-        EventClassFamilyVersionState state = new EventClassFamilyVersionState();
-        state.setEcfId("testID");
-        state.setVersion(42);
+  @Test
+  public void basicTest() {
+    EventClassFamilyVersionState state = new EventClassFamilyVersionState();
+    state.setEcfId("testID");
+    state.setVersion(42);
 
-        EventClassFamilyVersionStateDto dto = state.toDto();
+    EventClassFamilyVersionStateDto dto = state.toDto();
 
-        EventClassFamilyVersionState state2 = new EventClassFamilyVersionState(dto);
+    EventClassFamilyVersionState state2 = new EventClassFamilyVersionState(dto);
 
-        Assert.assertEquals(state.getEcfId(), state2.getEcfId());
-        Assert.assertEquals(state.getVersion(), state2.getVersion());
-    }
+    Assert.assertEquals(state.getEcfId(), state2.getEcfId());
+    Assert.assertEquals(state.getVersion(), state2.getVersion());
+  }
 
-    @Test
-    public void hashCodeEqualsTest(){
-        EqualsVerifier.forClass(EventClassFamilyVersionState.class).suppress(Warning.NONFINAL_FIELDS).verify();
-    }
+  @Test
+  public void hashCodeEqualsTest() {
+    EqualsVerifier.forClass(EventClassFamilyVersionState.class).suppress(Warning.NONFINAL_FIELDS).verify();
+  }
 
 
 }

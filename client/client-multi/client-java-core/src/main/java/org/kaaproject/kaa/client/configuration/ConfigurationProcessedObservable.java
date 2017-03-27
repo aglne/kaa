@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,26 @@
 package org.kaaproject.kaa.client.configuration;
 
 /**
- * Notifies subscribers when all deltas have been already processed
+ * Notifies subscribers when all deltas have been already processed.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface ConfigurationProcessedObservable {
 
-    /**
-     * Subscribes observer of configuration processing finished.
-     *
-     * @param callback Receiver to be subscribed.
-     * @see ConfigurationProcessedObserver
-     *
-     */
-    void addOnProcessedCallback(ConfigurationProcessedObserver callback);
+  /**
+   * Subscribes observer of configuration processing finished.
+   *
+   * @param callback Receiver to be subscribed.
+   * @see ConfigurationProcessedObserver
+   */
+  void addOnProcessedCallback(ConfigurationProcessedObserver callback);
 
-    /**
-     * Unsubscribes observer of configuration processing finished.
-     *
-     * @param callback Receiver to be unsubscribed.
-     * @see ConfigurationProcessedObserver
-     *
-     */
-    void removeOnProcessedCallback(ConfigurationProcessedObserver callback);
+  /**
+   * Unsubscribes observer of configuration processing finished.
+   *
+   * @param callback Receiver to be unsubscribed.
+   * @see ConfigurationProcessedObserver
+   */
+  void removeOnProcessedCallback(ConfigurationProcessedObserver callback);
 
 }

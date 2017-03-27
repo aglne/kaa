@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,67 +16,74 @@
 
 package org.kaaproject.kaa.client.schema.storage;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-
 import org.apache.avro.Schema;
 import org.kaaproject.kaa.client.schema.SchemaProcessor;
 import org.kaaproject.kaa.client.schema.SchemaRuntimeException;
 import org.kaaproject.kaa.client.schema.SchemaUpdatesReceiver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
 /**
- * Default {@link SchemaPersistenceManager} implementation
+ * Default {@link SchemaPersistenceManager} implementation.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public class DefaultSchemaPersistenceManager implements
-        SchemaPersistenceManager, SchemaUpdatesReceiver {
+    SchemaPersistenceManager, SchemaUpdatesReceiver {
 
-    private SchemaProcessor processor;
-    private SchemaStorage storage;
-    private boolean ignoreNextUpdate = false;
+  /**
+   * The Constant LOG.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultSchemaPersistenceManager.class);
 
-    public DefaultSchemaPersistenceManager() {
+  private SchemaProcessor processor;
+  private SchemaStorage storage;
+  private boolean ignoreNextUpdate = false;
 
-    }
+  public DefaultSchemaPersistenceManager() {
 
-    public DefaultSchemaPersistenceManager(SchemaProcessor processor) {
-        this.processor = processor;
-    }
+  }
 
-    @Override
-    public synchronized void onSchemaUpdated(Schema schema) {
-        if (!ignoreNextUpdate) {
-            try {
-                byte [] schemaBuffer = schema.toString().getBytes("UTF-8");
-                ByteBuffer buffer = ByteBuffer.wrap(schemaBuffer);
-                if (storage != null) {
-                    storage.saveSchema(buffer);
-                }
-            } catch (UnsupportedEncodingException e) {
-                throw new SchemaRuntimeException("Failed to save schema");
-            }
-        } else {
-            ignoreNextUpdate = false;
+  public DefaultSchemaPersistenceManager(SchemaProcessor processor) {
+    this.processor = processor;
+  }
+
+  @Override
+  public synchronized void onSchemaUpdated(Schema schema) {
+    if (!ignoreNextUpdate) {
+      try {
+        byte[] schemaBuffer = schema.toString().getBytes("UTF-8");
+        ByteBuffer buffer = ByteBuffer.wrap(schemaBuffer);
+        if (storage != null) {
+          storage.saveSchema(buffer);
         }
+      } catch (UnsupportedEncodingException ex) {
+        LOG.error("Failed to save schema: ", ex);
+        throw new SchemaRuntimeException("Failed to save schema");
+      }
+    } else {
+      ignoreNextUpdate = false;
     }
+  }
 
-    @Override
-    public synchronized void setSchemaStorage(SchemaStorage storage) throws IOException {
-        this.storage = storage;
-        if (processor.getSchema() == null) {
-            ByteBuffer schemaBuffer = storage.loadSchema();
-            if (schemaBuffer != null) {
-                ignoreNextUpdate = true;
-                processor.loadSchema(schemaBuffer);
-            }
-        }
+  @Override
+  public synchronized void setSchemaStorage(SchemaStorage storage) throws IOException {
+    this.storage = storage;
+    if (processor.getSchema() == null) {
+      ByteBuffer schemaBuffer = storage.loadSchema();
+      if (schemaBuffer != null) {
+        ignoreNextUpdate = true;
+        processor.loadSchema(schemaBuffer);
+      }
     }
+  }
 
-    public void setSchemaProcessor(SchemaProcessor processor) {
-        this.processor = processor;
-    }
+  public void setSchemaProcessor(SchemaProcessor processor) {
+    this.processor = processor;
+  }
 
 }

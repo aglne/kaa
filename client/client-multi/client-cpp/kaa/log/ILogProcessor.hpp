@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,10 @@ public:
     /**
      * Called when log upload response arrived.
      *
-     * \param   response    Response from operations server.
+     * \param   response        Response from operations service.
+     * \param   deliveryTime    The time point the log was delivered at.
      */
-    virtual void onLogUploadResponse(const LogSyncResponse& response) = 0;
+    virtual void onLogUploadResponse(const LogSyncResponse& response, std::size_t deliveryTime) = 0;
 
     virtual ~ILogProcessor() {}
 };

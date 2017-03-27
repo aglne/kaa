@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transport.platform;
 
 /**
  * A marker interface indicating that a class has basic knowledge about the
  * related platform layer that is used to encode/decode messages.
- * 
+ *
  * @author Andrew Shvayka
  */
 public interface PlatformAware {
 
-    /**
-     * Returns the platform layer id
-     * 
-     * @return the platform layer id
-     */
-    int getPlatformId();
+  /**
+   * Returns the platform layer id.
+   *
+   * @return the platform layer id
+   */
+  int getPlatformId();
 
 }

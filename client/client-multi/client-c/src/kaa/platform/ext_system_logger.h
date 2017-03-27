@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 #ifndef EXT_SYSTEM_LOGGER_H_
 #define EXT_SYSTEM_LOGGER_H_
 
-#include "../kaa_error.h"
-#include "../platform/time.h"
+#include "kaa_error.h"
+#include <platform/time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,7 +40,7 @@ void ext_write_log(FILE * sink, const char * buffer, size_t message_size);
  *
  * @return  time_t      Time in seconds.
  */
-kaa_time_t ext_get_systime();
+kaa_time_t ext_get_systime(void);
 
 /**
  * @brief Put formated LOG prefix in buffer.

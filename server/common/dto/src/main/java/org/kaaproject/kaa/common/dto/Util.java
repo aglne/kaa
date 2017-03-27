@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,20 @@ import java.util.Arrays;
 
 public class Util {
 
-    public static byte[] getArrayCopy(byte[] array) {
-        byte[] bytes = null;
-        if (array != null) {
-            bytes = Arrays.copyOf(array, array.length);
-        }
-        return bytes;
+  private Util() {
+  }
+
+  /**
+   * Copies an array.
+   *
+   * @param array array
+   * @return      array copy
+   */
+  public static byte[] getArrayCopy(byte[] array) {
+    byte[] bytes = null;
+    if (array != null) {
+      bytes = Arrays.copyOf(array, array.length);
     }
+    return bytes;
+  }
 }

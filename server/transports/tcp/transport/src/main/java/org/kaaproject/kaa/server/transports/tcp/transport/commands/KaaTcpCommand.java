@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transports.tcp.transport.commands;
 
 import org.kaaproject.kaa.server.transports.tcp.transport.netty.AbstractKaaTcpCommandProcessor;
 
-public class KaaTcpCommand extends AbstractKaaTcpCommandProcessor{
+public class KaaTcpCommand extends AbstractKaaTcpCommandProcessor {
 
-    static final String KAA_TCP = "KaaTcp";
+  static final String KAA_TCP = "KaaTcp";
 
-    @Override
-    public String getName() {
-        return KAA_TCP;
-    }
+  @Override
+  public String getName() {
+    return KAA_TCP;
+  }
 
 }

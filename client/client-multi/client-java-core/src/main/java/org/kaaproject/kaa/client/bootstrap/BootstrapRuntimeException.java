@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,9 @@ package org.kaaproject.kaa.client.bootstrap;
 
 public class BootstrapRuntimeException extends RuntimeException {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -1884411210618404248L;
+  private static final long serialVersionUID = -1884411210618404248L;
 
-    public BootstrapRuntimeException(String message) {
-        super(message);
-    }
+  public BootstrapRuntimeException(String message) {
+    super(message);
+  }
 }

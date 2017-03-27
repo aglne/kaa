@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 
 #include "kaa/channel/transport/AbstractKaaTransport.hpp"
 #include "kaa/channel/transport/ILoggingTransport.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
@@ -28,12 +29,12 @@ class ILogProcessor;
 
 class LoggingTransport : public AbstractKaaTransport<TransportType::LOGGING>, public ILoggingTransport {
 public:
-    LoggingTransport(IKaaChannelManager &manager, ILogProcessor& logProcessor);
+    LoggingTransport(IKaaChannelManager &manager, ILogProcessor& logProcessor, IKaaClientContext &context);
 
     virtual void sync();
 
     virtual std::shared_ptr<LogSyncRequest> createLogSyncRequest();
-    virtual void onLogSyncResponse(const LogSyncResponse& response);
+    virtual void onLogSyncResponse(const LogSyncResponse& response, std::size_t deliveryTime);
 
 private:
     ILogProcessor&   logProcessor_;

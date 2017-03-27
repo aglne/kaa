@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,14 +39,6 @@ public:
      *
      */
     virtual void sync() = 0;
-
-    /**
-     * Sets the client's state object.
-     *
-     * @param state state object to be set.
-     *
-     */
-    virtual void setClientState(IKaaClientStateStoragePtr status) = 0;
 
     virtual ~IKaaTransport() {}
 };

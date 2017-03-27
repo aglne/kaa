@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.common.dao.service;
 
 import org.junit.After;
@@ -29,18 +30,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = "/mongo-dao-test-context.xml")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class MongoDBHistoryServiceImplTest extends HistoryServiceImplTest {
-    @BeforeClass
-    public static void init() throws Exception {
-        MongoDBTestRunner.setUp();
-    }
+  @BeforeClass
+  public static void init() throws Exception {
+    MongoDBTestRunner.setUp();
+  }
 
-    @AfterClass
-    public static void after() throws Exception {
-        MongoDBTestRunner.tearDown();
-    }
+  @AfterClass
+  public static void after() throws Exception {
+    MongoDBTestRunner.tearDown();
+  }
 
-    @After
-    public void afterTest() {
-        MongoDataLoader.clearDBData();
-    }
+  @After
+  public void afterTest() {
+    MongoDataLoader.clearDBData();
+  }
 }

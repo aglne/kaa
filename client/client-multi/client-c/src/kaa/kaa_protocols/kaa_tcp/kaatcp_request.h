@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,8 @@ kaatcp_error_t kaatcp_get_request_kaasync(const kaatcp_kaasync_t *message
                                         , size_t *buf_size);
 
 kaatcp_error_t kaatcp_get_request_ping(char *buf, size_t *buf_size);
+
+kaatcp_error_t kaatcp_get_request_size(const kaatcp_connect_t *message, kaatcp_message_type_t type, size_t *size);
 
 #ifdef __cplusplus
 }      /* extern "C" */

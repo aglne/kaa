@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,34 @@
 
 package org.kaaproject.kaa.client.notification;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.kaaproject.kaa.common.endpoint.gen.Notification;
 import org.kaaproject.kaa.common.endpoint.gen.Topic;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Processes notifications.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface NotificationProcessor {
 
-    /**
-     * Called on topics' list update.
-     *
-     * @param list the new topics' list.
-     * @see Topic
-     */
-    void topicsListUpdated(List<Topic> list);
+  /**
+   * Called on topics' list update.
+   *
+   * @param list the new topics' list.
+   * @see Topic
+   */
+  void topicsListUpdated(List<Topic> list);
 
-    /**
-     * Called when new notifications arrived.
-     *
-     * @param notifications the list of new notifications.
-     * @see Notification
-     */
-    void notificationReceived(List<Notification> notifications) throws IOException;
+  /**
+   * Called when new notifications arrived.
+   *
+   * @param notifications the list of new notifications.
+   * @throws IOException the io exception
+   * @see Notification
+   */
+  void notificationReceived(List<Notification> notifications) throws IOException;
 
 }

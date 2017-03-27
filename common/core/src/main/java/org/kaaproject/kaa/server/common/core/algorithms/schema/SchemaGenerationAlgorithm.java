@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import org.kaaproject.kaa.server.common.core.schema.ProtocolSchema;
 
 public interface SchemaGenerationAlgorithm {
 
-    BaseSchema getBaseSchema() throws SchemaCreationException;
+  BaseSchema getBaseSchema() throws SchemaCreationException;
 
-    OverrideSchema getOverrideSchema() throws SchemaCreationException;
+  OverrideSchema getOverrideSchema() throws SchemaCreationException;
 
-    ProtocolSchema getProtocolSchema() throws SchemaCreationException;
+  ProtocolSchema getProtocolSchema() throws SchemaCreationException;
 
 }

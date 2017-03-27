@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,23 @@
 
 package org.kaaproject.kaa.server.common.core.algorithms.override;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.kaaproject.kaa.server.common.core.configuration.BaseData;
 import org.kaaproject.kaa.server.common.core.configuration.OverrideData;
 
+import java.io.IOException;
+import java.util.List;
+
 public interface OverrideAlgorithm {
 
-    /**
-     * Merges configurations into single configuration.
-     *
-     * @param baseConfiguration the base configuration
-     * @param overrideConfigurations list of configuration to merge from
-     * @return the merged configuration
-     * @throws OverrideException the configuration merger exception
-     */
-    BaseData override(BaseData baseConfiguration, List<OverrideData> overrideConfigurations) throws OverrideException, IOException;
+  /**
+   * Merges configurations into single configuration.
+   *
+   * @param baseConfiguration      the base configuration
+   * @param overrideConfigurations list of configuration to merge from
+   * @return the merged configuration
+   * @throws OverrideException the configuration merger exception
+   */
+  BaseData override(BaseData baseConfiguration, List<OverrideData> overrideConfigurations)
+          throws OverrideException, IOException;
 
 }

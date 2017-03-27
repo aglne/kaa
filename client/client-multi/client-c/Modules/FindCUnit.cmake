@@ -1,5 +1,5 @@
 #
-# Copyright 2014 CyberVision, Inc.
+# Copyright 2014-2016 CyberVision, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+
 # Find the CUnit headers and libraries
 #
 #  CUNIT_INCLUDE_DIRS - The CUnit include directory (directory where CUnit/CUnit.h was found)
 #  CUNIT_LIBRARIES    - The libraries needed to use CUnit
 #  CUNIT_FOUND        - True if CUnit found in system
- 
+
  
 FIND_PATH(CUNIT_INCLUDE_DIR NAMES CUnit/CUnit.h)
 MARK_AS_ADVANCED(CUNIT_INCLUDE_DIR)

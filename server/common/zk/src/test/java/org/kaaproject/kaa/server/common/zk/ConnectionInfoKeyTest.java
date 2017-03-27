@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package org.kaaproject.kaa.server.common.zk;
 
-import org.junit.Test;
-
 import nl.jqno.equalsverifier.EqualsVerifier;
+
+import org.junit.Test;
 
 public class ConnectionInfoKeyTest {
 
-    @Test
-    public void equalsTest(){
-        EqualsVerifier.forClass(ConnectionInfoKey.class).verify();
-    }
+  @Test
+  public void equalsTest() {
+    EqualsVerifier.forClass(ConnectionInfoKey.class).verify();
+  }
 }

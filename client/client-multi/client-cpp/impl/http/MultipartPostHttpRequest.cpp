@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace kaa {
 
 const std::string MultipartPostHttpRequest::BOUNDARY = "----Sanj56fD843koI0";
 
-MultipartPostHttpRequest::MultipartPostHttpRequest(const HttpUrl& url) : url_(url)
+MultipartPostHttpRequest::MultipartPostHttpRequest(const HttpUrl& url, IKaaClientContext &context) : url_(url),context_(context)
 {
 
 }

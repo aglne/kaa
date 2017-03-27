@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,6 @@
 
 package org.kaaproject.kaa.client.persistence;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.DecoderFactory;
@@ -47,427 +28,581 @@ import org.apache.commons.io.IOUtils;
 import org.kaaproject.kaa.client.KaaClientProperties;
 import org.kaaproject.kaa.client.event.EndpointAccessToken;
 import org.kaaproject.kaa.client.event.EndpointKeyHash;
+import org.kaaproject.kaa.client.exceptions.KaaRuntimeException;
+import org.kaaproject.kaa.client.notification.TopicListHashCalculator;
 import org.kaaproject.kaa.client.util.Base64;
+import org.kaaproject.kaa.common.endpoint.gen.SubscriptionType;
 import org.kaaproject.kaa.common.endpoint.gen.Topic;
-import org.kaaproject.kaa.common.endpoint.gen.TopicSubscriptionInfo;
 import org.kaaproject.kaa.common.endpoint.security.KeyUtil;
 import org.kaaproject.kaa.common.hash.EndpointObjectHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class KaaClientPropertiesState implements KaaClientState {
 
-    private static final String APP_STATE_SEQ_NUMBER = "APP_STATE_SEQ_NUMBER";
-    private static final String CONFIG_SEQ_NUMBER = "CONFIG_SEQ_NUMBER";
-    private static final String NOTIFICATION_SEQ_NUMBER = "NOTIFICATION_SEQ_NUMBER";
-    private static final String PROFILE_HASH = "PROFILE_HASH";
-    private static final String ENDPOINT_ACCESS_TOKEN = "ENDPOINT_TOKEN";
+  private static final String APP_STATE_SEQ_NUMBER = "APP_STATE_SEQ_NUMBER";
+  private static final String PROFILE_HASH = "PROFILE_HASH";
+  private static final String ENDPOINT_ACCESS_TOKEN = "ENDPOINT_TOKEN";
 
-    /** The Constant logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(KaaClientPropertiesState.class);
+  /**
+   * The Constant LOG.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(KaaClientPropertiesState.class);
 
-    private static final String ATTACHED_ENDPOINTS = "attached_eps";
-    private static final String NF_SUBSCRIPTIONS = "nf_subscriptions";
-    private static final String IS_REGISTERED = "is_registered";
-    private static final String IS_ATTACHED = "is_attached";
+  private static final String ATTACHED_ENDPOINTS = "attached_eps";
+  private static final String NF_SUBSCRIPTIONS = "nf_subscriptions";
+  private static final String IS_REGISTERED = "is_registered";
+  private static final String IS_ATTACHED = "is_attached";
 
-    public static final String STATE_FILE_LOCATION = "state.file_location";
-    public static final String CLIENT_PRIVATE_KEY_FILE_LOCATION = "keys.private";
-    public static final String CLIENT_PUBLIC_KEY_FILE_LOCATION = "keys.public";
+  private static final String EVENT_SEQ_NUM = "event.seq.num";
 
-    public static final String STATE_FILE_DEFAULT = "state.properties";
-    public static final String CLIENT_PRIVATE_KEY_DEFAULT = "key.private";
-    public static final String CLIENT_PUBLIC_KEY_DEFAULT = "key.public";
+  private static final String TOPIC_LIST = "topic.list";
+  private static final String TOPIC_LIST_HASH = "topic.list.hash";
 
-    private static final String EVENT_SEQ_NUM = "event.seq.num";
+  private static final String PROPERTIES_HASH = "properties.hash";
 
-    private static final String PROPERTIES_HASH = "properties.hash";
+  private static final String NEED_PROFILE_RESYNC = "need.profile.resync";
 
-    private final PersistentStorage storage;
-    private final Base64 base64;
-    private final Properties state;
-    private final String stateFileLocation;
-    private final String clientPrivateKeyFileLocation;
-    private final String clientPublicKeyFileLocation;
-    private final Map<String, TopicSubscriptionInfo> nfSubscriptions = new HashMap<String, TopicSubscriptionInfo>();
-    private final Map<EndpointAccessToken, EndpointKeyHash> attachedEndpoints = new HashMap<EndpointAccessToken, EndpointKeyHash>();
-    private final AtomicInteger eventSequence = new AtomicInteger();
+  private final PersistentStorage storage;
+  private final Base64 base64;
+  private final Properties state;
+  private final String stateFileLocation;
+  private final String clientPrivateKeyFileLocation;
+  private final String clientPublicKeyFileLocation;
+  private final Map<Long, Topic> topicMap = new HashMap<>();
+  private final Map<Long, Integer> nfSubscriptions = new HashMap<>();
+  private final Map<EndpointAccessToken, EndpointKeyHash> attachedEndpoints = new HashMap<>();
+  private final AtomicInteger eventSequence = new AtomicInteger();
+  private Integer topicListHash;
 
-    private KeyPair kp;
-    private EndpointKeyHash keyHash;
-    private boolean isConfigVersionUpdated = false;
+  private KeyPair keyPair;
+  private EndpointKeyHash keyHash;
+  private boolean isConfigVersionUpdated = false;
+  private boolean hasUpdate = false;
 
-    public KaaClientPropertiesState(PersistentStorage storage, Base64 base64, KaaClientProperties properties) {
-        super();
-        this.storage = storage;
-        this.base64 = base64;
-        stateFileLocation = properties.containsKey(STATE_FILE_LOCATION) ? properties.getProperty(STATE_FILE_LOCATION) : STATE_FILE_DEFAULT;
+  private boolean isAutogeneratedKeys;
 
-        clientPrivateKeyFileLocation = properties.containsKey(CLIENT_PRIVATE_KEY_FILE_LOCATION) ? properties
-                .getProperty(CLIENT_PRIVATE_KEY_FILE_LOCATION) : CLIENT_PRIVATE_KEY_DEFAULT;
+  public KaaClientPropertiesState(PersistentStorage storage, Base64 base64,
+                                  KaaClientProperties properties) {
+    this(storage, base64, properties, false);
+  }
 
-        clientPublicKeyFileLocation = properties.containsKey(CLIENT_PUBLIC_KEY_FILE_LOCATION) ? properties
-                .getProperty(CLIENT_PUBLIC_KEY_FILE_LOCATION) : CLIENT_PUBLIC_KEY_DEFAULT;
+  /**
+   * All needed properties for creating Kaa client
+   *
+   * @param storage             - in what storage platform will work
+   * @param base64              - interface for Base64 type
+   * @param properties          - saved properties for client
+   * @param isAutogeneratedKeys - if not key pair keyPair and true, then create keys. In default it
+   *                            false and used already created keys.
+   */
+  public KaaClientPropertiesState(PersistentStorage storage, Base64 base64,
+                                  KaaClientProperties properties, boolean isAutogeneratedKeys) {
 
-        LOG.info("Version: '{}', commit hash: '{}'", properties.getBuildVersion(), properties.getCommitHash());
+    super();
+    this.storage = storage;
+    this.base64 = base64;
+    this.isAutogeneratedKeys = isAutogeneratedKeys;
 
-        state = new Properties();
-        if (storage.exists(stateFileLocation)) {
-            InputStream stream = null;
-            try {
-                stream = storage.openForRead(stateFileLocation);
-                state.load(stream);
+    properties.setBase64(base64);
 
-                if (isSDKPropertiesUpdated(properties, state)) {
-                    LOG.info("SDK properties were updated");
-                    setRegistered(false);
-                    setPropertiesHash(properties.getPropertiesHash());
-                } else {
-                    LOG.info("SDK properties are up to date");
-                }
+    stateFileLocation = properties.getStateFileFullName();
 
-                parseNfSubscriptions();
+    clientPrivateKeyFileLocation = properties.getPrivateKeyFileFullName();
 
-                String attachedEndpointsString = state.getProperty(ATTACHED_ENDPOINTS);
-                if(attachedEndpointsString != null){
-                    String[] splittedEndpointsList = attachedEndpointsString.split(",");
-                    for (String attachedEndpoint : splittedEndpointsList) {
-                        if (!attachedEndpoint.isEmpty()) {
-                            String[] splittedValues = attachedEndpoint.split(":");
-                            attachedEndpoints.put(new EndpointAccessToken(splittedValues[0]), new EndpointKeyHash(splittedValues[1]));
-                        }
-                    }
-                }
+    clientPublicKeyFileLocation = properties.getPublicKeyFileFullName();
 
-                String eventSeqNumStr = state.getProperty(EVENT_SEQ_NUM);
-                if(eventSeqNumStr != null){
-                    Integer eventSeqNum = 0;
-                    try { // NOSONAR
-                        eventSeqNum = Integer.parseInt(eventSeqNumStr);
-                    } catch (NumberFormatException e) {
-                        LOG.error("Unexpected exception while parsing event sequence number. Can not parse String: {} to Integer",
-                                eventSeqNumStr);
-                    }
-                    eventSequence.set(eventSeqNum);
-                }
-            } catch (Exception e) {
-                LOG.error("Can't load state file", e);
-            } finally {
-                IOUtils.closeQuietly(stream);
-            }
+    LOG.info("Version: '{}', commit hash: '{}'", properties.getBuildVersion(),
+            properties.getCommitHash());
+
+    state = new Properties();
+    if (storage.exists(stateFileLocation)) {
+      InputStream stream = null;
+      try {
+        stream = storage.openForRead(stateFileLocation);
+        state.load(stream);
+
+        if (isSdkPropertiesUpdated(properties)) {
+          LOG.info("SDK properties were updated");
+          setRegistered(false);
+          setPropertiesHash(properties.getPropertiesHash());
+          //TODO: add more intelligent check by comparing part of SDK token.
+          isConfigVersionUpdated = true;
         } else {
-            LOG.info("First SDK start");
-            setPropertiesHash(properties.getPropertiesHash());
+          LOG.info("SDK properties are up to date");
         }
-    }
 
-    private void parseNfSubscriptions() {
-        if(state.getProperty(NF_SUBSCRIPTIONS) != null){
-            byte[] data = base64.decodeBase64(state.getProperty(NF_SUBSCRIPTIONS));
-            BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(data, null);
-            SpecificDatumReader<TopicSubscriptionInfo> avroReader = new SpecificDatumReader<TopicSubscriptionInfo>(
-                    TopicSubscriptionInfo.class);
-    
-            try { // NOSONAR
-                TopicSubscriptionInfo decodedInfo = null;
-    
-                while (!decoder.isEnd()) {
-                    decodedInfo = avroReader.read(null, decoder);
-                    LOG.debug("Loaded {}", decodedInfo);
-                    nfSubscriptions.put(decodedInfo.getTopicInfo().getId(), decodedInfo);
-                }
-            } catch (Exception e) {
-                LOG.error("Unexpected exception occurred while reading information from decoder", e);
+        parseTopics();
+        parseNfSubscriptions();
+
+        String attachedEndpointsString = state.getProperty(ATTACHED_ENDPOINTS);
+        if (attachedEndpointsString != null) {
+          String[] splittedEndpointsList = attachedEndpointsString.split(",");
+          for (String attachedEndpoint : splittedEndpointsList) {
+            if (!attachedEndpoint.isEmpty()) {
+              String[] splittedValues = attachedEndpoint.split(":");
+              attachedEndpoints.put(new EndpointAccessToken(splittedValues[0]),
+                      new EndpointKeyHash(splittedValues[1]));
             }
-        }else{
-            LOG.info("No subscription info found in state");
-        }
-    }
-
-    private boolean isSDKPropertiesUpdated(KaaClientProperties sdkProperties, Properties stateProperties) {
-        byte[] hashFromSDK = sdkProperties.getPropertiesHash();
-        byte[] hashFromStateFile = base64.decodeBase64(state.getProperty(PROPERTIES_HASH,
-                new String(base64.encodeBase64(new byte[0]), Charsets.UTF_8)).getBytes(Charsets.UTF_8));
-
-        return !Arrays.equals(hashFromSDK, hashFromStateFile);
-    }
-
-    private void setPropertiesHash(byte[] hash) {
-        state.setProperty(PROPERTIES_HASH, new String(base64.encodeBase64(hash), Charsets.UTF_8));
-    }
-
-    @Override
-    public boolean isConfigurationVersionUpdated() {
-        return isConfigVersionUpdated;
-    }
-
-    @Override
-    public boolean isRegistered() {
-        return Boolean.parseBoolean(state.getProperty(IS_REGISTERED, Boolean.FALSE.toString()));
-    }
-
-    @Override
-    public void setRegistered(boolean registered) {
-        state.setProperty(IS_REGISTERED, Boolean.toString(registered));
-    }
-
-    @Override
-    public void persist() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(baos, null);
-        SpecificDatumWriter<TopicSubscriptionInfo> datumWriter = new SpecificDatumWriter<TopicSubscriptionInfo>(TopicSubscriptionInfo.class);
-
-        try {
-            for (Map.Entry<String, TopicSubscriptionInfo> cursor : nfSubscriptions.entrySet()) {
-                datumWriter.write(cursor.getValue(), encoder);
-                LOG.info("Persisted {}", cursor.getValue());
-            }
-
-            encoder.flush();
-            String base64Str = new String(base64.encodeBase64(baos.toByteArray()), Charset.forName("UTF-8"));
-            state.setProperty(NF_SUBSCRIPTIONS, base64Str);
-        } catch (IOException e) {
-            LOG.error("Can't persist notification subscription info", e);
+          }
         }
 
-        StringBuilder attachedEndpointsString = new StringBuilder();
-        for (Map.Entry<EndpointAccessToken, EndpointKeyHash> attached : attachedEndpoints.entrySet()) {
-            attachedEndpointsString.append(attached.getKey().getToken()).append(":").append(attached.getValue().getKeyHash()).append(',');
+        String eventSeqNumStr = state.getProperty(EVENT_SEQ_NUM);
+        if (eventSeqNumStr != null) {
+          Integer eventSeqNum = 0;
+          try { // NOSONAR
+            eventSeqNum = Integer.parseInt(eventSeqNumStr);
+          } catch (NumberFormatException ex) {
+            LOG.error("Unexpected exception while parsing event sequence number. "
+                    + "Can not parse String: {} to Integer", eventSeqNumStr);
+          }
+          eventSequence.set(eventSeqNum);
         }
-        state.setProperty(ATTACHED_ENDPOINTS, attachedEndpointsString.toString());
-        state.setProperty(EVENT_SEQ_NUM, "" + eventSequence.get());
-
-        OutputStream os = null;
-        try {
-            storage.renameTo(stateFileLocation, stateFileLocation + "_bckp");
-            os = storage.openForWrite(stateFileLocation);
-            state.store(os, null);
-        } catch (IOException e) {
-            LOG.error("Can't persist state file", e);
-        } finally {
-            IOUtils.closeQuietly(os);
-        }
-    }
-
-    @Override
-    public String refreshEndpointAccessToken() {
-        String newAccessToken = UUID.randomUUID().toString();
-        setEndpointAccessToken(newAccessToken);
-        return newAccessToken;
-    }
-
-    @Override
-    public PublicKey getPublicKey() {
-        return getOrInitKeyPair().getPublic();
-    }
-    
-    @Override
-    public PrivateKey getPrivateKey() {
-        return getOrInitKeyPair().getPrivate();
-    }
-
-    private KeyPair getOrInitKeyPair() {
-        LOG.debug("Check if key pair exists {}, {}", clientPublicKeyFileLocation, clientPrivateKeyFileLocation);
-        if(kp != null){
-            return kp;
-        }
-        if (storage.exists(clientPublicKeyFileLocation) && storage.exists(clientPrivateKeyFileLocation)) {
-            InputStream publicKeyInput = null;
-            InputStream privateKeyInput = null;
-            try {
-                publicKeyInput = storage.openForRead(clientPublicKeyFileLocation);
-                privateKeyInput = storage.openForRead(clientPrivateKeyFileLocation);
-                kp = new KeyPair(KeyUtil.getPublic(publicKeyInput), KeyUtil.getPrivate(privateKeyInput));
-            } catch (Exception e) {
-                LOG.error("Error loading Client Private Key", e);
-                throw new RuntimeException(e); // NOSONAR
-            } finally {
-                IOUtils.closeQuietly(publicKeyInput);
-                IOUtils.closeQuietly(privateKeyInput);
-            }
-        }
-        if (kp == null) {
-            LOG.debug("Generating Client Key pair");
-            OutputStream privateKeyOutput = null;
-            OutputStream publicKeyOutput = null;
-            try {
-                privateKeyOutput = storage.openForWrite(clientPrivateKeyFileLocation);
-                publicKeyOutput = storage.openForWrite(clientPublicKeyFileLocation);
-                kp = KeyUtil.generateKeyPair(privateKeyOutput, publicKeyOutput);
-            } catch (IOException e) {
-                LOG.error("Error generating Client Key pair", e);
-                throw new RuntimeException(e);
-            } finally {
-                IOUtils.closeQuietly(privateKeyOutput);
-                IOUtils.closeQuietly(publicKeyOutput);
-            }
-        }
-        return kp;
-    }
-    
-    @Override
-    public EndpointKeyHash getEndpointKeyHash() {
-        if(keyHash == null){
-            EndpointObjectHash publicKeyHash = EndpointObjectHash.fromSHA1(getOrInitKeyPair().getPublic().getEncoded());
-            keyHash = new EndpointKeyHash(new String(base64.encodeBase64(publicKeyHash.getData())));
-        } 
-        return keyHash;
-    }
-
-    @Override
-    public int getAppStateSeqNumber() {
-        return Integer.parseInt(state.getProperty(APP_STATE_SEQ_NUMBER, "1"));
-    }
-
-    @Override
-    public EndpointObjectHash getProfileHash() {
-        return EndpointObjectHash.fromBytes(base64.decodeBase64(state.getProperty(PROFILE_HASH,
-                new String(base64.encodeBase64(new byte[0]), Charsets.UTF_8)).getBytes(Charsets.UTF_8)));
-    }
-
-    @Override
-    public void setAppStateSeqNumber(int appStateSeqNumber) {
-        state.setProperty(APP_STATE_SEQ_NUMBER, Integer.toString(appStateSeqNumber));
-    }
-
-    @Override
-    public void setProfileHash(EndpointObjectHash hash) {
-        state.setProperty(PROFILE_HASH, new String(base64.encodeBase64(hash.getData()), Charsets.UTF_8));
-    }
-
-    @Override
-    public void addTopic(Topic topic) {
-        TopicSubscriptionInfo subscriptionInfo = nfSubscriptions.get(topic.getId());
-        if (subscriptionInfo == null) {
-            nfSubscriptions.put(topic.getId(), new TopicSubscriptionInfo(topic, 0));
-            LOG.info("Adding new seqNumber 0 for {} subscription", topic.getId());
-        }
-    }
-
-    @Override
-    public void removeTopic(String topicId) {
-        if (nfSubscriptions.remove(topicId) != null) {
-            LOG.debug("Removed subscription info for {}", topicId);
-        }
-    }
-
-    @Override
-    public boolean updateTopicSubscriptionInfo(String topicId, Integer sequenceNumber) {
-        TopicSubscriptionInfo subscriptionInfo = nfSubscriptions.get(topicId);
-        boolean updated = false;
-        if (subscriptionInfo != null) {
-            if (sequenceNumber > subscriptionInfo.getSeqNumber()) {
-                updated = true;
-                subscriptionInfo.setSeqNumber(sequenceNumber);
-                nfSubscriptions.put(topicId, subscriptionInfo);
-                LOG.debug("Updated seqNumber to {} for {} subscription", subscriptionInfo.getSeqNumber(), topicId);
-            }
-        }
-        return updated;
-    }
-
-    @Override
-    public Map<String, Integer> getNfSubscriptions() {
-        HashMap<String, Integer> subscriptions = new HashMap<String, Integer>(); // NOSONAR
-
-        for (Map.Entry<String, TopicSubscriptionInfo> cursor : nfSubscriptions.entrySet()) {
-            subscriptions.put(cursor.getKey(), cursor.getValue().getSeqNumber());
+        String topicListHashStr = state.getProperty(TOPIC_LIST_HASH);
+        if (topicListHashStr != null) {
+          try { // NOSONAR
+            this.topicListHash = Integer.parseInt(topicListHashStr);
+          } catch (NumberFormatException ex) {
+            LOG.error("Unexpected exception while parsing topic list hash. Can not parse String: "
+                    + "{} to Integer", topicListHashStr);
+          }
         }
 
-        return subscriptions;
+      } catch (Exception ex) {
+        LOG.error("Can't load state file", ex);
+      } finally {
+        IOUtils.closeQuietly(stream);
+      }
+    } else {
+      LOG.info("First SDK start");
+      setPropertiesHash(properties.getPropertiesHash());
     }
+  }
 
-    @Override
-    public List<Topic> getTopics() {
-        List<Topic> topics = new LinkedList<Topic>();
-
-        for (Map.Entry<String, TopicSubscriptionInfo> cursor : nfSubscriptions.entrySet()) {
-            topics.add(cursor.getValue().getTopicInfo());
+  private void parseTopics() {
+    if (state.getProperty(TOPIC_LIST) != null) {
+      byte[] data = base64.decodeBase64(state.getProperty(TOPIC_LIST));
+      BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(data, null);
+      SpecificDatumReader<Topic> avroReader = new SpecificDatumReader<>(Topic.class);
+      try { // NOSONAR
+        Topic decodedTopic;
+        while (!decoder.isEnd()) {
+          decodedTopic = avroReader.read(null, decoder);
+          LOG.debug("Loaded {}", decodedTopic);
+          topicMap.put(decodedTopic.getId(), decodedTopic);
         }
-
-        return topics;
+      } catch (Exception ex) {
+        LOG.error("Unexpected exception occurred while reading information from decoder", ex);
+      }
+    } else {
+      LOG.info("No topic list found in state");
     }
+  }
 
-    @Override
-    public void setAttachedEndpointsList(Map<EndpointAccessToken, EndpointKeyHash> attachedEndpoints) {
-        this.attachedEndpoints.clear();
-        this.attachedEndpoints.putAll(attachedEndpoints);
+  @SuppressWarnings("unchecked")
+  private void parseNfSubscriptions() {
+    if (state.getProperty(NF_SUBSCRIPTIONS) != null) {
+      byte[] data = base64.decodeBase64(state.getProperty(NF_SUBSCRIPTIONS));
+      ByteArrayInputStream is = new ByteArrayInputStream(data);
+      try (ObjectInputStream ois = new ObjectInputStream(is)) {
+        nfSubscriptions.putAll((Map<Long, Integer>) ois.readObject());
+      } catch (Exception ex) {
+        LOG.error("Unexpected exception occurred while reading subscription information from state",
+                ex);
+      }
+    } else {
+      LOG.info("No subscription info found in state");
     }
+  }
 
-    @Override
-    public Map<EndpointAccessToken, EndpointKeyHash> getAttachedEndpointsList() {
-        return attachedEndpoints;
-    }
+  private boolean isSdkPropertiesUpdated(KaaClientProperties sdkProperties) {
+    byte[] hashFromSdk = sdkProperties.getPropertiesHash();
+    byte[] hashFromStateFile = base64.decodeBase64(state.getProperty(PROPERTIES_HASH,
+        new String(base64.encodeBase64(new byte[0]), Charsets.UTF_8)).getBytes(Charsets.UTF_8));
 
-    @Override
-    public void setEndpointAccessToken(String token) {
-        state.setProperty(ENDPOINT_ACCESS_TOKEN, token);
-    }
+    return !Arrays.equals(hashFromSdk, hashFromStateFile);
+  }
 
-    @Override
-    public String getEndpointAccessToken() {
-        return state.getProperty(ENDPOINT_ACCESS_TOKEN, "");
-    }
+  private void setStateStringValue(String propertyKey, String value) {
+    Object previous = state.setProperty(propertyKey, value);
+    String previousString = previous == null ? null : previous.toString();
+    hasUpdate |= !value.equals(previousString);
+  }
 
-    @Override
-    public void setConfigSeqNumber(int configSeqNumber) {
-        state.setProperty(CONFIG_SEQ_NUMBER, Integer.toString(configSeqNumber));
-    }
+  private void setStateBooleanValue(String propertyKey, boolean value) {
+    Object previous = state.setProperty(propertyKey, Boolean.toString(value));
+    boolean previousBoolean = previous == null ? false : Boolean.valueOf(previous.toString());
+    hasUpdate |= value != previousBoolean;
+  }
 
-    @Override
-    public int getConfigSeqNumber() {
-        return Integer.parseInt(state.getProperty(CONFIG_SEQ_NUMBER, "1"));
-    }
+  private void setPropertiesHash(byte[] hash) {
+    setStateStringValue(PROPERTIES_HASH, new String(base64.encodeBase64(hash), Charsets.UTF_8));
+  }
 
-    @Override
-    public void setNotificationSeqNumber(int notificationSeqNumber) {
-        state.setProperty(NOTIFICATION_SEQ_NUMBER, Integer.toString(notificationSeqNumber));
-    }
+  @Override
+  public boolean isConfigurationVersionUpdated() {
+    return isConfigVersionUpdated;
+  }
 
-    @Override
-    public int getNotificationSeqNumber() {
-        return Integer.parseInt(state.getProperty(NOTIFICATION_SEQ_NUMBER, "1"));
-    }
+  @Override
+  public boolean isRegistered() {
+    return Boolean.parseBoolean(state.getProperty(IS_REGISTERED, Boolean.FALSE.toString()));
+  }
 
-    @Override
-    public int getAndIncrementEventSeqNum() {
-        return eventSequence.getAndIncrement();
-    }
+  @Override
+  public void setRegistered(boolean registered) {
+    setStateBooleanValue(IS_REGISTERED, registered);
+  }
 
-    @Override
-    public int getEventSeqNum() {
-        return eventSequence.get();
-    }
+  @Override
+  public boolean isNeedProfileResync() {
+    return Boolean.parseBoolean(state.getProperty(NEED_PROFILE_RESYNC, Boolean.FALSE.toString()));
+  }
 
-    @Override
-    public void setEventSeqNum(int newSeqNum) {
-        eventSequence.set(newSeqNum);
-    }
+  @Override
+  public void setIfNeedProfileResync(boolean needProfileResync) {
+    setStateBooleanValue(NEED_PROFILE_RESYNC, needProfileResync);
+  }
 
-    @Override
-    public boolean isAttachedToUser() {
-        return Boolean.parseBoolean(state.getProperty(IS_ATTACHED, "false"));
-    }
-
-    @Override
-    public void setAttachedToUser(boolean isAttached) {
-        state.setProperty(IS_ATTACHED, Boolean.toString(isAttached));
-    }
-
-    @Override
-    public void clean() {
-        state.setProperty(IS_REGISTERED, "false");
-        saveFileDelete(stateFileLocation);
-        saveFileDelete(stateFileLocation + "_bckp");
-    }
-
-    private void saveFileDelete(String fileName) {
-        try {
-            FileUtils.forceDelete(new File(fileName));
-        } catch (FileNotFoundException e) {
-            LOG.trace("File {} wasn't deleted, as it hadn't existed :", fileName, e);
-        } catch (IOException e) {
-            LOG.debug("An error occurred during deletion of the file [{}] :", fileName, e);
+  @Override
+  public void persist() {
+    if (hasUpdate) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(baos, null);
+      SpecificDatumWriter<Topic> datumWriter = new SpecificDatumWriter<>(Topic.class);
+      try {
+        for (Topic topic : topicMap.values()) {
+          datumWriter.write(topic, encoder);
+          LOG.info("Persisted {}", topic);
         }
+        encoder.flush();
+        String base64Str = new String(base64.encodeBase64(baos.toByteArray()),
+                Charset.forName("UTF-8"));
+        state.setProperty(TOPIC_LIST, base64Str);
+      } catch (IOException ex) {
+        LOG.error("Can't persist topic list info", ex);
+      }
+
+      baos = new ByteArrayOutputStream();
+      try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+        oos.writeObject(nfSubscriptions);
+        String base64Str = new String(base64.encodeBase64(baos.toByteArray()),
+                Charset.forName("UTF-8"));
+        state.setProperty(NF_SUBSCRIPTIONS, base64Str);
+      } catch (IOException ex) {
+        LOG.error("Can't persist notification subscription info", ex);
+      }
+
+      StringBuilder attachedEndpointsString = new StringBuilder();
+      for (Map.Entry<EndpointAccessToken, EndpointKeyHash> attached : attachedEndpoints
+              .entrySet()) {
+        attachedEndpointsString.append(attached.getKey().getToken()).append(":")
+                .append(attached.getValue().getKeyHash()).append(',');
+      }
+      state.setProperty(ATTACHED_ENDPOINTS, attachedEndpointsString.toString());
+      state.setProperty(EVENT_SEQ_NUM, "" + eventSequence.get());
+      if (topicListHash != null) {
+        state.setProperty(TOPIC_LIST_HASH, "" + topicListHash);
+      }
+
+      OutputStream os = null;
+      try {
+        storage.renameTo(stateFileLocation, stateFileLocation + "_bckp");
+        os = storage.openForWrite(stateFileLocation);
+        state.store(os, null);
+        hasUpdate = false;
+      } catch (IOException ex) {
+        LOG.error("Can't persist state file", ex);
+      } finally {
+        IOUtils.closeQuietly(os);
+      }
     }
+  }
+
+  @Override
+  public String refreshEndpointAccessToken() {
+    String newAccessToken = UUID.randomUUID().toString();
+    setEndpointAccessToken(newAccessToken);
+    return newAccessToken;
+  }
+
+  @Override
+  public PrivateKey getPrivateKey() {
+    return getOrInitKeyPair(isAutogeneratedKeys).getPrivate();
+  }
+
+  @Override
+  public PublicKey getPublicKey() {
+    return getOrInitKeyPair(isAutogeneratedKeys).getPublic();
+  }
+
+  private KeyPair getOrInitKeyPair(boolean isAutogeneratedKeys) {
+    LOG.debug("Check if key pair exists {}, {}",
+            clientPublicKeyFileLocation, clientPrivateKeyFileLocation);
+    if (keyPair != null) {
+      return keyPair;
+    }
+    if (storage.exists(clientPublicKeyFileLocation)
+            && storage.exists(clientPrivateKeyFileLocation)) {
+      InputStream publicKeyInput = null;
+      InputStream privateKeyInput = null;
+      try {
+        publicKeyInput = storage.openForRead(clientPublicKeyFileLocation);
+        privateKeyInput = storage.openForRead(clientPrivateKeyFileLocation);
+
+        PublicKey publicKey = KeyUtil.getPublic(publicKeyInput);
+        PrivateKey privateKey = KeyUtil.getPrivate(privateKeyInput);
+
+        if (publicKey != null && privateKey != null) {
+          keyPair = new KeyPair(publicKey, privateKey);
+          if (!KeyUtil.validateKeyPair(keyPair)) {
+            throw new InvalidKeyException();
+          }
+
+          return keyPair;
+        }
+      } catch (InvalidKeyException ex) {
+        keyPair = null;
+        LOG.error("Unable to parse client RSA keypair. Generating new keys.. Reason {}", ex);
+      } catch (Exception ex) {
+        LOG.error("Error loading client RSA keypair. Reason {}", ex);
+        throw new RuntimeException(ex); // NOSONAR
+      } finally {
+        IOUtils.closeQuietly(publicKeyInput);
+        IOUtils.closeQuietly(privateKeyInput);
+      }
+    }
+    if (isAutogeneratedKeys) {
+      LOG.debug("Generating Client Key pair");
+      OutputStream privateKeyOutput = null;
+      OutputStream publicKeyOutput = null;
+      try {
+        privateKeyOutput = storage.openForWrite(clientPrivateKeyFileLocation);
+        publicKeyOutput = storage.openForWrite(clientPublicKeyFileLocation);
+        keyPair = KeyUtil.generateKeyPair(privateKeyOutput, publicKeyOutput);
+      } catch (IOException ex) {
+        LOG.error("Error generating Client Key pair", ex);
+        throw new RuntimeException(ex);
+      } finally {
+        IOUtils.closeQuietly(privateKeyOutput);
+        IOUtils.closeQuietly(publicKeyOutput);
+      }
+    } else {
+      LOG.debug("Error loading key pair!", "Key pair is not found and key strategy is default");
+      throw new KaaRuntimeException("Key pair is not found and your key strategy is default");
+    }
+    return keyPair;
+  }
+
+  @Override
+  public EndpointKeyHash getEndpointKeyHash() {
+    if (keyHash == null) {
+      EndpointObjectHash publicKeyHash = EndpointObjectHash
+              .fromSha1(getOrInitKeyPair(isAutogeneratedKeys).getPublic().getEncoded());
+      keyHash = new EndpointKeyHash(new String(base64.encodeBase64(publicKeyHash.getData())));
+    }
+    return keyHash;
+  }
+
+  @Override
+  public int getAppStateSeqNumber() {
+    return Integer.parseInt(state.getProperty(APP_STATE_SEQ_NUMBER, "1"));
+  }
+
+  @Override
+  public void setAppStateSeqNumber(int appStateSeqNumber) {
+    setStateStringValue(APP_STATE_SEQ_NUMBER, Integer.toString(appStateSeqNumber));
+  }
+
+  @Override
+  public EndpointObjectHash getProfileHash() {
+    return EndpointObjectHash.fromBytes(base64.decodeBase64(state.getProperty(PROFILE_HASH,
+        new String(base64.encodeBase64(new byte[0]), Charsets.UTF_8)).getBytes(Charsets.UTF_8)));
+  }
+
+  @Override
+  public void setProfileHash(EndpointObjectHash hash) {
+    setStateStringValue(PROFILE_HASH,
+            new String(base64.encodeBase64(hash.getData()), Charsets.UTF_8));
+  }
+
+  @Override
+  public void addTopic(Topic topic) {
+    if (topicMap.get(topic.getId()) == null) {
+      topicMap.put(topic.getId(), topic);
+      if (topic.getSubscriptionType() == SubscriptionType.MANDATORY_SUBSCRIPTION) {
+        nfSubscriptions.put(topic.getId(), 0);
+        LOG.info("Adding new seqNumber 0 for {} subscription", topic.getId());
+      }
+      hasUpdate = true;
+      LOG.info("Adding new topic with id {}", topic.getId());
+    }
+  }
+
+  @Override
+  public void removeTopic(Long topicId) {
+    if (topicMap.remove(topicId) != null) {
+      if (nfSubscriptions.remove(topicId) != null) {
+        LOG.info("Removed subscription info for {}", topicId);
+      }
+      hasUpdate = true;
+      LOG.info("Removed topic with id {}", topicId);
+    }
+  }
+
+  @Override
+  public void addTopicSubscription(Long topicId) {
+    Integer seqNum = nfSubscriptions.get(topicId);
+    if (seqNum == null) {
+      nfSubscriptions.put(topicId, 0);
+      LOG.info("Adding new seqNumber 0 for {} subscription", topicId);
+      hasUpdate = true;
+    }
+  }
+
+  @Override
+  public void removeTopicSubscription(Long topicId) {
+    if (nfSubscriptions.remove(topicId) != null) {
+      LOG.info("Removed subscription info for {}", topicId);
+      hasUpdate = true;
+    }
+  }
+
+  @Override
+  public boolean updateTopicSubscriptionInfo(Long topicId, Integer sequenceNumber) {
+    Integer seqNum = nfSubscriptions.get(topicId);
+    boolean updated = false;
+    if (seqNum != null) {
+      if (sequenceNumber > seqNum) {
+        updated = true;
+        nfSubscriptions.put(topicId, sequenceNumber);
+        hasUpdate = true;
+        LOG.debug("Updated seqNumber to {} for {} subscription", sequenceNumber, topicId);
+      }
+    }
+    return updated;
+  }
+
+  @Override
+  public Map<Long, Integer> getNfSubscriptions() {
+    return nfSubscriptions;
+  }
+
+  @Override
+  public Collection<Topic> getTopics() {
+    return topicMap.values();
+  }
+
+  @Override
+  public Integer getTopicListHash() {
+    if (topicListHash == null) {
+      return TopicListHashCalculator.NULL_LIST_HASH;
+    } else {
+      return topicListHash;
+    }
+  }
+
+  @Override
+  public void setTopicListHash(Integer topicListHash) {
+    if (!Objects.equals(this.topicListHash, topicListHash)) {
+      this.topicListHash = topicListHash;
+      hasUpdate = true;
+    }
+  }
+
+  @Override
+  public Map<EndpointAccessToken, EndpointKeyHash> getAttachedEndpointsList() {
+    return attachedEndpoints;
+  }
+
+  @Override
+  public void setAttachedEndpointsList(
+          Map<EndpointAccessToken, EndpointKeyHash> attachedEndpoints) {
+    this.attachedEndpoints.clear();
+    this.attachedEndpoints.putAll(attachedEndpoints);
+    hasUpdate = true;
+  }
+
+  @Override
+  public String getEndpointAccessToken() {
+    return state.getProperty(ENDPOINT_ACCESS_TOKEN, "");
+  }
+
+  @Override
+  public void setEndpointAccessToken(String token) {
+    setStateStringValue(ENDPOINT_ACCESS_TOKEN, token);
+  }
+
+  @Override
+  public int getAndIncrementEventSeqNum() {
+    hasUpdate = true;
+    return eventSequence.getAndIncrement();
+  }
+
+  @Override
+  public int getEventSeqNum() {
+    return eventSequence.get();
+  }
+
+  @Override
+  public void setEventSeqNum(int newSeqNum) {
+    if (eventSequence.get() != newSeqNum) {
+      eventSequence.set(newSeqNum);
+      hasUpdate = true;
+    }
+  }
+
+  @Override
+  public boolean isAttachedToUser() {
+    return Boolean.parseBoolean(state.getProperty(IS_ATTACHED, Boolean.FALSE.toString()));
+  }
+
+  @Override
+  public void setAttachedToUser(boolean isAttached) {
+    setStateBooleanValue(IS_ATTACHED, isAttached);
+  }
+
+  @Override
+  public void clean() {
+    setRegistered(false);
+    setIfNeedProfileResync(false);
+    saveFileDelete(stateFileLocation);
+    saveFileDelete(stateFileLocation + "_bckp");
+    keyPair = null;
+    hasUpdate = true;
+  }
+
+  private void saveFileDelete(String fileName) {
+    try {
+      FileUtils.forceDelete(new File(fileName));
+    } catch (FileNotFoundException ex) {
+      LOG.trace("File {} wasn't deleted, as it hadn't existed :", fileName, ex);
+    } catch (IOException ex) {
+      LOG.debug("An error occurred during deletion of the file [{}] :", fileName, ex);
+    }
+  }
+
 }

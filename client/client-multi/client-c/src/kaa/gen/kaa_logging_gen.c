@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 # include <inttypes.h>
 # include <string.h>
-# include "../platform/stdio.h"
+# include <platform/stdio.h>
 # include "kaa_logging_gen.h"
-# include "../avro_src/avro/io.h"
-# include "../avro_src/encoding.h"
-# include "../utilities/kaa_mem.h"
+# include "avro_src/avro/io.h"
+# include "avro_src/encoding.h"
+# include "utilities/kaa_mem.h"
 
 /*
  * AUTO-GENERATED CODE
@@ -60,7 +60,7 @@ static size_t kaa_test_log_record_get_size(void *data)
     return 0;
 }
 
-kaa_test_log_record_t *kaa_test_log_record_create()
+kaa_test_log_record_t *kaa_test_log_record_create(void)
 {
     kaa_test_log_record_t *record = 
             (kaa_test_log_record_t *)KAA_CALLOC(1, sizeof(kaa_test_log_record_t));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,10 @@
 #ifndef DEFAULTPROFILECONTAINER_HPP_
 #define DEFAULTPROFILECONTAINER_HPP_
 
+#include <kaa/profile/IProfileContainer.hpp>
 #include <kaa/profile/gen/ProfileDefinitions.hpp>
 
-using namespace kaa;
+namespace kaa {
 
 class DefaultProfileContainer : public IProfileContainer {
 public:
@@ -39,5 +40,7 @@ public:
 private:
     KaaProfile profile_;
 };
+
+}
 
 #endif /* DEFAULTPROFILECONTAINER_HPP_ */

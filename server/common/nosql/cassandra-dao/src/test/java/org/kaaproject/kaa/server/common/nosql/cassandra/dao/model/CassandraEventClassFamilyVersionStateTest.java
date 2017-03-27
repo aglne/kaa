@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.kaaproject.kaa.server.common.nosql.cassandra.dao.model;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.kaaproject.kaa.common.dto.EventClassFamilyVersionStateDto;
@@ -25,23 +26,23 @@ import org.kaaproject.kaa.server.common.nosql.cassandra.dao.model.type.Cassandra
 
 public class CassandraEventClassFamilyVersionStateTest {
 
-    @Test
-    public void basicTest() {
-        CassandraEventClassFamilyVersionState state = new CassandraEventClassFamilyVersionState();
-        state.setEcfId("testID");
-        state.setVersion(42);
+  @Test
+  public void basicTest() {
+    CassandraEventClassFamilyVersionState state = new CassandraEventClassFamilyVersionState();
+    state.setEcfId("testID");
+    state.setVersion(42);
 
-        EventClassFamilyVersionStateDto dto = state.toDto();
+    EventClassFamilyVersionStateDto dto = state.toDto();
 
-        CassandraEventClassFamilyVersionState state2 = new CassandraEventClassFamilyVersionState(dto);
+    CassandraEventClassFamilyVersionState state2 = new CassandraEventClassFamilyVersionState(dto);
 
-        Assert.assertEquals(state.getEcfId(), state2.getEcfId());
-        Assert.assertEquals(state.getVersion(), state2.getVersion());
-    }
+    Assert.assertEquals(state.getEcfId(), state2.getEcfId());
+    Assert.assertEquals(state.getVersion(), state2.getVersion());
+  }
 
-    @Test
-    public void hashCodeEqualsTest(){
-        EqualsVerifier.forClass(CassandraEventClassFamilyVersionState.class).suppress(Warning.NONFINAL_FIELDS).verify();
-    }
+  @Test
+  public void hashCodeEqualsTest() {
+    EqualsVerifier.forClass(CassandraEventClassFamilyVersionState.class).suppress(Warning.NONFINAL_FIELDS).verify();
+  }
 
 }

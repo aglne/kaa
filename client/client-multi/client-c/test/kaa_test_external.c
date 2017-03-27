@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,42 +20,41 @@
 #include <stdbool.h>
 
 #include "platform/ext_status.h"
+#include "platform/ext_sha.h"
 #include "platform/ext_key_utils.h"
 #include "utilities/kaa_mem.h"
 #include "kaa_common.h"
 
-static const char test_ep_key[20] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 0x10, 0x11, 0x12, 0x13, 0x14};
+static const uint8_t test_ep_key[] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 0x10, 0x11, 0x12, 0x13, 0x14};
 
 void ext_status_read(char **buffer, size_t *buffer_size, bool *needs_deallocation)
 {
-
+    (void)buffer;
+    (void)buffer_size;
+    (void)needs_deallocation;
 }
 
 void ext_status_store(const char *buffer, size_t buffer_size)
 {
-
+    (void)buffer;
+    (void)buffer_size;
 }
 
-void ext_get_endpoint_public_key(char **buffer, size_t *buffer_size, bool *needs_deallocation)
+void ext_get_endpoint_public_key(const uint8_t **buffer, size_t *buffer_size)
 {
-    *buffer = (char *) KAA_MALLOC(20 * sizeof(char));
-    if (*buffer != NULL) {
-        memcpy(*buffer, test_ep_key, 20);
-        *buffer_size = 20;
-        *needs_deallocation = true;
-    } else {
-        *buffer_size = 0;
-        *needs_deallocation = false;
-    }
+    *buffer = test_ep_key;
+    *buffer_size = sizeof(test_ep_key);
 }
 
 void ext_configuration_read(char **buffer, size_t *buffer_size, bool *needs_deallocation)
 {
-
+    (void)buffer;
+    (void)buffer_size;
+    (void)needs_deallocation;
 }
 
 void ext_configuration_store(const char *buffer, size_t buffer_size)
 {
-
+    (void)buffer;
+    (void)buffer_size;
 }
-

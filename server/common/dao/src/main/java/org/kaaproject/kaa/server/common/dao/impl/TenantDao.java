@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,24 @@ package org.kaaproject.kaa.server.common.dao.impl;
 
 /**
  * The interface Tenant dao.
- * @param <T>  the type parameter
+ *
+ * @param <T> the type parameter
  */
 public interface TenantDao<T> extends SqlDao<T> {
 
-    /**
-     * Find tenant by name.
-     *
-     * @param tenantName the tenant name
-     * @return the tenant
-     */
-    T findByName(String tenantName);
+  /**
+   * Find tenant by name.
+   *
+   * @param tenantName the tenant name
+   * @return the tenant
+   */
+  T findByName(String tenantName);
 
 
-    /**
-     * Removes tenant by name.
-     *
-     * @param tenantName the tenant name
-     */
-    void removeByName(String tenantName);
+  /**
+   * Removes tenant by name.
+   *
+   * @param tenantName the tenant name
+   */
+  void removeByName(String tenantName);
 }

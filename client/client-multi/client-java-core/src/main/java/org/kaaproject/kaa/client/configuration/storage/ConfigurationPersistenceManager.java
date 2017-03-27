@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,16 +29,16 @@ import java.io.IOException;
  *
  * @author Yaroslav Zeygerman
  * @see ConfigurationStorage
- *
  */
 public interface ConfigurationPersistenceManager {
 
-    /**
-     * Provide storage object which is able to persist encoded configuration data.
-     *
-     * @param storage Object which will save and load configuration data
-     * @see ConfigurationStorage
-     */
-    void setConfigurationStorage(ConfigurationStorage storage) throws IOException;
+  /**
+   * Provide storage object which is able to persist encoded configuration data.
+   *
+   * @param storage Object which will save and load configuration data
+   * @throws IOException the io exception
+   * @see ConfigurationStorage
+   */
+  void setConfigurationStorage(ConfigurationStorage storage) throws IOException;
 
 }

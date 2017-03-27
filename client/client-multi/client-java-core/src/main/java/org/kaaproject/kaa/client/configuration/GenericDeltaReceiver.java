@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,16 @@ import org.apache.avro.generic.GenericRecord;
  * Interface for subscriber to receive deltas in avro generic objects.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface GenericDeltaReceiver {
 
-    /**
-     * Called on each deserialized delta
-     *
-     * @param index Index of the current delta in the union list
-     * @param data Avro generic object with deserialized delta
-     * @param fullResync Tells if current delta is a full resync
-     *
-     */
-    void onDeltaReceived(int index, GenericRecord data, boolean fullResync);
+  /**
+   * Called on each deserialized delta.
+   *
+   * @param index      Index of the current delta in the union list
+   * @param data       Avro generic object with deserialized delta
+   * @param fullResync Tells if current delta is a full resync
+   */
+  void onDeltaReceived(int index, GenericRecord data, boolean fullResync);
 
 }

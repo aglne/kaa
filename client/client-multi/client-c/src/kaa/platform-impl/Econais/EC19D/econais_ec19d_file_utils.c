@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <sndc_sdk_api.h>
 #include <sndc_file_api.h>
 #include "econais_ec19d_file_utils.h"
-#include "../../../kaa_common.h"
+#include "kaa_common.h"
 
 int econais_ec19d_binary_file_read(const char *file_name, char **buffer, size_t *buffer_size, bool *needs_deallocation)
 {
@@ -60,4 +60,9 @@ int econais_ec19d_binary_file_store(const char *file_name, const char *buffer, s
         return 0 ? (i >= 0) : -1;
     }
     return -1;
+}
+
+int econais_ec19d_binary_file_delete(const char *file_name)
+{
+    return sndc_file_delete(file_name);
 }

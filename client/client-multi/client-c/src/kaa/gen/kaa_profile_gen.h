@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 # ifndef KAA_PROFILE_GEN_H_
 # define KAA_PROFILE_GEN_H_
 
-# include "../kaa_common_schema.h"
-# include "../collections/kaa_list.h"
+# include "kaa_common_schema.h"
+# include "collections/kaa_list.h"
 
 # ifdef __cplusplus
 extern "C" {
@@ -33,7 +33,7 @@ typedef struct {
     destroy_fn   destroy;
 } kaa_profile_basic_endpoint_profile_test_t;
 
-kaa_profile_basic_endpoint_profile_test_t *kaa_profile_basic_endpoint_profile_test_create();
+kaa_profile_basic_endpoint_profile_test_t *kaa_profile_basic_endpoint_profile_test_create(void);
 kaa_profile_basic_endpoint_profile_test_t *kaa_profile_basic_endpoint_profile_test_deserialize(avro_reader_t reader);
 
 #ifdef __cplusplus

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,15 @@ package org.kaaproject.kaa.client.common;
 import org.apache.avro.Schema;
 
 /**
- * Interface for objects whose serialization depends on schema
+ * Interface for objects whose serialization depends on schema.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface SchemaDependent {
 
-    /**
-     * @return schema object
-     * @see org.apache.avro.Schema
-     */
-    Schema getSchema();
+  /**
+   * @return schema object
+   * @see org.apache.avro.Schema
+   */
+  Schema getSchema();
 }

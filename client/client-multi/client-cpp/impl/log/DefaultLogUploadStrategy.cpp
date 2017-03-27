@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@
 
 namespace kaa {
 
-const std::size_t DefaultLogUploadStrategy::DEFAULT_BATCH_SIZE;
-const std::size_t DefaultLogUploadStrategy::DEFAULT_RECORDS_BATCH_COUNT;
 const std::size_t DefaultLogUploadStrategy::DEFAULT_UPLOAD_TIMEOUT;
 const std::size_t DefaultLogUploadStrategy::DEFAULT_RETRY_PERIOD;
 const std::size_t DefaultLogUploadStrategy::DEFAULT_TIMEOUT_CHECK_PERIOD;
@@ -32,6 +30,8 @@ const std::size_t DefaultLogUploadStrategy::DEFAULT_LOG_UPLOAD_CHECK_PERIOD;
 
 const std::size_t DefaultLogUploadStrategy::DEFAULT_UPLOAD_VOLUME_THRESHOLD;
 const std::size_t DefaultLogUploadStrategy::DEFAULT_UPLOAD_COUNT_THRESHOLD;
+
+const std::size_t DefaultLogUploadStrategy::DEFAULT_MAX_PARALLEL_UPLOADS;
 
 LogUploadStrategyDecision DefaultLogUploadStrategy::isUploadNeeded(ILogStorageStatus& status)
 {

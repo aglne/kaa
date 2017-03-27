@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,10 @@ import org.kaaproject.kaa.server.common.core.schema.BaseSchema;
 
 public class BaseDataFactory implements KaaDataFactory<BaseSchema, BaseData> {
 
-    @Override
-    public BaseData createData(BaseSchema schema, String data) {
-        return new BaseData(schema, data);
-    }
-
+  @Override
+  public BaseData createData(BaseSchema schema, String data) {
+    return new BaseData(schema, data);
+  }
 
 
 }

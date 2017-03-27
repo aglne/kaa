@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package org.kaaproject.kaa.client.event;
 
-import javax.annotation.Generated;
-
 import org.kaaproject.kaa.client.context.ExecutorContext;
 import org.kaaproject.kaa.client.transact.TransactionId;
+
+import javax.annotation.Generated;
 
 /**
  * Factory for accessing supported event families.
@@ -27,27 +27,26 @@ import org.kaaproject.kaa.client.transact.TransactionId;
  *
  * @author Taras Lemkin
  * @author Andrew Shvayka
- *
  */
 @Generated("EventFamilyFactory.java.template")
 public class EventFamilyFactory {
-    private final EventManager eventManager;
-    private final ExecutorContext executorContext;
+  private final EventManager eventManager;
+  private final ExecutorContext executorContext;
 
-    public EventFamilyFactory(EventManager eventManager, ExecutorContext executorContext) {
-        this.eventManager = eventManager;
-        this.executorContext = executorContext;
-    }
+  public EventFamilyFactory(EventManager eventManager, ExecutorContext executorContext) {
+    this.eventManager = eventManager;
+    this.executorContext = executorContext;
+  }
 
-    public TransactionId startEventsBlock() {
-        return eventManager.beginTransaction();
-    }
+  public TransactionId startEventsBlock() {
+    return eventManager.beginTransaction();
+  }
 
-    public void submitEventsBlock(TransactionId trxId) {
-        eventManager.commit(trxId);
-    }
+  public void submitEventsBlock(TransactionId trxId) {
+    eventManager.commit(trxId);
+  }
 
-    public void removeEventsBlock(TransactionId trxId) {
-        eventManager.rollback(trxId);
-    }
+  public void removeEventsBlock(TransactionId trxId) {
+    eventManager.rollback(trxId);
+  }
 }

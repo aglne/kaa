@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,22 @@ package org.kaaproject.kaa.client.schema;
 /**
  * Sends notifications with new schema object
  *
- * @author Yaroslav Zeygerman
- *
+ * @author Yaroslav Zeygerman.
  */
 public interface SchemaObservable {
 
-    /**
-     * Subscribes new receiver for schema updates
-     *
-     * @param receiver receiver to get schema updates
-     *
-     */
-    void subscribeForSchemaUpdates(SchemaUpdatesReceiver receiver);
+  /**
+   * Subscribes new receiver for schema updates.
+   *
+   * @param receiver receiver to get schema updates
+   */
+  void subscribeForSchemaUpdates(SchemaUpdatesReceiver receiver);
 
-    /**
-     * Unsubscribes receiver from schema updates
-     *
-     * @param receiver receiver to be unsubscribed from schema updates
-     *
-     */
-    void unsubscribeFromSchemaUpdates(SchemaUpdatesReceiver receiver);
+  /**
+   * Unsubscribes receiver from schema updates.
+   *
+   * @param receiver receiver to be unsubscribed from schema updates
+   */
+  void unsubscribeFromSchemaUpdates(SchemaUpdatesReceiver receiver);
 
 }

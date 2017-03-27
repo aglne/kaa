@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,18 @@
 #include <exception>
 #include <sstream>
 
+#ifndef NDEBUG
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <Windows.h>
+#undef  NOMINMAX
 #include <DbgHelp.h>
 #undef WIN32_LEAN_AND_MEAN
 #else
 #include <execinfo.h>
 #endif
+#endif // NDEBUG
 
 namespace kaa {
 
@@ -36,7 +40,7 @@ class KaaException : public std::exception {
 public:
     KaaException() : message_("") {}
 
-    KaaException(boost::format f) {
+    KaaException(boost::format& f) {
         std::stringstream ss;
         ss << "[Kaa OpenSource Project] Instruction failed! Details: \"" << f
            << "\" Original message: " << std::exception::what();
@@ -44,7 +48,7 @@ public:
         message_ = ss.str();
     }
 
-    KaaException(const std::string &message) {
+    KaaException(const std::string& message) {
         std::stringstream ss;
         ss << "[Kaa OpenSource Project] Instruction failed! Details: \"" << message
            << "\" Original message: " << std::exception::what();
@@ -52,16 +56,24 @@ public:
         message_ = ss.str();
     }
 
-    virtual const char * what() const throw () {
+    KaaException(const std::exception& e) {
+        std::stringstream ss;
+        ss << "[Kaa OpenSource Project] Instruction failed! Details: \"" << e.what();
+        captureStack(ss);
+        message_ = ss.str();
+    }
+
+    virtual const char * what() const throw() {
         return message_.c_str();
     }
 
-    virtual ~KaaException() throw () {}
+    virtual ~KaaException() noexcept = default;
 
 private:
     std::string message_;
 
     void captureStack(std::stringstream& ss)  {
+#ifndef NDEBUG
          void *trace[16];
          int i, trace_size = 0;
 #ifdef _WIN32
@@ -90,6 +102,9 @@ private:
 #ifdef _WIN32
          free( symbol );
 #endif
+#else
+         static_cast<void>(ss);
+#endif // NDEBUG
      }
 };
 

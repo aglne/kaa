@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,31 @@
 
 package org.kaaproject.kaa.client.logging;
 
-import java.io.IOException;
-
 import org.kaaproject.kaa.common.endpoint.gen.LogSyncRequest;
 import org.kaaproject.kaa.common.endpoint.gen.LogSyncResponse;
+
+import java.io.IOException;
 
 /**
  * Processes the Logging requests and responses.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface LogProcessor {
 
-    /**
-     * Fills the given request with the latest Logging state.
-     *
-     * @param request the Log request which is going to be filled.
-     *
-     */
-    void fillSyncRequest(LogSyncRequest request);
+  /**
+   * Fills the given request with the latest Logging state.
+   *
+   * @param request the Log request which is going to be filled.
+   */
+  void fillSyncRequest(LogSyncRequest request);
 
-    /**
-     * Updates the state using response from the server.
-     *
-     * @param response the response from the remote server.
-     *
-     */
-    void onLogResponse(LogSyncResponse response) throws IOException;
+  /**
+   * Updates the state using response from the server.
+   *
+   * @param response the response from the remote server.
+   * @throws IOException the io exception
+   */
+  void onLogResponse(LogSyncResponse response) throws IOException;
 
 }

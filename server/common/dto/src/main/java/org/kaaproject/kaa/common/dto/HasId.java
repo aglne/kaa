@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,17 @@ package org.kaaproject.kaa.common.dto;
  */
 public interface HasId {
 
-    /**
-     * This method return string id
-     *
-     * @return string id
-     */
-    String getId();
+  /**
+   * This method return string id.
+   *
+   * @return string id
+   */
+  String getId();
 
-    /**
-     * This is method set string id
-     *
-     * @param id string id
-     */
-    void setId(String id);
+  /**
+   * This is method set string id.
+   *
+   * @param id string id
+   */
+  void setId(String id);
 }

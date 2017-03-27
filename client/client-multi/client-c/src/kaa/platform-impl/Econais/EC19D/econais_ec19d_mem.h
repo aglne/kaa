@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,10 @@
 
 #ifndef __KAA_CALLOC
 #define __KAA_CALLOC(N,S)         sndc_mem_calloc(N, S)
+#endif
+
+#ifndef __KAA_REALLOC
+#define __KAA_REALLOC(P, S)       sndc_mem_realloc(P, S)
 #endif
 
 #ifndef __KAA_FREE

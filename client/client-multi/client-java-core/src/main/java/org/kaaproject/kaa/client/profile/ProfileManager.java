@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,13 @@ import java.io.IOException;
 /**
  * <p>Interface for the profile manager.</p>
  *
- * <p>Responsible for the management of the user-defined profile container
- * ({@link AbstractProfileContainer})</p>
- *
- * <p>Profile manager is used to track any profile updates.
- * If no container is set, Kaa won't be able to process these updates.</p>
+ * <p>Profile manager is used to track any profile updates. If no container is set, Kaa won't be
+ * able to process these updates.</p>
  *
  * <pre>
  * {@code
- * // Assume, BasicEndpointProfile is a profile class auto-generated according to predefined Avro schema
+ * // Assume, BasicEndpointProfile is a profile class auto-generated according to predefined Avro
+ * schema
  * public class BasicProfileContainer extends AbstractProfileContainer<BasicEndpointProfile> {
  *     private BasicEndpointProfile profile = new BasicEndpointProfile();
  *
@@ -60,31 +58,34 @@ import java.io.IOException;
  *
  * @author Yaroslav Zeygerman
  * @author Andrew Shvayka
- *
- * @see AbstractProfileContainer
- * @see SerializedProfileContainer
  */
 public interface ProfileManager {
 
-    /**
-     * Sets profile container implemented by the user.
-     *
-     * @param container User-defined container
-     * @see AbstractProfileContainer
-     *
-     */
-    void setProfileContainer(ProfileContainer container);
+  /**
+   * Sets profile container implemented by the user.
+   *
+   * @param container User-defined container
+   */
+  void setProfileContainer(ProfileContainer container);
 
-    /**
-     * Retrieves serialized profile
-     *
-     * @return serialized profile data
-     *
-     */
-    byte[] getSerializedProfile() throws IOException;
-    
-    /**
-     * Force sync of updated profile with server
-     */
-    void updateProfile();
+  /**
+   * Retrieves serialized profile
+   *
+   * @return serialized profile data
+   * @throws IOException the io exception
+   */
+  byte[] getSerializedProfile() throws IOException;
+
+  /**
+   * Force sync of updated profile with server.
+   */
+  void updateProfile();
+
+  /**
+   * Retrieves ready-to-use state.
+   * A user should provide a profile container in case of a non-default profile schema.
+   *
+   * @return True if ready.
+   */
+  boolean isInitialized();
 }

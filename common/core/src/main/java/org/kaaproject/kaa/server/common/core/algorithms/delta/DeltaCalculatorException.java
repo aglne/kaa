@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,18 @@ package org.kaaproject.kaa.server.common.core.algorithms.delta;
  */
 public class DeltaCalculatorException extends Exception {
 
-    /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = 1L;
+  /**
+   * The Constant serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
-    /**
-     * Instantiates a new delta calculator exception.
-     *
-     * @param message the message
-     */
-    public DeltaCalculatorException(String message) {
-        super(message);
-    }
+  /**
+   * Instantiates a new delta calculator exception.
+   *
+   * @param message the message
+   */
+  public DeltaCalculatorException(String message) {
+    super(message);
+  }
 
 }

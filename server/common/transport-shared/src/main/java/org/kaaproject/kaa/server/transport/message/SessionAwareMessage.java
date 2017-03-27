@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transport.message;
 
 import org.kaaproject.kaa.server.transport.session.SessionAware;
 
 /**
- * Represents {@link SessionAware} {@link Message}
- * 
- * @author Andrew Shvayka
+ * Represents {@link SessionAware} {@link Message}.
  *
+ * @author Andrew Shvayka
  */
-public interface SessionAwareMessage extends Message, SessionAware{
+public interface SessionAwareMessage extends Message, SessionAware {
 
-    /**
-     * Return encoded message data
-     * @return encoded message data
-     */
-    byte[] getEncodedMessageData();
+  /**
+   * Return encoded message data
+   *
+   * @return encoded message data
+   */
+  byte[] getEncodedMessageData();
 
 }

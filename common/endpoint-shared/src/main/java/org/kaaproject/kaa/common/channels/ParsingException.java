@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.common.channels;
 
 /**
  * ParsingException Class.
  * Used to indicate error during Avro SupportedChannel object conversations.
- * @author Andrey Panasenko
  *
+ * @author Andrey Panasenko
  */
 public class ParsingException extends Exception {
 
-    private static final long serialVersionUID = -8699414933370024424L;
+  private static final long serialVersionUID = -8699414933370024424L;
 
-    public ParsingException(String error) {
-        super(error);
-    }
+  public ParsingException(String error) {
+    super(error);
+  }
 }

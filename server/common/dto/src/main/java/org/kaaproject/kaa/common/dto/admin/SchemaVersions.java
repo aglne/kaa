@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,55 +16,55 @@
 
 package org.kaaproject.kaa.common.dto.admin;
 
-import java.io.Serializable;
-import java.util.*;
+import org.kaaproject.kaa.common.dto.VersionDto;
 
-import org.kaaproject.kaa.common.dto.SchemaDto;
+import java.io.Serializable;
+import java.util.List;
 
 public class SchemaVersions implements Serializable {
 
-    private static final long serialVersionUID = 2648014748733736078L;
+  private static final long serialVersionUID = 2648014748733736078L;
 
-    private List<SchemaDto> configurationSchemaVersions;
-    private List<SchemaDto> profileSchemaVersions;
-    private List<SchemaDto> notificationSchemaVersions;
-    private List<SchemaDto> logSchemaVersions;
+  private List<VersionDto> configurationSchemaVersions;
+  private List<VersionDto> profileSchemaVersions;
+  private List<VersionDto> notificationSchemaVersions;
+  private List<VersionDto> logSchemaVersions;
 
-    public SchemaVersions() {
-    }
+  public SchemaVersions() {
+  }
 
-    public List<SchemaDto> getConfigurationSchemaVersions() {
-        return configurationSchemaVersions;
-    }
+  public List<VersionDto> getConfigurationSchemaVersions() {
+    return configurationSchemaVersions;
+  }
 
-    public void setConfigurationSchemaVersions(
-            List<SchemaDto> configurationSchemaVersions) {
-        this.configurationSchemaVersions = configurationSchemaVersions;
-    }
+  public void setConfigurationSchemaVersions(
+      List<VersionDto> configurationSchemaVersions) {
+    this.configurationSchemaVersions = configurationSchemaVersions;
+  }
 
-    public List<SchemaDto> getProfileSchemaVersions() {
-        return profileSchemaVersions;
-    }
+  public List<VersionDto> getProfileSchemaVersions() {
+    return profileSchemaVersions;
+  }
 
-    public void setProfileSchemaVersions(List<SchemaDto> profileSchemaVersions) {
-        this.profileSchemaVersions = profileSchemaVersions;
-    }
+  public void setProfileSchemaVersions(List<VersionDto> profileSchemaVersions) {
+    this.profileSchemaVersions = profileSchemaVersions;
+  }
 
-    public List<SchemaDto> getNotificationSchemaVersions() {
-        return notificationSchemaVersions;
-    }
+  public List<VersionDto> getNotificationSchemaVersions() {
+    return notificationSchemaVersions;
+  }
 
-    public void setNotificationSchemaVersions(
-            List<SchemaDto> notificationSchemaVersions) {
-        this.notificationSchemaVersions = notificationSchemaVersions;
-    }
+  public void setNotificationSchemaVersions(
+      List<VersionDto> notificationSchemaVersions) {
+    this.notificationSchemaVersions = notificationSchemaVersions;
+  }
 
-    public List<SchemaDto> getLogSchemaVersions() {
-        return logSchemaVersions;
-    }
+  public List<VersionDto> getLogSchemaVersions() {
+    return logSchemaVersions;
+  }
 
-    public void setLogSchemaVersions(List<SchemaDto> logSchemaVersions) {
-        this.logSchemaVersions = logSchemaVersions;
-    }
+  public void setLogSchemaVersions(List<VersionDto> logSchemaVersions) {
+    this.logSchemaVersions = logSchemaVersions;
+  }
 
 }

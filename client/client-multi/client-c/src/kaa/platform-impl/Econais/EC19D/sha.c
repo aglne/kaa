@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 #include <sndc_sdk_api.h>
 #include <sndc_crypto_api.h>
-#include "../../../kaa_common.h"
-#include "../../../platform/ext_sha.h"
+#include "kaa_common.h"
+#include "platform/ext_sha.h"
 
 
 

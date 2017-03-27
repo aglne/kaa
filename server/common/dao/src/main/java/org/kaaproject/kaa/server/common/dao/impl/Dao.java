@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,50 +20,44 @@ import java.util.List;
 
 /**
  * The generic Dao interface.
- * @param <T>  the type parameter
+ *
+ * @param <T> the type parameter
  */
 public interface Dao<T, K> {
 
-    /**
-     * Save object. Will be returned object with id
-     *
-     * @param o the domain object
-     * @return the saved object
-     */
-    T save(T o);
+  /**
+   * Save object. Will be returned object with id
+   *
+   * @param object the domain object
+   * @return the saved object
+   */
+  T save(T object);
 
-    /**
-     * Find all objects.
-     *
-     * @return the list of objects
-     */
-    List<T> find();
+  /**
+   * Find all objects.
+   *
+   * @return the list of objects
+   */
+  List<T> find();
 
-    /**
-     * Find object by id.
-     *
-     * @param id the id
-     * @return the found object
-     */
-    T findById(K id);
+  /**
+   * Find object by id.
+   *
+   * @param id the id
+   * @return the found object
+   */
+  T findById(K id);
 
-    /**
-     * Remove all objects from collection/table.
-     */
-    void removeAll();
+  /**
+   * Remove all objects from collection/table.
+   */
+  void removeAll();
 
-    /**
-     * Remove object by id.
-     *
-     * @param id the object id
-     */
-    void removeById(K id);
-
-    /**
-     * @param o
-     * @param clazz
-     * @return
-     */
-    <V> V save(V o, Class<?> clazz);
+  /**
+   * Remove object by id.
+   *
+   * @param id the object id
+   */
+  void removeById(K id);
 
 }

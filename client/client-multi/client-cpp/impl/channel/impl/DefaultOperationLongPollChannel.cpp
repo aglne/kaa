@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,11 @@ const std::map<TransportType, ChannelDirection> DefaultOperationLongPollChannel:
                 { TransportType::EVENT, ChannelDirection::DOWN }
         };
 
-DefaultOperationLongPollChannel::DefaultOperationLongPollChannel(IKaaChannelManager *channelManager, const KeyPair& clientKeys)
+DefaultOperationLongPollChannel::DefaultOperationLongPollChannel(IKaaChannelManager& channelManager, const KeyPair& clientKeys, IKaaClientContext &context)
     : clientKeys_(clientKeys), work_(io_), pollThread_()
     , stopped_(true), isShutdown_(false), isPaused_(false), connectionInProgress_(false), taskPosted_(false), firstStart_(true)
-    , multiplexer_(nullptr), demultiplexer_(nullptr), channelManager_(channelManager) {}
+    , multiplexer_(nullptr), demultiplexer_(nullptr), channelManager_(channelManager)
+    , httpDataProcessor_(context), httpClient_(context), context_(context) {}
 
 DefaultOperationLongPollChannel::~DefaultOperationLongPollChannel()
 {
@@ -150,7 +151,8 @@ void DefaultOperationLongPollChannel::executeTask()
         KAA_MUTEX_LOCKED("conditionMutex_");
         KAA_CONDITION_NOTIFY_ALL(waitCondition_);
         if (isServerFailed) {
-            channelManager_->onServerFailed(std::dynamic_pointer_cast<ITransportConnectionInfo, IPTransportInfo>(currentServer_));
+            channelManager_.onServerFailed(std::dynamic_pointer_cast<ITransportConnectionInfo, IPTransportInfo>(currentServer_),
+                                            KaaFailoverReason::NO_CONNECTIVITY);
         }
         return;
     }
@@ -245,7 +247,7 @@ void DefaultOperationLongPollChannel::setServer(ITransportConnectionInfoPtr serv
         std::shared_ptr<IEncoderDecoder> encDec(
                 new RsaEncoderDecoder(clientKeys_.getPublicKey()
                                     , clientKeys_.getPrivateKey()
-                                    , currentServer_->getPublicKey()));
+                                    , currentServer_->getPublicKey(), context_));
         httpDataProcessor_.setEncoderDecoder(encDec);
 
         if (!isPaused_) {

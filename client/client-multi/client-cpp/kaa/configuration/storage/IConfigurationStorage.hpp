@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,14 +31,12 @@ namespace kaa {
  */
 class IConfigurationStorage {
 public:
-    virtual ~IConfigurationStorage() {}
-
     /**
      * Specifies routine to persist configuration data.
      *
      * @param bytes Configuration binary data.
      */
-    virtual void saveConfiguration(std::vector<std::uint8_t>&& bytes) = 0;
+    virtual void saveConfiguration(const std::vector<std::uint8_t>& bytes) = 0;
 
     /**
      * Specifies routine to load configuration data.
@@ -46,6 +44,13 @@ public:
      * @return Configuration binary data.
      */
     virtual std::vector<std::uint8_t> loadConfiguration() = 0;
+
+    /**
+     * Clear configuration data (file).
+     */
+    virtual void clearConfiguration() = 0;
+
+    virtual ~IConfigurationStorage() = default;
 };
 
 typedef std::shared_ptr<IConfigurationStorage> IConfigurationStoragePtr;

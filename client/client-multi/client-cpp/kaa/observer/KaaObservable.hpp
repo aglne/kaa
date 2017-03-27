@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,10 @@ public:
         KAA_MUTEX_LOCKED("mainGuard_");
 
         for (auto& pair : slots_) {
-            pair.second(std::forward<Args>(args)...);
+            try {
+                pair.second(std::forward<Args>(args)...);
+            } catch (...) {
+            }
         }
         isNotifying_ = false;
 

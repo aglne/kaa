@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
 package org.kaaproject.kaa.client.common;
 
 /**
- * Common enum interface
+ * Common enum interface.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface CommonEnum extends SchemaDependent {
 
-    /**
-     * @return enum symbol
-     */
-    String getSymbol();
+  /**
+   * @return enum symbol.
+   */
+  String getSymbol();
 }

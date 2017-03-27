@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.client.logging;
 
 /**
@@ -34,29 +35,33 @@ package org.kaaproject.kaa.client.logging;
  * </p>
  *
  * @see LogStorage
- * @see LogStorageStatus
  * @see LogUploadStrategy
- * @see LogUploadConfiguration
+ * @see LogDeliveryListener
  */
 public interface GenericLogCollector {
-    /**
-     * Set user implementation of a log storage.
-     *
-     * @param storage
-     *            User-defined log storage object
-     */
-    void setStorage(LogStorage storage);
+  /**
+   * Set user implementation of a log storage.
+   *
+   * @param storage User-defined log storage object
+   */
+  void setStorage(LogStorage storage);
 
-    /**
-     * Set user implementation of a log upload strategy.
-     *
-     * @param strategy
-     *            User-defined log upload strategy object.
-     */
-    void setStrategy(LogUploadStrategy strategy);
-    
-    /**
-     * Stops and/or cleanup resources. 
-     */
-    void stop();
+  /**
+   * Set user implementation of a log upload strategy.
+   *
+   * @param strategy User-defined log upload strategy object.
+   */
+  void setStrategy(LogUploadStrategy strategy);
+
+  /**
+   * Set a listener which receives a delivery status of each log bucket.
+   *
+   * @param listener User-defined listener object.
+   */
+  void setLogDeliveryListener(LogDeliveryListener listener);
+
+  /**
+   * Stops and/or cleanup resources.
+   */
+  void stop();
 }

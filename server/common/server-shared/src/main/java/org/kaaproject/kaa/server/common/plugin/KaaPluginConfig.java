@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,19 @@ import java.lang.annotation.Target;
 
 /**
  * Represents a marker annotation for {@link PluginConfig}.
- * 
- * @author Igor Kulikov
  *
+ * @author Igor Kulikov
  */
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE) 
+@Target(ElementType.TYPE)
 public @interface KaaPluginConfig {
 
-    PluginType pluginType();
-    
+  /**
+   * Type of plugin.
+   *
+   * @return type of plugin
+   */
+  PluginType pluginType();
+
 }

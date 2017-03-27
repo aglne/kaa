@@ -1,5 +1,5 @@
 #
-# Copyright 2014 CyberVision, Inc.
+# Copyright 2014-2016 CyberVision, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 #
 
 set (KAA_SOURCE_FILES  ${KAA_SOURCE_FILES}
-                       ${KAA_SRC_FOLDER}/kaa_event.c
                        ${KAA_SRC_FOLDER}/gen/kaa_profile_gen.c
                        ${KAA_SRC_FOLDER}/gen/kaa_logging_gen.c
                        ${KAA_SRC_FOLDER}/gen/kaa_configuration_gen.c

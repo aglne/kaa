@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,20 +52,28 @@ import java.nio.ByteBuffer;
  */
 public interface ConfigurationStorage {
 
-    /**
-     * Saves configuration data
-     *
-     * @param buffer buffer with configuration data
-     *
-     */
-    void saveConfiguration(ByteBuffer buffer) throws IOException;
+  /**
+   * Saves configuration data.
+   *
+   * @param buffer buffer with configuration data
+   * @throws IOException the io exception
+   */
+  void saveConfiguration(ByteBuffer buffer) throws IOException;
 
-    /**
-     * Loads configuration data
-     *
-     * @return buffer with loaded configuration data, or null if configuration is empty
-     *
-     */
-    ByteBuffer loadConfiguration() throws IOException;
+  /**
+   * Loads configuration data.
+   *
+   * @return buffer with loaded configuration data, or null if configuration is empty
+   * @throws IOException the io exception
+   */
+  ByteBuffer loadConfiguration() throws IOException;
+
+  /**
+   * Clear configuration data (file).
+   *
+   * @throws IOException the io exception
+   */
+  void clearConfiguration() throws IOException;
+
 
 }

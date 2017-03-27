@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,12 @@
 
 namespace kaa {
 
+#define KAA_PROFILE_SCHEMA_VERSION    0
+
 /**
  * @typedef The user-defined profile structure.
  */
-typedef kaa_profile::Profile KaaProfile;
+typedef kaa_profile::EmptyData KaaProfile;
 
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,6 @@
 
 namespace kaa {
 
-class IConfigurationHashContainer;
-typedef std::shared_ptr<IConfigurationHashContainer> IConfigurationHashContainerPtr;
-
 /**
  * Container for the configuration data hash.
  */
@@ -42,8 +39,10 @@ public:
      */
     virtual EndpointObjectHash getConfigurationHash() = 0;
 
-    virtual ~IConfigurationHashContainer() {}
+    virtual ~IConfigurationHashContainer() = default;
 };
+
+typedef std::shared_ptr<IConfigurationHashContainer> IConfigurationHashContainerPtr;
 
 }  // namespace kaa
 

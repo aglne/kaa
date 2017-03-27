@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.client.profile;
+
+import org.kaaproject.kaa.common.avro.AvroByteArrayConverter;
+import org.kaaproject.kaa.schema.system.EmptyData;
 
 import java.io.IOException;
 
 import javax.annotation.Generated;
-
-import org.kaaproject.kaa.common.avro.AvroByteArrayConverter;
-import org.kaaproject.kaa.schema.base.Profile;
 
 /**
  * This class serialize entity defined in profile schema and returned by profile container.
@@ -33,19 +34,24 @@ import org.kaaproject.kaa.schema.base.Profile;
  */
 @Generated("ProfileSerializer.java.template")
 class ProfileSerializer {
-    private final AvroByteArrayConverter<Profile> converter = new AvroByteArrayConverter<Profile>(Profile.class);
+  private final AvroByteArrayConverter<EmptyData> converter =
+          new AvroByteArrayConverter<EmptyData>(EmptyData.class);
 
-    byte[] toByteArray(ProfileContainer container) throws IOException {
-        Profile profile;
-        if (container == null) {
-            throw new RuntimeException("Profile container is not set!");
-        } else {
-            profile = container.getProfile();
-        }
-        if (profile != null) {
-            return converter.toByteArray(profile);
-        } else {
-            throw new RuntimeException("Profile is not set!");
-        }
+  byte[] toByteArray(ProfileContainer container) throws IOException {
+    EmptyData profile;
+    if (container == null) {
+      throw new RuntimeException("Profile container is not set!");
+    } else {
+      profile = container.getProfile();
     }
+    if (profile != null) {
+      return converter.toByteArray(profile);
+    } else {
+      throw new RuntimeException("Profile is not set!");
+    }
+  }
+
+  boolean isDefault() {
+    return false;
+  }
 }

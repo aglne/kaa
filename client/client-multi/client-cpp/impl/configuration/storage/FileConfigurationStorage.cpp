@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,16 @@
 
 #include <fstream>
 #include <iterator>
+#include <cstdio>
 
 namespace kaa {
 
 
-void FileConfigurationStorage::saveConfiguration(std::vector<std::uint8_t>&& bytes)
+void FileConfigurationStorage::saveConfiguration(const std::vector<std::uint8_t>& bytes)
 {
     std::ofstream outFile(filename_, std::ofstream::binary);
     if (outFile.good()) {
-        outFile.write(reinterpret_cast<char *>(bytes.data()), bytes.size());
+        outFile.write(reinterpret_cast<const char *>(bytes.data()), bytes.size());
         outFile.close();
     }
 }
@@ -45,6 +46,11 @@ std::vector<std::uint8_t> FileConfigurationStorage::loadConfiguration()
         return result;
     }
     return std::vector<std::uint8_t>();
+}
+
+void FileConfigurationStorage::clearConfiguration()
+{
+    std::remove(filename_.c_str());
 }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #ifndef EXT_SHA_H_
 #define EXT_SHA_H_
 
-#include "../kaa_error.h"
+#include "kaa_error.h"
 
 #ifdef __cplusplus
 extern "C" {

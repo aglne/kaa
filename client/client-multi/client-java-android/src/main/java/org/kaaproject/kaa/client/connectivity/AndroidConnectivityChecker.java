@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,45 +17,44 @@
 
 package org.kaaproject.kaa.client.connectivity;
 
-import org.kaaproject.kaa.client.channel.connectivity.ConnectivityChecker;
-import org.kaaproject.kaa.client.channel.impl.channels.DefaultBootstrapChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import org.kaaproject.kaa.client.channel.connectivity.ConnectivityChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AndroidConnectivityChecker implements ConnectivityChecker {
-    public static final Logger LOG = LoggerFactory //NOSONAR
-            .getLogger(DefaultBootstrapChannel.class);
+  public static final Logger LOG = LoggerFactory //NOSONAR
+      .getLogger(AndroidConnectivityChecker.class);
 
-    private final Context context;
+  private final Context context;
 
-    public AndroidConnectivityChecker(Context context) {
-        this.context = context;
-    }
+  public AndroidConnectivityChecker(Context context) {
+    this.context = context;
+  }
 
-    @Override
-    public boolean checkConnectivity() {
-        boolean isConnectionExists = false;
+  @Override
+  public boolean checkConnectivity() {
+    boolean isConnectionExists = false;
 
-        if (context != null) {
-            ConnectivityManager cm = (ConnectivityManager) context
-                    .getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo[] networkInfos = cm.getAllNetworkInfo();
+    if (context != null) {
+      ConnectivityManager cm = (ConnectivityManager) context
+          .getSystemService(Context.CONNECTIVITY_SERVICE);
+      NetworkInfo[] networkInfos = cm.getAllNetworkInfo();
 
-            if (networkInfos != null) {
-                for (NetworkInfo tempNetworkInfo : networkInfos) {
-                    if (tempNetworkInfo.isConnected()) {
-                        isConnectionExists = true;
-                        LOG.info("Connection to the network exists");
-                        break;
-                    }
-                }
-            }
+      if (networkInfos != null) {
+        for (NetworkInfo tempNetworkInfo : networkInfos) {
+          if (tempNetworkInfo.isConnected()) {
+            isConnectionExists = true;
+            LOG.info("Connection to the network exists");
+            break;
+          }
         }
-
-        return isConnectionExists;
+      }
     }
+
+    return isConnectionExists;
+  }
 }

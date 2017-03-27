@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdarg.h>
-#include "../../platform/ext_system_logger.h"
+#include "platform/ext_system_logger.h"
 
 
 
@@ -30,7 +30,7 @@ void ext_write_log(FILE * sink, const char * buffer, size_t message_size)
     fflush(sink);
 }
 
-time_t ext_get_systime()
+kaa_time_t ext_get_systime(void)
 {
     return time(NULL);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,25 @@
 
 package org.kaaproject.kaa.client.notification;
 
-import javax.annotation.Generated;
-
 import org.kaaproject.kaa.schema.base.Notification;
+
+import javax.annotation.Generated;
 
 /**
  * The listener to notifications.
  *
  * @author Yaroslav Zeygerman
  * @author Andrew Shvayka
- *
  */
 @Generated("NotificationListener.java.template")
 public interface NotificationListener {
 
-    /**
-     * Called on each new notification.
-     *
-     * @param topicId the topic's id.
-     * @param notification the notification object.
-     *
-     */
-    void onNotification(String topicId, Notification notification);
+  /**
+   * Called on each new notification.
+   *
+   * @param topicId      the topic's id.
+   * @param notification the notification object.
+   */
+  void onNotification(long topicId, Notification notification);
 
 }

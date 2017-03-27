@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transport;
 
 import java.lang.annotation.ElementType;
@@ -22,12 +23,11 @@ import java.lang.annotation.Target;
 
 /**
  * Represents a marker annotation for {@link TransportConfig}.
- * 
- * @author Andrew Shvayka
  *
+ * @author Andrew Shvayka
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE) 
+@Target(ElementType.TYPE)
 public @interface KaaTransportConfig {
 
 }

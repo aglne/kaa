@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,12 +34,13 @@
 #include "kaa/channel/IPTransportInfo.hpp"
 #include "kaa/channel/ITransportConnectionInfo.hpp"
 #include "kaa/channel/TransportProtocolIdConstants.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
 class DefaultOperationLongPollChannel : public IDataChannel {
 public:
-    DefaultOperationLongPollChannel(IKaaChannelManager *channelManager, const KeyPair& clientKeys);
+    DefaultOperationLongPollChannel(IKaaChannelManager& channelManager, const KeyPair& clientKeys, IKaaClientContext &context);
     virtual ~DefaultOperationLongPollChannel();
 
     virtual void sync(TransportType type);
@@ -103,13 +104,16 @@ private:
     bool firstStart_;
     IKaaDataMultiplexer *multiplexer_;
     IKaaDataDemultiplexer *demultiplexer_;
-    IKaaChannelManager *channelManager_;
+    IKaaChannelManager& channelManager_;
     std::shared_ptr<IPTransportInfo> currentServer_;
     HttpDataProcessor httpDataProcessor_;
     HttpClient httpClient_;
     KAA_CONDITION_VARIABLE_DECLARE(waitCondition_);
     KAA_MUTEX_DECLARE(conditionMutex_);
     KAA_MUTEX_DECLARE(channelGuard_);
+
+protected:
+    IKaaClientContext &context_;
 };
 
 }

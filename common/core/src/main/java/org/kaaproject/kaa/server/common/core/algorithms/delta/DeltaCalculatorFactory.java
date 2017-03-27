@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,14 @@ import org.kaaproject.kaa.server.common.core.schema.ProtocolSchema;
  */
 public interface DeltaCalculatorFactory {
 
-    /**
-     * Creates a new DeltaCalculator object.
-     * @param protocolSchemaBody protocol the schema body
-     * @param baseDataSchema base the schema body
-     * @return the delta calculator
-     */
-    DeltaCalculationAlgorithm createDeltaCalculator(ProtocolSchema protocolSchemaBody, BaseSchema baseDataSchema);
+  /**
+   * Creates a new DeltaCalculator object.
+   *
+   * @param protocolSchemaBody protocol the schema body
+   * @param baseDataSchema     base the schema body
+   * @return the delta calculator
+   */
+  DeltaCalculationAlgorithm createDeltaCalculator(
+          ProtocolSchema protocolSchemaBody, BaseSchema baseDataSchema);
 
 }

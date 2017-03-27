@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
  */
 
 /**
- * Provides classes and interfaces used to decode platform level data to {@link org.kaaproject.kaa.server.sync.ClientSync} and encode {@link org.kaaproject.kaa.server.sync.ServerSync}
+ * Provides classes and interfaces used to decode platform level data to {@link
+ * org.kaaproject.kaa.server.sync.ClientSync} and encode
+ *   {@link org.kaaproject.kaa.server.sync.ServerSync}
  */
 package org.kaaproject.kaa.server.sync.platform;
 

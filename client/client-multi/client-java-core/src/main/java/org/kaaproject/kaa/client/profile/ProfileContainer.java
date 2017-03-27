@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.kaaproject.kaa.client.profile;
 
-import javax.annotation.Generated;
+import org.kaaproject.kaa.schema.system.EmptyData;
 
-import org.kaaproject.kaa.schema.base.Profile;
+import javax.annotation.Generated;
 
 /**
  * Interface for the profile container.
@@ -26,12 +26,11 @@ import org.kaaproject.kaa.schema.base.Profile;
 @Generated("ProfileContainer.java.template")
 public interface ProfileContainer {
 
-    /**
-     * Retrieves serialized profile
-     *
-     * @return byte array with serialized profile
-     *
-     */
-    Profile getProfile();
+  /**
+   * Retrieves serialized profile.
+   *
+   * @return byte array with serialized profile
+   */
+  EmptyData getProfile();
 
 }

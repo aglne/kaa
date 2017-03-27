@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,12 @@
 #include "utilities/kaa_log.h"
 #include "platform/ext_sha.h"
 #include "platform/ext_key_utils.h"
+#include "kaa_private.h"
 
 kaa_digest test_ep_key_hash = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 0x10, 0x11, 0x12, 0x13, 0x14};
 kaa_digest test_profile_hash= {0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28};
 
 #define KAA_STATUS_STORAGE "status.conf"
-
-extern kaa_error_t kaa_status_create(kaa_status_t **kaa_status_p);
-extern void        kaa_status_destroy(kaa_status_t *self);
-extern kaa_error_t kaa_status_save(kaa_status_t *self);
-extern kaa_error_t kaa_status_set_endpoint_access_token(kaa_status_t *self, const char *token);
 
 static kaa_logger_t *logger = NULL;
 
@@ -82,16 +78,15 @@ void ext_status_store(const char *buffer, size_t buffer_size)
     }
 }
 
-void ext_get_endpoint_public_key(char **buffer, size_t *buffer_size, bool *needs_deallocation)
+void ext_get_endpoint_public_key(const uint8_t **buffer, size_t *buffer_size)
 {
     *buffer = NULL;
     *buffer_size = 0;
-    *needs_deallocation = false;
 }
 
-void test_create_status()
+void test_create_status(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_status_t *status;
     kaa_error_t err_code = kaa_status_create(&status);
@@ -102,23 +97,26 @@ void test_create_status()
     kaa_status_destroy(status);
 }
 
-void test_status_persistense()
+void test_status_persistense(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_status_t *status;
     kaa_error_t err_code = kaa_status_create(&status);
+    assert_int_equal(KAA_ERR_NONE, err_code);
 
     ASSERT_NULL(status->endpoint_access_token);
     ASSERT_EQUAL(status->event_seq_n, 0);
     ASSERT_FALSE(status->is_attached);
     ASSERT_FALSE(status->is_registered);
+    ASSERT_FALSE(status->is_updated);
 
     ASSERT_EQUAL(kaa_status_set_endpoint_access_token(status, "my_token"), KAA_ERR_NONE);
     ASSERT_EQUAL(ext_copy_sha_hash(status->endpoint_public_key_hash, test_ep_key_hash), KAA_ERR_NONE);
     ASSERT_EQUAL(ext_copy_sha_hash(status->profile_hash, test_profile_hash), KAA_ERR_NONE);
     status->is_attached = true;
     status->is_registered = true;
+    status->is_updated = true;
     status->event_seq_n = 10;
 
     err_code = kaa_status_save(status);
@@ -129,6 +127,7 @@ void test_status_persistense()
 
 
     err_code = kaa_status_create(&status);
+    assert_int_equal(KAA_ERR_NONE, err_code);
 
     ASSERT_NOT_NULL(status->endpoint_access_token);
     ASSERT_EQUAL(strcmp("my_token", status->endpoint_access_token), 0);
@@ -136,6 +135,7 @@ void test_status_persistense()
     ASSERT_EQUAL(status->event_seq_n, 10);
     ASSERT_TRUE(status->is_attached);
     ASSERT_TRUE(status->is_registered);
+    ASSERT_TRUE(status->is_updated);
 
     ASSERT_EQUAL(memcmp(test_ep_key_hash, status->endpoint_public_key_hash, SHA_1_DIGEST_LENGTH), 0);
     ASSERT_EQUAL(memcmp(test_profile_hash, status->profile_hash, SHA_1_DIGEST_LENGTH), 0);

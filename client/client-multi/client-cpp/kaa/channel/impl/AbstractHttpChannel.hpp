@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,15 @@
 #include "kaa/channel/ITransportConnectionInfo.hpp"
 #include "kaa/channel/TransportProtocolIdConstants.hpp"
 #include "kaa/IKaaClientStateStorage.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
 class AbstractHttpChannel : public ImpermanentDataChannel {
 public:
-    AbstractHttpChannel(IKaaChannelManager *channelManager, const KeyPair& clientKeys, IKaaClientStateStoragePtr clientState);
-    virtual ~AbstractHttpChannel() { }
+    AbstractHttpChannel(IKaaChannelManager& channelManager,
+                        const KeyPair& clientKeys,
+                        IKaaClientContext& context);
 
     virtual void sync(TransportType type);
     virtual void syncAll();
@@ -66,12 +68,15 @@ public:
     }
 
     virtual void setFailoverStrategy(IFailoverStrategyPtr strategy) {}
-    virtual void setConnectivityChecker(ConnectivityCheckerPtr checker) {}
+    virtual void setConnectivityChecker(ConnectivityCheckerPtr checker) {
+        connectivityChecker_ = checker;
+    }
 
 protected:
     typedef std::shared_ptr<IPTransportInfo> IPTransportInfoPtr;
 
     HttpDataProcessor* getHttpDataProcessor() { return &httpDataProcessor_; }
+
     virtual void processTypes(const std::map<TransportType, ChannelDirection>& types
 #ifdef KAA_THREADSAFE
                             , KAA_MUTEX_UNIQUE& lock
@@ -84,22 +89,21 @@ private:
     virtual std::shared_ptr<IHttpRequest> createRequest(IPTransportInfoPtr server, const std::vector<std::uint8_t>& body) = 0;
     virtual std::string retrieveResponse(const IHttpResponse& response) = 0;
 
-    void onServerFailed();
+    void onServerFailed(KaaFailoverReason reason);
 
 private:
-    KeyPair clientKeys_;
+    IKaaChannelManager&      channelManager_;
+    IKaaClientContext&       context_;
+    KeyPair                  clientKeys_;
+    IPTransportInfoPtr       currentServer_;
+    HttpDataProcessor        httpDataProcessor_;
+    HttpClient               httpClient_;
 
-    bool lastConnectionFailed_;
-
-    IKaaDataMultiplexer *multiplexer_;
-    IKaaDataDemultiplexer *demultiplexer_;
-    IKaaChannelManager *channelManager_;
-    IPTransportInfoPtr currentServer_;
-    HttpDataProcessor httpDataProcessor_;
-    HttpClient httpClient_;
     KAA_MUTEX_DECLARE(channelGuard_);
 
-    IKaaClientStateStoragePtr clientState_;
+    IKaaDataMultiplexer      *multiplexer_   = nullptr;
+    IKaaDataDemultiplexer    *demultiplexer_ = nullptr;
+    ConnectivityCheckerPtr   connectivityChecker_;
 };
 
 }

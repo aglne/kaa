@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.common.dao.model;
 
 import org.kaaproject.kaa.common.dto.EndpointUserConfigurationDto;
 
 public interface EndpointUserConfiguration extends ToDto<EndpointUserConfigurationDto> {
 
-    String getUserId();
+  String getUserId();
 
-    void setUserId(String userId);
+  void setUserId(String userId);
 
-    String getAppToken();
+  String getAppToken();
 
-    public void setAppToken(String appToken);
+  public void setAppToken(String appToken);
 
-    Integer getSchemaVersion();
+  Integer getSchemaVersion();
 
-    void setSchemaVersion(Integer schemaVersion);
+  void setSchemaVersion(Integer schemaVersion);
 }

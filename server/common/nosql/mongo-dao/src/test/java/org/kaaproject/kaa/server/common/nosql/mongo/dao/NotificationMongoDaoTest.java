@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kaaproject.kaa.common.dto.NotificationDto;
-import org.kaaproject.kaa.server.common.dao.impl.NotificationDao;
 import org.kaaproject.kaa.server.common.dao.AbstractTest;
-import org.kaaproject.kaa.server.common.nosql.mongo.dao.model.MongoNotification;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.kaaproject.kaa.server.common.dao.model.Notification;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,32 +36,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class NotificationMongoDaoTest extends AbstractTest {
 
-    @BeforeClass
-    public static void init() throws Exception {
-        MongoDBTestRunner.setUp();
-    }
+  @BeforeClass
+  public static void init() throws Exception {
+    MongoDBTestRunner.setUp();
+  }
 
-    @AfterClass
-    public static void after() throws Exception {
-        MongoDBTestRunner.tearDown();
-    }
+  @AfterClass
+  public static void after() throws Exception {
+    MongoDBTestRunner.tearDown();
+  }
 
-    @After
-    public void afterTest() {
-        MongoDataLoader.clearDBData();
-        clearDBData();
-    }
+  @After
+  public void afterTest() {
+    MongoDataLoader.clearDBData();
+  }
 
-    @Autowired
-    private NotificationDao<MongoNotification> notificationDao;
-
-    @Test
-    public void testRemoveById() {
-        NotificationDto notification = generateNotifications(null, null, 1, null).get(0);
-        Assert.assertNotNull(notification.getId());
-        notificationDao.removeById(notification.getId());
-        MongoNotification found = notificationDao.findById(notification.getId());
-        Assert.assertNull(found);
-    }
+  @Test
+  public void testRemoveById() {
+    NotificationDto notification = generateNotificationsDto(null, null, 1, null).get(0);
+    Assert.assertNotNull(notification.getId());
+    notificationDao.removeById(notification.getId());
+    Notification found = notificationDao.findById(notification.getId());
+    Assert.assertNull(found);
+  }
 
 }

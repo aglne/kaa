@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "../kaa_test.h"
+#include "kaa_test.h"
 
+#include "utilities/kaa_mem.h"
 #include "utilities/kaa_log.h"
 #include "kaa_protocols/kaa_tcp/kaatcp_parser.h"
 
@@ -36,18 +37,24 @@ static kaa_logger_t *logger = NULL;
 
 void connack_listener(void *context, kaatcp_connack_t message)
 {
+    (void)context;
+
     connack_received = 1;
     ASSERT_EQUAL(message.return_code, KAATCP_CONNACK_IDENTIFIER_REJECTED);
 }
 
 void disconnect_listener(void *context, kaatcp_disconnect_t message)
 {
+    (void)context;
+
     disconnect_received = 1;
     ASSERT_EQUAL(message.reason, KAATCP_DISCONNECT_BAD_REQUEST);
 }
 
 void kaasync_listener(void *context, kaatcp_kaasync_t *message)
 {
+    (void)context;
+
     kaasync_received = 1;
 
     ASSERT_EQUAL(message->sync_header.protocol_name_length, 6);
@@ -68,27 +75,32 @@ void kaasync_listener(void *context, kaatcp_kaasync_t *message)
 
 void ping_listener(void *context)
 {
+    (void)context;
+
     ping_received = 1;
 }
 
-void test_kaatcp_parser()
+void test_kaatcp_parser(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaatcp_parser_handlers_t handlers = { NULL, &connack_listener, &disconnect_listener, &kaasync_listener, &ping_listener };
     kaatcp_parser_t parser;
 
+    parser.payload_buffer_size = 1;
+    parser.payload = KAA_CALLOC(parser.payload_buffer_size, sizeof(char));
+
     kaatcp_error_t rval = kaatcp_parser_init(&parser, &handlers);
     ASSERT_EQUAL(rval, KAATCP_ERR_NONE);
 
-    char connack_and_ping_messages[] = { 0x20, 0x02, 0x00, 0x03, 0xD0, 0x00 };
-    rval = kaatcp_parser_process_buffer(&parser, connack_and_ping_messages, 6);
+    uint8_t connack_and_ping_messages[] = { 0x20, 0x02, 0x00, 0x03, 0xD0, 0x00 };
+    rval = kaatcp_parser_process_buffer(&parser, (char *)connack_and_ping_messages, 6);
     ASSERT_EQUAL(rval, KAATCP_ERR_NONE);
 
     ASSERT_NOT_EQUAL(ping_received, 0);
     ASSERT_NOT_EQUAL(connack_received, 0);
 
-    unsigned char kaa_sync_message[] = { 0xF0, 0x0D, 0x00, 0x06, 'K', 'a', 'a', 't', 'c', 'p', 0x01, 0x00, 0x05, 0x14, 0xFF };
+    uint8_t kaa_sync_message[] = { 0xF0, 0x0D, 0x00, 0x06, 'K', 'a', 'a', 't', 'c', 'p', 0x01, 0x00, 0x05, 0x14, 0xFF };
     rval = kaatcp_parser_process_buffer(&parser, (const char *)kaa_sync_message, 15);
     ASSERT_EQUAL(rval, KAATCP_ERR_NONE);
 
@@ -100,7 +112,7 @@ void test_kaatcp_parser()
 
     ASSERT_NOT_EQUAL(disconnect_received, 0);
 
-    KAA_TRACE_OUT(logger);
+    KAA_FREE(parser.payload);
 }
 
 int test_init(void)

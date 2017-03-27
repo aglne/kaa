@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,18 @@ import org.kaaproject.kaa.common.endpoint.gen.RedirectSyncResponse;
 
 public class DefaultRedirectionTransport implements RedirectionTransport {
 
-    private BootstrapManager manager;
+  private BootstrapManager manager;
 
-    @Override
-    public void setBootstrapManager(BootstrapManager manager) {
-        this.manager = manager;
-    }
+  @Override
+  public void setBootstrapManager(BootstrapManager manager) {
+    this.manager = manager;
+  }
 
-    @Override
-    public void onRedirectionResponse(RedirectSyncResponse response) {
-        if (response != null && manager != null) {
-            manager.useNextOperationsServerByAccessPointId(response.getAccessPointId());
-        }
+  @Override
+  public void onRedirectionResponse(RedirectSyncResponse response) {
+    if (response != null && manager != null) {
+      manager.useNextOperationsServerByAccessPointId(response.getAccessPointId());
     }
+  }
 
 }

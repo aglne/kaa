@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,16 +33,16 @@ import java.util.UUID;
 @Transactional
 public class HibernateUserVerifierDaoTest extends HibernateAbstractTest {
 
-    @Test
-    public void testFindByAppIdAndVerifierToken() {
-        String token = UUID.randomUUID().toString();
-        UserVerifier expected = generateUserVerifier(null, token);
-        generateUserVerifier(expected.getApplication(), UUID.randomUUID().toString());
-        generateUserVerifier(null, UUID.randomUUID().toString());
-        UserVerifier found = verifierDao.findByAppIdAndVerifierToken(expected.getApplication().getStringId(), token);
-        Assert.assertEquals(expected, found);
-        UserVerifier expectNull = verifierDao.findByAppIdAndVerifierToken(expected.getApplication().getStringId(), UUID.randomUUID().toString());
-        Assert.assertNull(expectNull);
-    }
+  @Test
+  public void testFindByAppIdAndVerifierToken() {
+    String token = UUID.randomUUID().toString();
+    UserVerifier expected = generateUserVerifier(null, token);
+    generateUserVerifier(expected.getApplication(), UUID.randomUUID().toString());
+    generateUserVerifier(null, UUID.randomUUID().toString());
+    UserVerifier found = verifierDao.findByAppIdAndVerifierToken(expected.getApplication().getStringId(), token);
+    Assert.assertEquals(expected, found);
+    UserVerifier expectNull = verifierDao.findByAppIdAndVerifierToken(expected.getApplication().getStringId(), UUID.randomUUID().toString());
+    Assert.assertNull(expectNull);
+  }
 
 }

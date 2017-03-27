@@ -1,5 +1,5 @@
-/**
- * Copyright 2014 CyberVision, Inc.
+/*
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,24 +21,24 @@ package org.kaaproject.kaa.client.transact;
  */
 public interface Transactable {
 
-	/**
-	 * Create new transaction entry.<br>
-	 *
-	 * @return TransactionId Unique id of created transaction.
-	 */
-    TransactionId beginTransaction();
+  /**
+   * Create new transaction entry.<br>
+   *
+   * @return TransactionId Unique id of created transaction.
+   */
+  TransactionId beginTransaction();
 
-    /**
-     * Submit the transaction<br>
-     *
-     * @param trxId The unique identifier of the transaction which should be submitted.
-     */
-    void commit(TransactionId trxId);
+  /**
+   * Submit the transaction<br>
+   *
+   * @param trxId The unique identifier of the transaction which should be submitted.
+   */
+  void commit(TransactionId trxId);
 
-    /**
-     * Revert the transaction<br>
-     *
-     * @param trxId The unique identifier of the transaction which should be reverted.
-     */
-    void rollback(TransactionId trxId);
+  /**
+   * Revert the transaction<br>
+   *
+   * @param trxId The unique identifier of the transaction which should be reverted.
+   */
+  void rollback(TransactionId trxId);
 }

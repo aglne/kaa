@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,63 +17,55 @@
 #ifndef KAA_HPP_
 #define KAA_HPP_
 
-#include "kaa/KaaClient.hpp"
-#include <botan/botan.h>
 #include <memory>
+
+#include <botan/botan.h>
+#include <botan/init.h>
+
+#include "kaa/IKaaClient.hpp"
+#include "kaa/KaaClientStateListener.hpp"
+#include "kaa/IKaaClientPlatformContext.hpp"
+#include "kaa/KaaClientPlatformContext.hpp"
 
 namespace kaa {
 
 /**
- * Entry point to the Kaa library.
+ * @brief Creates a new Kaa client based on @link IKaaClientPlatformContext @endlink and optional
+ * @link KaaClientStateListener @endlink.
  *
- * Responsible for the Kaa initialization and start/stop actions.
  */
 class Kaa
 {
 public:
     /**
-     * Initialize Kaa library
+     * @brief Use @link newClient() @endlink to create a Kaa client instance.
      */
-    static void init(int options = KaaClient::KAA_DEFAULT_OPTIONS);
+    Kaa() = delete;
 
     /**
-     * Starts Kaa's workflow.
+     * @brief Use @link newClient() @endlink to create a Kaa client instance.
      */
-    static void start();
+    Kaa(const Kaa&) = delete;
 
     /**
-     * Stops Kaa's workflow.
+     * @brief Use @link newClient() @endlink to create a Kaa client instance.
      */
-    static void stop();
+    Kaa& operator=(const Kaa&) = delete;
 
     /**
-     * Retrieves the Kaa client.
+     * @brief Creates a new instance of a Kaa client.
      *
-     * @return @link IKaaClient @endlink instance.
+     * @param context     Platform context.
+     * @param listener    Kaa client state listener.
      *
+     * @return New instance of Kaa client.
      */
-    static IKaaClient& getKaaClient();
-
-    /**
-     * Pauses Kaa's workflow.
-     */
-    static void pause();
-
-    /**
-     * Resumes Kaa's workflow.
-     */
-    static void resume();
+    static std::shared_ptr<IKaaClient> newClient(
+        IKaaClientPlatformContextPtr context = std::make_shared<KaaClientPlatformContext>(),
+        KaaClientStateListenerPtr listener = std::make_shared<KaaClientStateListener>());
 
 private:
-    Kaa();
-    ~Kaa();
-    Kaa(const Kaa&);
-    Kaa& operator=(const Kaa&);
-
-private:
-    static Botan::LibraryInitializer botanInit_;
-    static std::unique_ptr<KaaClient> client_;
-
+    static Botan::LibraryInitializer     botanInit_;
 };
 
 }

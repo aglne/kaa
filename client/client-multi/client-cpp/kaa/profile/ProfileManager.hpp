@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 #include "kaa/profile/DefaultProfileContainer.hpp"
 #include "kaa/common/AvroByteArrayConverter.hpp"
 #include "kaa/channel/transport/IProfileTransport.hpp"
+#include "kaa/profile/gen/ProfileDefinitions.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
@@ -33,13 +35,18 @@ namespace kaa {
  */
 class ProfileManager : public IProfileManager {
 public:
-    ProfileManager() : profileContainer_(std::make_shared<DefaultProfileContainer>()) { }
+    ProfileManager(IKaaClientContext &context) : profileContainer_(std::make_shared<DefaultProfileContainer>()), context_(context) { }
 
     /**
      * Sets profile container implemented by the user
      * @param container user-defined container
      */
-    virtual void setProfileContainer(IProfileContainerPtr container);
+    virtual void setProfileContainer(IProfileContainerPtr container)
+    {
+        if (container) {
+            profileContainer_ = container;
+        }
+    }
 
     /**
      * Retrieves serialized profile
@@ -49,8 +56,18 @@ public:
      */
     SharedDataBuffer getSerializedProfile()
     {
-        AvroByteArrayConverter<KaaProfile> avroConverter;
-        return avroConverter.toByteArray(profileContainer_->getProfile());
+        static AvroByteArrayConverter<KaaProfile> avroConverter;
+
+        if (profileContainer_) {
+            return avroConverter.toByteArray(profileContainer_->getProfile());
+        }
+#if KAA_PROFILE_SCHEMA_VERSION > 0
+        else {
+            throw KaaException("Profile container is not set!");
+        }
+#endif
+
+        return avroConverter.toByteArray(KaaProfile());
     }
 
     /**
@@ -59,9 +76,19 @@ public:
     void updateProfile()
     {
         SharedDataBuffer serializedProfile = getSerializedProfile();
-        if (serializedProfile.first.get() && serializedProfile.second > 0) {
+        if ((serializedProfile.first.get() && serializedProfile.second > 0)
+                || context_.getStatus().isProfileResyncNeeded()) {
             transport_->sync();
         }
+    }
+
+    virtual bool isInitialized()
+    {
+#if KAA_PROFILE_SCHEMA_VERSION > 0
+        return profileContainer_.operator bool();
+#else
+        return true;
+#endif
     }
 
     /**
@@ -78,14 +105,8 @@ public:
 private:
     IProfileTransportPtr            transport_;
     IProfileContainerPtr     profileContainer_;
+    IKaaClientContext                &context_;
 };
-
-inline void ProfileManager::setProfileContainer(IProfileContainerPtr container)
-{
-    if (container) {
-        profileContainer_ = container;
-    }
-}
 
 } /* namespace kaa */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +18,29 @@ package org.kaaproject.kaa.server.common.server;
 
 /**
  * Class BadRequestException.
- *
  */
 public class BadRequestException extends Exception {
 
-    /**
-     * serialVersionUID filed.
-     */
-    private static final long serialVersionUID = 6924120083020075880L;
+  /**
+   * serialVersionUID filed.
+   */
+  private static final long serialVersionUID = 6924120083020075880L;
 
-    /**
-     * BadRequestException constructor.
-     * @param cause - Throwable cause of error.
-     */
-    public BadRequestException(final Throwable cause) {
-        super(cause);
-    }
+  /**
+   * BadRequestException constructor.
+   *
+   * @param cause - Throwable cause of error.
+   */
+  public BadRequestException(final Throwable cause) {
+    super(cause);
+  }
 
-    /**
-     * BadRequestException constructor.
-     * @param string - description cause of error
-     */
-    public BadRequestException(final String string) {
-        super(string);
-    }
+  /**
+   * BadRequestException constructor.
+   *
+   * @param string - description cause of error
+   */
+  public BadRequestException(final String string) {
+    super(string);
+  }
 }

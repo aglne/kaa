@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ int econais_ec19d_binary_file_read(const char *file_name, char **buffer, size_t 
 
 int econais_ec19d_binary_file_store(const char *file_name, const char *buffer, size_t buffer_size);
 
+
+int econais_ec19d_binary_file_delete(const char *file_name);
 
 #ifdef __cplusplus
 }      /* extern "C" */

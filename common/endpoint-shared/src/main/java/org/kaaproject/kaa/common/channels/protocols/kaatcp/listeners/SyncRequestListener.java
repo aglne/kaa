@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.common.channels.protocols.kaatcp.listeners;
 
 import org.kaaproject.kaa.common.channels.protocols.kaatcp.messages.SyncRequest;
 
 /**
- * @author Andrey Panasenko
- *
+ * @author Andrey Panasenko.
  */
 public interface SyncRequestListener extends MessageListener<SyncRequest> {
 

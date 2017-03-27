@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,16 +53,9 @@ bool IPConnectivityChecker::checkConnectivity()
 
             boost::asio::ip::tcp::socket sock_(io_service);
             boost::asio::connect(sock_, ep);
-
-            KAA_LOG_INFO("Connection to the network exists");
-        } else {
-            KAA_LOG_WARN(boost::format("Unsupported ping server data (server=%p)") % server.get());
         }
-
         return true;
-    } catch (std::exception& e) {
-        KAA_LOG_INFO(boost::format("Connection to the network has disappeared: %1%") % e.what());
-    }
+    } catch (std::exception& e) {}
 
     return false;
 }

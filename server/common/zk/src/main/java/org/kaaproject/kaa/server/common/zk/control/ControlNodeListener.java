@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,23 +24,22 @@ import org.kaaproject.kaa.server.common.zk.gen.ControlNodeInfo;
  * The class that is interested in processing a controlNode
  * event implements this interface, and the object created
  * with that class is registered with a component using the
- * component's <code>addControlNodeListener<code> method. When
+ * component's <code>addControlNodeListener</code> method. When
  * the controlNode event occurs, that object's appropriate
  * method is invoked.
- *
- * @see ControlNodeEvent
  */
 public interface ControlNodeListener {
-    
-    /**
-     * On control node down.
-     */
-    void onControlNodeDown();
 
-    /**control
-     * On control node change.
-     *
-     * @param nodeInfo the node info
-     */
-    void onControlNodeChange(ControlNodeInfo nodeInfo);
+  /**
+   * On control node down.
+   */
+  void onControlNodeDown();
+
+  /**
+   * control
+   * On control node change.
+   *
+   * @param nodeInfo the node info
+   */
+  void onControlNodeChange(ControlNodeInfo nodeInfo);
 }

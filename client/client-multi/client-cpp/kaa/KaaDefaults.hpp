@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ extern const char * const DEFAULT_USER_VERIFIER_TOKEN;
 typedef std::vector<ITransportConnectionInfoPtr> BootstrapServers;
 const BootstrapServers& getBootstrapServers();
 
-const Botan::SecureVector<std::uint8_t>& getDefaultConfigData();
+const Botan::secure_vector<std::uint8_t>& getDefaultConfigData();
 
 HashDigest getPropertiesHash();
 

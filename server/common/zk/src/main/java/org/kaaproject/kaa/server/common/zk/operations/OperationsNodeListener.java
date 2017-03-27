@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,32 +24,30 @@ import org.kaaproject.kaa.server.common.zk.gen.OperationsNodeInfo;
  * The class that is interested in processing a endpointNode
  * event implements this interface, and the object created
  * with that class is registered with a component using the
- * component's <code>addOperationsNodeListener<code> method. When
+ * component's <code>addOperationsNodeListener</code> method. When
  * the endpointNode event occurs, that object's appropriate
  * method is invoked.
- *
- * @see OperationsNodeEvent
  */
 public interface OperationsNodeListener {
 
-    /**
-     * On node added.
-     *
-     * @param nodeInfo the node info
-     */
-    void onNodeAdded(OperationsNodeInfo nodeInfo);
+  /**
+   * On node added.
+   *
+   * @param nodeInfo the node info
+   */
+  void onNodeAdded(OperationsNodeInfo nodeInfo);
 
-    /**
-     * Invoked when on node update occurs.
-     *
-     * @param nodeInfo the node info
-     */
-    void onNodeUpdated(OperationsNodeInfo nodeInfo);
+  /**
+   * Invoked when on node update occurs.
+   *
+   * @param nodeInfo the node info
+   */
+  void onNodeUpdated(OperationsNodeInfo nodeInfo);
 
-    /**
-     * On node removed.
-     *
-     * @param nodeInfo the node info
-     */
-    void onNodeRemoved(OperationsNodeInfo nodeInfo);
+  /**
+   * On node removed.
+   *
+   * @param nodeInfo the node info
+   */
+  void onNodeRemoved(OperationsNodeInfo nodeInfo);
 }

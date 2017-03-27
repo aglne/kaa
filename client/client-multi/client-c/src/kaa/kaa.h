@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ kaa_error_t kaa_init(kaa_context_t **kaa_context_p);
 /**
  * @brief Starts Kaa's workflow.
  *
- * @b NOTE: Should be called after @link kaa_init() @endlink.
+ * @note Should be called after @link kaa_init() @endlink.
  *
  * @param[in]   kaa_context    Pointer to an initialized Kaa endpoint context.
  *
@@ -58,6 +58,16 @@ kaa_error_t kaa_init(kaa_context_t **kaa_context_p);
  */
 kaa_error_t kaa_start(kaa_context_t *kaa_context);
 
+/**
+ * @brief Stops Kaa's workflow.
+ *
+ * @note Should be called after @link kaa_start() @endlink.
+ *
+ * @param[in]   kaa_context    Pointer to an initialized Kaa endpoint context.
+ *
+ * @return Error code.
+ */
+kaa_error_t kaa_stop(kaa_context_t *kaa_context);
 
 
 /**
@@ -76,11 +86,22 @@ kaa_error_t kaa_deinit(kaa_context_t *kaa_context);
 /**
  * @brief Processes failovers.
  *
- * @param[in]   self           Bootstrap manager.
- * @return                     if failover is scheduled returns true, otherwise - false.
- *
+ * @param[in]   kaa_context    Bootstrap manager.
+ * @retval      true           Failover is scheduled
+ * @retval      false          Otherwise
  */
 bool kaa_process_failover(kaa_context_t *kaa_context);
+
+
+
+/**
+ * @brief Checks if Kaa context is initialized and ready to be used.
+ *
+ * @param[in]       kaa_context     Pointer to an initialized Kaa endpoint context.
+ *
+ * @return KAA_ERR_NONE if Kaa context is ready to be used.
+ */
+kaa_error_t kaa_check_readiness(kaa_context_t *kaa_context);
 
 #ifdef __cplusplus
 }      /* extern "C" */

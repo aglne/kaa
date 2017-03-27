@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,29 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transport;
 
 /**
  * Represents a context for transport initialization parameters with binary configuration.
- * 
- * @author Andrew Shvayka
  *
+ * @author Andrew Shvayka
  */
-public class GenericTransportContext extends TransportContext{
+public class GenericTransportContext extends TransportContext {
 
-    private final byte[] configuration;
-    
-    public GenericTransportContext(TransportContext context, byte[] configuration) {
-        super(context);
-        this.configuration = configuration;
-    }
+  private final byte[] configuration;
 
-    /**
-     * Returns the serialized configuration of this specific {@link Transport}.
-     * @return the serialized configuration
-     */
-    public byte[] getConfiguration() {
-        return configuration;
-    }
+  public GenericTransportContext(TransportContext context, byte[] configuration) {
+    super(context);
+    this.configuration = configuration;
+  }
+
+  /**
+   * Returns the serialized configuration of this specific {@link Transport}.
+   *
+   * @return the serialized configuration
+   */
+  public byte[] getConfiguration() {
+    return configuration;
+  }
 
 }

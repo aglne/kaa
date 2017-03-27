@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,63 +16,81 @@
 
 package org.kaaproject.kaa.client.persistence;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.List;
-import java.util.Map;
-
 import org.kaaproject.kaa.client.event.EndpointAccessToken;
 import org.kaaproject.kaa.client.event.EndpointKeyHash;
 import org.kaaproject.kaa.common.endpoint.gen.Topic;
 import org.kaaproject.kaa.common.hash.EndpointObjectHash;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Collection;
+import java.util.Map;
+
 public interface KaaClientState {
 
-    boolean isRegistered();
-    void setRegistered(boolean registered);
+  boolean isRegistered();
 
-    PrivateKey getPrivateKey();
-    PublicKey getPublicKey();
+  void setRegistered(boolean registered);
 
-    EndpointKeyHash getEndpointKeyHash();
+  PrivateKey getPrivateKey();
 
-    void setAppStateSeqNumber(int appStateSeqNumber);
-    int getAppStateSeqNumber();
+  PublicKey getPublicKey();
 
-    void setConfigSeqNumber(int configSeqNumber);
-    int getConfigSeqNumber();
+  EndpointKeyHash getEndpointKeyHash();
 
-    void setNotificationSeqNumber(int notificationSeqNumber);
-    int getNotificationSeqNumber();
+  int getAppStateSeqNumber();
 
-    void setProfileHash(EndpointObjectHash hash);
-    EndpointObjectHash getProfileHash();
+  void setAppStateSeqNumber(int appStateSeqNumber);
 
-    void addTopic(Topic topic);
-    void removeTopic(String topicId);
-    boolean updateTopicSubscriptionInfo(String topicId, Integer sequenceNumber);
+  void setIfNeedProfileResync(boolean needProfileResync);
 
-    Map<String, Integer> getNfSubscriptions();
-    List<Topic> getTopics();
+  boolean isNeedProfileResync();
 
-    void setAttachedEndpointsList(Map<EndpointAccessToken, EndpointKeyHash> attachedEndpoints);
-    Map<EndpointAccessToken, EndpointKeyHash> getAttachedEndpointsList();
+  EndpointObjectHash getProfileHash();
 
-    void setEndpointAccessToken(String token);
-    String getEndpointAccessToken();
+  void setProfileHash(EndpointObjectHash hash);
 
-    int getAndIncrementEventSeqNum();
-    int getEventSeqNum();
-    void setEventSeqNum(int newSeqNum);
+  void addTopic(Topic topic);
 
-    boolean isAttachedToUser();
-    void setAttachedToUser(boolean isAttached);
+  void removeTopic(Long topicId);
 
-    boolean isConfigurationVersionUpdated();
+  void addTopicSubscription(Long topicId);
 
-    void persist();
+  void removeTopicSubscription(Long topicId);
 
-    String refreshEndpointAccessToken();
+  boolean updateTopicSubscriptionInfo(Long topicId, Integer sequenceNumber);
 
-    void clean();
+  Integer getTopicListHash();
+
+  void setTopicListHash(Integer topicListHash);
+
+  Map<Long, Integer> getNfSubscriptions();
+
+  Collection<Topic> getTopics();
+
+  Map<EndpointAccessToken, EndpointKeyHash> getAttachedEndpointsList();
+
+  void setAttachedEndpointsList(Map<EndpointAccessToken, EndpointKeyHash> attachedEndpoints);
+
+  String getEndpointAccessToken();
+
+  void setEndpointAccessToken(String token);
+
+  int getAndIncrementEventSeqNum();
+
+  int getEventSeqNum();
+
+  void setEventSeqNum(int newSeqNum);
+
+  boolean isAttachedToUser();
+
+  void setAttachedToUser(boolean isAttached);
+
+  boolean isConfigurationVersionUpdated();
+
+  void persist();
+
+  String refreshEndpointAccessToken();
+
+  void clean();
 }

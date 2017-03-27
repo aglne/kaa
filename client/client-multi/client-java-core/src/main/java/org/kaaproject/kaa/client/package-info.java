@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,6 @@
  *
  * @see org.kaaproject.kaa.client.Kaa
  * @see org.kaaproject.kaa.client.KaaClient
- *
  */
+
 package org.kaaproject.kaa.client;

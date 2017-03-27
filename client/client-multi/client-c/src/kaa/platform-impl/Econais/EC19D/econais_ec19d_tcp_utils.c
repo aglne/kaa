@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@
 #include <sndc_sock_api.h>
 #include <sndc_sdk_api.h>
 
-#include "../../../platform/sock.h"
+#include "platform/sock.h"
 
-#include "../../../platform/ext_tcp_utils.h"
-#include "../../../utilities/kaa_log.h"
-#include "../../../kaa_error.h"
-#include "../../../kaa_common.h"
+#include "platform/ext_tcp_utils.h"
+#include "utilities/kaa_log.h"
+#include "kaa_error.h"
+#include "kaa_common.h"
 
 #define START_BASE_PORT 49500
 #define PORT_RANG 10000
@@ -50,7 +50,7 @@ static kaa_error_t get_sock_error(kaa_fd_t sockid, int *sockerror)
    return KAA_ERR_NONE;
 }
 
-ext_tcp_utils_function_return_state_t ext_tcp_utils_gethostbyaddr(kaa_dns_resolve_listener_t *resolve_listener
+ext_tcp_utils_function_return_state_t ext_tcp_utils_getaddrbyhost(kaa_dns_resolve_listener_t *resolve_listener
                                                                 , const kaa_dns_resolve_info_t *resolve_props
                                                                 , kaa_sockaddr_t *result
                                                                 , kaa_socklen_t *result_size)

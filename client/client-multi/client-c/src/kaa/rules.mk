@@ -1,5 +1,5 @@
 #
-# Copyright 2014 CyberVision, Inc.
+# Copyright 2014-2016 CyberVision, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ dirstack_$(sp) := $(d)
 d := $(dir)
 BUILDDIRS += $(BUILD_PATH)/$(d)
 BUILDDIRS += $(BUILD_PATH)/$(d)/utilities
+BUILDDIRS += $(BUILD_PATH)/$(d)/platform-impl/common
 BUILDDIRS += $(BUILD_PATH)/$(d)/platform-impl/stm32/leafMapleMini
 BUILDDIRS += $(BUILD_PATH)/$(d)/platform-impl/stm32/leafMapleMini/esp8266
 BUILDDIRS += $(BUILD_PATH)/$(d)/kaa_protocols/kaa_tcp
@@ -40,20 +41,22 @@ cSRCS_$(d) :=  utilities/kaa_log.c \
                platform-impl/stm32/leafMapleMini/esp8266/esp8266.c \
                platform-impl/stm32/leafMapleMini/esp8266/esp8266_kaa_client.c \
                platform-impl/stm32/leafMapleMini/esp8266/esp8266_kaa_tcp_channel.c  \
-               platform-impl/ext_log_storage_memory.c \
-               platform-impl/ext_log_upload_strategy_by_volume.c \
-               platform-impl/sha1.c \
-               platform-impl/sha.c \
+               platform-impl/common/kaa_failover_strategy.c \
+               platform-impl/common/ext_log_storage_memory.c \
+               platform-impl/common/ext_log_upload_strategies.c \
+               platform-impl/common/sha1.c \
+               platform-impl/common/sha.c \
                kaa_protocols/kaa_tcp/kaatcp_parser.c \
                kaa_protocols/kaa_tcp/kaatcp_request.c \
                avro_src/encoding_binary.c \
                avro_src/io.c \
-               collections/kaa_deque.c \
                collections/kaa_list.c \
                gen/kaa_configuration_gen.c \
                gen/kaa_logging_gen.c \
                gen/kaa_profile_gen.c \
                gen/kaa_notification_gen.c \
+               gen/kaa_geo_fencing_event_class_family.c \
+               gen/kaa_geo_fencing_event_class_family_definitions.c \
                kaa_bootstrap_manager.c \
                kaa_channel_manager.c \
                kaa_common_schema.c \

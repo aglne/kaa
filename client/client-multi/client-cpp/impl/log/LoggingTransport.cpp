@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 
 namespace kaa {
 
-LoggingTransport::LoggingTransport(IKaaChannelManager& manager, ILogProcessor& logProcessor_)
-    : AbstractKaaTransport(manager), logProcessor_(logProcessor_)
+LoggingTransport::LoggingTransport(IKaaChannelManager& manager, ILogProcessor& logProcessor_, IKaaClientContext &context)
+    : AbstractKaaTransport(manager, context), logProcessor_(logProcessor_)
 {
 }
 
@@ -37,9 +37,9 @@ std::shared_ptr<LogSyncRequest> LoggingTransport::createLogSyncRequest()
     return logProcessor_.getLogUploadRequest();
 }
 
-void LoggingTransport::onLogSyncResponse(const LogSyncResponse& response)
+void LoggingTransport::onLogSyncResponse(const LogSyncResponse& response, std::size_t deliveryTime)
 {
-    logProcessor_.onLogUploadResponse(response);
+    logProcessor_.onLogUploadResponse(response, deliveryTime);
 }
 
 }  // namespace kaa

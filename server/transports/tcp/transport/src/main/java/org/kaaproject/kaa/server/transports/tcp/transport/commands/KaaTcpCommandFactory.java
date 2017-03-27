@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transports.tcp.transport.commands;
 
 import org.kaaproject.kaa.common.channels.protocols.kaatcp.messages.MqttFrame;
 import org.kaaproject.kaa.server.common.server.KaaCommandProcessor;
 import org.kaaproject.kaa.server.common.server.KaaCommandProcessorFactory;
 
-public class KaaTcpCommandFactory implements KaaCommandProcessorFactory<MqttFrame, MqttFrame>{
+public class KaaTcpCommandFactory implements KaaCommandProcessorFactory<MqttFrame, MqttFrame> {
 
-    @Override
-    public String getCommandName() {
-        return KaaTcpCommand.KAA_TCP;
-    }
+  @Override
+  public String getCommandName() {
+    return KaaTcpCommand.KAA_TCP;
+  }
 
-    @Override
-    public KaaCommandProcessor<MqttFrame, MqttFrame> createCommandProcessor() {
-        return new KaaTcpCommand();
-    }
+  @Override
+  public KaaCommandProcessor<MqttFrame, MqttFrame> createCommandProcessor() {
+    return new KaaTcpCommand();
+  }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 #ifndef KAACLIENTSTATESTORAGEMOCK_HPP_
 #define KAACLIENTSTATESTORAGEMOCK_HPP_
 
+#include <cstddef>
+
 #include <kaa/IKaaClientStateStorage.hpp>
 
 namespace kaa {
@@ -25,83 +27,88 @@ class MockKaaClientStateStorage : public IKaaClientStateStorage
 {
 public:
     virtual std::int32_t getEventSequenceNumber() const {
-        return 0;
+        return eventSequenceNumber_;
     }
-
-    virtual void setEventSequenceNumber(std::int32_t) {}
-
-    virtual std::int32_t getConfigurationSequenceNumber() const  {
-        return 0;
-    }
-
-    virtual void setConfigurationSequenceNumber(std::int32_t) {}
-
-    virtual std::int32_t getNotificationSequenceNumber() const  {
-        return 0;
-    }
-
-    virtual void setNotificationSequenceNumber(std::int32_t) {}
-
-    virtual SequenceNumber getAppSeqNumber() const  {
-        static SequenceNumber sn;
-        return sn;
-    }
-    virtual void setAppSeqNumber(SequenceNumber) {}
+    virtual void setEventSequenceNumber(std::int32_t sequenceNumber) {}
 
     virtual bool isRegistered() const {
-        return true;
+        return isRegistered_;
     }
+    virtual void setRegistered(bool isRegistered) {}
 
-    virtual void setRegistered(bool) {}
-
-    virtual DetailedTopicStates getTopicStates() const {
-        static DetailedTopicStates states;
-        return states;
+    virtual Topics getTopicList() const {
+        return topics_;
     }
-    virtual void setTopicStates(const DetailedTopicStates&) {}
+    virtual void setTopicList(const Topics& stateContainer) {}
+
+    virtual std::int32_t getTopicListHash() {
+        return topicListHash_;
+    }
+    virtual void setTopicListHash(const std::int32_t topicListHash) {}
 
     virtual HashDigest getProfileHash() const {
-        static HashDigest profileHash;
-        return profileHash;
+        return profileHash_;
     }
-    virtual void setProfileHash(HashDigest) {}
+    virtual void setProfileHash(HashDigest hash) {}
 
     virtual AttachedEndpoints getAttachedEndpoints() const {
-        static AttachedEndpoints endpoints;
-        return endpoints;
+        return attachedEndpoints_;
     }
-
-    virtual void setAttachedEndpoints(const AttachedEndpoints&) {}
+    virtual void setAttachedEndpoints(const AttachedEndpoints& endpoints) {}
 
     virtual std::string getEndpointAccessToken() {
-        static std::string token("token");
-        return token;
+        return endpointAccessToken_;
     }
-
-    std::string refreshEndpointAccessToken() {
-        static std::string token("token");
-        return token;
+    virtual void setEndpointAccessToken(const std::string& token) {}
+    virtual std::string refreshEndpointAccessToken() {
+        return endpointAccessToken_;
     }
-
-    virtual void setEndpointAccessToken(const std::string&) {}
 
     virtual bool getEndpointAttachStatus() const {
-        return false;
+        return endpointAttachStatus_;
     }
-    virtual void setEndpointAttachStatus(bool) {}
+    virtual void setEndpointAttachStatus(bool isAttached) {}
 
     virtual std::string getEndpointKeyHash() const {
-        static std::string hash("hash");
-        return hash;
+        return endpointKeyHash_;
     }
-    virtual void setEndpointKeyHash(const std::string& ) {}
+    virtual void setEndpointKeyHash(const std::string& keyHash) {}
 
     virtual bool isSDKPropertiesUpdated() const {
-        return false;
+        return isSDKPropertiesUpdated_;
+    }
+
+    virtual TopicStates& getTopicStates() {
+        return topicStates_;
+    }
+    virtual void setTopicStates(const TopicStates& states) {}
+
+    virtual bool isProfileResyncNeeded() const {
+        return isProfileResyncNeeded_;
+    }
+    virtual void setProfileResyncNeeded(bool isNeeded) {
+        ++onSetProfileResyncNeeded_;
+        isProfileResyncNeeded_ = isNeeded;
     }
 
     virtual void read() {}
     virtual void save() {}
+
+public:
+    std::int32_t eventSequenceNumber_ = 0;
+    bool isRegistered_                = false;
+    Topics topics_;
+    std::int32_t topicListHash_       = 0;
+    HashDigest profileHash_;
+    AttachedEndpoints attachedEndpoints_;
+    std::string endpointAccessToken_;
+    bool endpointAttachStatus_       = false;
+    std::string endpointKeyHash_;
+    bool isSDKPropertiesUpdated_     = false;
+    TopicStates topicStates_;
+
+    bool isProfileResyncNeeded_      = false;
+    std::size_t onSetProfileResyncNeeded_ = 0;
 };
 
 }

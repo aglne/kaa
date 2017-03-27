@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.client.configuration.base;
 
 import org.kaaproject.kaa.client.configuration.ConfigurationHashContainer;
@@ -21,21 +22,21 @@ import org.kaaproject.kaa.client.configuration.storage.ConfigurationStorage;
 
 public interface GenericConfigurationManager {
 
-    void init();
+  void init();
 
-    boolean addListener(ConfigurationListener listener);
+  boolean addListener(ConfigurationListener listener);
 
-    boolean removeListener(ConfigurationListener listener);
+  boolean removeListener(ConfigurationListener listener);
 
-    /**
-     * Provide storage object which is able to persist encoded configuration data.
-     *
-     * @param storage Object which will save and load configuration data
-     * @see ConfigurationStorage
-     */
-    void setConfigurationStorage(ConfigurationStorage storage);
+  /**
+   * Provide storage object which is able to persist encoded configuration data.
+   *
+   * @param storage Object which will save and load configuration data
+   * @see ConfigurationStorage
+   */
+  void setConfigurationStorage(ConfigurationStorage storage);
 
-    ConfigurationProcessor getConfigurationProcessor();
+  ConfigurationProcessor getConfigurationProcessor();
 
-    ConfigurationHashContainer getConfigurationHashContainer();
+  ConfigurationHashContainer getConfigurationHashContainer();
 }

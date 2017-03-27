@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.common.verifier;
 
 import org.kaaproject.kaa.common.dto.user.UserVerifierDto;
@@ -21,29 +22,28 @@ import org.kaaproject.kaa.common.dto.user.UserVerifierDto;
 /**
  * Provides a context for verifier initialization parameters and {@link MessageHandler
  * }.
- * 
- * @author Andrew Shvayka
  *
+ * @author Andrew Shvayka
  */
 public class UserVerifierContext {
 
-    private final UserVerifierDto verifierDto;
+  private final UserVerifierDto verifierDto;
 
-    public UserVerifierContext(UserVerifierDto verifierDto) {
-        super();
-        this.verifierDto = verifierDto;
-    }
+  public UserVerifierContext(UserVerifierDto verifierDto) {
+    super();
+    this.verifierDto = verifierDto;
+  }
 
-    public UserVerifierDto getVerifierDto() {
-        return verifierDto;
-    }
+  public UserVerifierDto getVerifierDto() {
+    return verifierDto;
+  }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("UserVerifierContext [verifierDto=");
-        builder.append(verifierDto);
-        builder.append("]");
-        return builder.toString();
-    }
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("UserVerifierContext [verifierDto=");
+    builder.append(verifierDto);
+    builder.append("]");
+    return builder.toString();
+  }
 }

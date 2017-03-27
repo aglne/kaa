@@ -1,18 +1,18 @@
-::
-:: Copyright 2014-2015 CyberVision, Inc.
-::
-:: Licensed under the Apache License, Version 2.0 (the "License");
-:: you may not use this file except in compliance with the License.
-:: You may obtain a copy of the License at
-::
-::      http://www.apache.org/licenses/LICENSE-2.0
-::
-:: Unless required by applicable law or agreed to in writing, software
-:: distributed under the License is distributed on an "AS IS" BASIS,
-:: WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-:: See the License for the specific language governing permissions and
-:: limitations under the License.
-::
+@REM
+@REM Copyright 2014-2016 CyberVision, Inc.
+@REM
+@REM Licensed under the Apache License, Version 2.0 (the "License");
+@REM you may not use this file except in compliance with the License.
+@REM You may obtain a copy of the License at
+@REM
+@REM      http://www.apache.org/licenses/LICENSE-2.0
+@REM
+@REM Unless required by applicable law or agreed to in writing, software
+@REM distributed under the License is distributed on an "AS IS" BASIS,
+@REM WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+@REM See the License for the specific language governing permissions and
+@REM limitations under the License.
+@REM
 
 @echo off
 
@@ -35,68 +35,122 @@ goto :eof
 goto :eof
 
 :buildKaaThirdparty
-   echo Building Kaa thirdparty components...
-   call :buildAvro
-   call :buildBotan
+  echo Building Kaa thirdparty components...
+  call :buildZlib
+  call :buildAvro
+  call :buildBotan
+  call :buildSqlite
 goto :eof
 
 :buildAvro
- echo Building Avro...
-  
- SET AVRO_SRC=avro-src-1.7.5
+  echo Building Avro...
 
- IF EXIST %AVRO_SRC%\NUL (
-   call :deleteDir %AVRO_SRC%
- )
-   
- 7z x -y %AVRO_SRC%.tar.gz
- 7z x -y %AVRO_SRC%.tar
+  call :deleteDir %AVRO_SRC%
 
- md %AVRO_SRC%\lang\c++\build.win
- cd %AVRO_SRC%\lang\c++\build.win
+  call :download %AVRO_SRC%.tar.gz %AVRO_URL%
 
- if %BUILD_TYPE%==debug (
-    cmake .. -DCMAKE_INSTALL_PREFIX:PATH=%AVRO_ROOT_DIR% -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Debug
- ) else (
-    cmake .. -DCMAKE_INSTALL_PREFIX:PATH=%AVRO_ROOT_DIR% -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
- )
- nmake install
+  md %AVRO_SRC%\lang\c++\build.win
+  cd %AVRO_SRC%\lang\c++\build.win
 
- cd %BUILD_HOME%
+  if %BUILD_PLATFORM% == x86 (
+    cmake -DCMAKE_INSTALL_PREFIX:PATH=%ROOT_PATH% -G "Visual Studio %MSVC_VERSION%"  ..
+  ) else (
+    cmake -DCMAKE_INSTALL_PREFIX:PATH=%ROOT_PATH% -G "Visual Studio %MSVC_VERSION% Win64"  ..
+  )
+
+  del buffertest.vcxproj
+  del SchemaTests.vcxproj
+
+  msbuild INSTALL.vcxproj /property:Configuration=%BUILD_TYPE%  /property:Platform=%BUILD_PLATFORM%
+
+  cd %BUILD_HOME%
+
+goto :eof
+
+:buildZlib
+
+  echo Building zlib...
+
+  call :deleteDir %ZLIB_SRC%
+
+  call :download %ZLIB_SRC%.tar.gz %ZLIB_URL%
+
+  md %ZLIB_SRC%\build.win
+  cd %ZLIB_SRC%\build.win
+
+  if %BUILD_PLATFORM% == x86 (
+    cmake -DCMAKE_INSTALL_PREFIX:PATH=%ROOT_PATH% -G "Visual Studio %MSVC_VERSION%"  ..
+  ) else (
+    cmake -DCMAKE_INSTALL_PREFIX:PATH=%ROOT_PATH% -G "Visual Studio %MSVC_VERSION% Win64"  ..
+  )
+  msbuild INSTALL.vcxproj /property:Configuration=%BUILD_TYPE% /property:Platform=%BUILD_PLATFORM%
+
+  cd %BUILD_HOME%
 
 goto :eof
 
 :buildBotan
 
- echo Building Botan...
+  echo Building Botan...
 
- SET BOTAN_SRC=Botan-1.10.9
+  call :deleteDir %BOTAN_SRC%
 
- IF EXIST %BOTAN_SRC%\NUL (
-   call :deleteDir %BOTAN_SRC%
- )
+  call :download %BOTAN_SRC%.tar.gz %BOTAN_URL%
 
- 7z x -y -obotan_archive Botan-1.10.9.tgz 
- 7z x -y -o. botan_archive\Botan-1.10.9.tgz 
+  cd %BOTAN_SRC%
 
- cd %BOTAN_SRC%
+  if %BUILD_PLATFORM% == x86 (
+    set ARCH=i386
+  ) else (
+    set ARCH=amd64
+  )
+  if %BUILD_TYPE%==debug (
+    python configure.py --cc=msvc --cpu=%ARCH% --prefix=%ROOT_PATH% --with-debug-info --no-optimizations
+  ) else (
+    python configure.py --cc=msvc --cpu=%ARCH% --prefix=%ROOT_PATH%
+  ) 
 
- if %BUILD_TYPE%==debug (
-   python configure.py --cc=msvc --cpu=i386 --prefix=%BOTAN_ROOT% --enable-debug
- ) else (
-   python configure.py --cc=msvc --cpu=i386 --prefix=%BOTAN_ROOT%
- ) 
+  nmake install
 
- nmake install
+  move %ROOT_PATH%/include/botan-1.11/botan %ROOT_PATH%/include
 
- cd %BUILD_HOME%
+  cd %BUILD_HOME%
+
+goto :eof
+
+:buildSqlite
+
+  echo Building Sqlite...
+  call :download %SQLITE_SRC%.tar.gz %SQLITE_URL%
+  cd %SQLITE_SRC%
+  nmake /f Makefile.msc sqlite3.c
+  nmake /f Makefile.msc
+  mkdir %ROOT_PATH%\include
+  copy sqlite3.h %ROOT_PATH%\include
+  copy sqlite3ext.h %ROOT_PATH%\include
+  mkdir %ROOT_PATH%\lib
+  copy sqlite3.dll %ROOT_PATH%\lib
+  copy sqlite3.lib %ROOT_PATH%\lib
+
+goto :eof
+
+:download
+
+  IF not EXIST %1 (
+    wget --no-check-certificate --content-disposition -c %2
+  )
+  bsdtar -xf %1
 
 goto :eof
 
 :deleteDir
- del /s /f /q %1\*.*
- for /f %%f in ('dir /ad /b %1\') do rd /s /q %1\%%f
- rd /s /q %1
+
+  IF EXIST %1\NUL (
+    del /s /f /q %1\*.*
+    for /f %%f in ('dir /ad /b %1\') do rd /s /q %1\%%f
+    rd /s /q %1
+  )
+
 goto :eof
 
 endlocal

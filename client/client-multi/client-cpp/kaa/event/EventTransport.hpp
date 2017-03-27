@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "kaa/channel/transport/IEventTransport.hpp"
 #include "kaa/channel/transport/AbstractKaaTransport.hpp"
 #include "kaa/KaaThread.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
@@ -31,7 +32,7 @@ class IKaaChannelManager;
 
 class EventTransport : public AbstractKaaTransport<TransportType::EVENT>, public IEventTransport {
 public:
-    EventTransport(IEventDataProcessor& eventManager, IKaaChannelManager& channelManager, IKaaClientStateStoragePtr state);
+    EventTransport(IEventDataProcessor& eventManager, IKaaChannelManager& channelManager, IKaaClientContext &context);
 
     std::shared_ptr<EventSyncRequest> createEventRequest(std::int32_t requestId);
 

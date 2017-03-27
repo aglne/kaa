@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public:
     virtual void setFailoverStrategy(IFailoverStrategyPtr strategy) = 0;
 
     /**
-     * Receives the latest list of servers from the bootstrap server.
+     * Receives the latest list of servers from the bootstrap service.
      */
     virtual void receiveOperationsServerList() = 0;
 
@@ -47,8 +47,10 @@ public:
      *
      * @param type the channel's type (i.e. HTTP channel, HTTP long poll channel, etc.).
      * @see ChannelType
+     *
+     * @param failoverReason The reason why failover occured.
      */
-    virtual void useNextOperationsServer(const TransportProtocolId& protocolId) = 0;
+    virtual void onOperationsServerFailed(const TransportProtocolId& protocolId, KaaFailoverReason failoverReason) = 0;
 
     /**
      * Update the Channel Manager with endpoint's properties retrieved by its DNS.

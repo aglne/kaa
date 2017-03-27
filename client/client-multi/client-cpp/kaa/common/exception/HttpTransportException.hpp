@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@ namespace kaa {
 #include "kaa/transport/TransportException.hpp"
 
 enum HttpStatusCode {
-    OK = 200,
-    UNAUTHORIZED = 401
+    OK           = 200,
+    UNAUTHORIZED = 401,
+    FORBIDDEN    = 403,
 };
 
 class HttpTransportException: public TransportException {

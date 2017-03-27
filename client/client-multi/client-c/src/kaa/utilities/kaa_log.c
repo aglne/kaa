@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "../platform/platform.h"
+
+#include <stddef.h>
+#include <stdarg.h>
+#include <string.h>
 #include "kaa_log.h"
-#include "../kaa_common.h"
-#include "../platform/ext_system_logger.h"
+#include "kaa_common.h"
+#include "platform/ext_system_logger.h"
 #include "kaa_mem.h"
 
-
+#include <platform/stdio.h>
 
 #define KAA_LOG_PREFIX_FORMAT   "%04d/%02d/%02d %d:%02d:%02d [%s] [%s:%d] (%d) - "
 
@@ -65,6 +68,7 @@ kaa_error_t kaa_log_create(kaa_logger_t **logger_p, size_t buffer_size, kaa_log_
     }
 
     (*logger_p)->buffer_size = buffer_size;
+
     (*logger_p)->sink = sink ? sink : stdout;
     (*logger_p)->max_log_level = max_log_level;
 #ifdef KAA_TRACE_MEMORY_ALLOCATIONS

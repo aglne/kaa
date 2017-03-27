@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transport.session;
 
 /**
  * Represents a listener for the session creation event.
- * 
- * @author Andrew Shvayka
  *
+ * @author Andrew Shvayka
  */
 public interface SessionCreateListener {
 
-    /**
-     * Notifies about the created session.
-     * @param session the session
-     */
-    void onSessionCreated(SessionInfo session);
+  /**
+   * Notifies about the created session.
+   *
+   * @param session the session
+   */
+  void onSessionCreated(SessionInfo session);
 
 }

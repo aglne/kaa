@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package org.kaaproject.kaa.client.logging;
 
-import javax.annotation.Generated;
-
+import org.kaaproject.kaa.client.logging.future.RecordFuture;
 import org.kaaproject.kaa.schema.base.Log;
+
+import javax.annotation.Generated;
 
 /**
  * <p>Interface for a log collector.</p>
@@ -30,21 +31,21 @@ import org.kaaproject.kaa.schema.base.Log;
  * Each of them may be set independently of others.</p>
  *
  * <p>Reference implementation of each module used by default.</p>
- * 
+ *
  * <p>This interface is auto-generated.</p>
  *
- * @see LogStorage
- * @see LogStorageStatus
- * @see LogUploadStrategy
- * @see LogUploadConfiguration
+ * @see GenericLogCollector
+ * @see BucketInfo
  */
 @Generated("LogCollector.java.template")
-public interface LogCollector extends GenericLogCollector{
+public interface LogCollector extends GenericLogCollector {
 
-    /**
-     * Adds new log record to local storage.
-     *
-     * @param record New log record object
-     */
-    void addLogRecord(Log record);
+  /**
+   * Adds a log record to a log storage.
+   *
+   * @param record A log record object.
+   * @return The {@link RecordFuture} object which allows tracking a delivery status of a log
+   *         record.
+   */
+  RecordFuture addLogRecord(Log record);
 }

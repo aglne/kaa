@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,49 +21,51 @@ import org.junit.Test;
 
 public class DefaultLogUploadStrategyTest {
 
-    class TestLogStorageStatus implements LogStorageStatus {
-        private final long consumedVolume;
-        private final long recordCount;
+  @Test
+  public void testNOOPDecision() {
+    DefaultLogUploadStrategy strategy = new DefaultLogUploadStrategy();
+    strategy.setBatch(20);
+    strategy.setVolumeThreshold(60);
+    strategy.setTimeout(300);
+    TestLogStorageStatus status = new TestLogStorageStatus(30, 3);
 
-        TestLogStorageStatus(long consumedVolume, long recordCount) {
-            this.consumedVolume = consumedVolume;
-            this.recordCount = recordCount;
-        }
+    Assert.assertEquals(LogUploadStrategyDecision.NOOP, strategy.isUploadNeeded(status));
+  }
 
-        @Override
-        public long getConsumedVolume() {
-            return consumedVolume;
-        }
+  ;
 
-        @Override
-        public long getRecordCount() {
-            return recordCount;
-        }
-    };
+  @Test
+  public void testUpdateDecision() {
+    DefaultLogUploadStrategy strategy = new DefaultLogUploadStrategy();
+    strategy.setBatch(20);
+    strategy.setVolumeThreshold(60);
+    strategy.setTimeout(300);
 
-    @Test
-    public void testNOOPDecision() {
-        DefaultLogUploadStrategy strategy = new DefaultLogUploadStrategy();
-        strategy.setBatch(20);
-        strategy.setVolumeThreshold(60);
-        strategy.setTimeout(300);
-        TestLogStorageStatus status = new TestLogStorageStatus(30, 3);
+    TestLogStorageStatus status = new TestLogStorageStatus(60, 3);
 
-        Assert.assertEquals(LogUploadStrategyDecision.NOOP, strategy.isUploadNeeded(status));
+    Assert.assertEquals(LogUploadStrategyDecision.UPLOAD, strategy.isUploadNeeded(status));
+
+    status = new TestLogStorageStatus(70, 3);
+    Assert.assertEquals(LogUploadStrategyDecision.UPLOAD, strategy.isUploadNeeded(status));
+  }
+
+  class TestLogStorageStatus implements LogStorageStatus {
+    private final long consumedVolume;
+    private final long recordCount;
+
+    TestLogStorageStatus(long consumedVolume, long recordCount) {
+      this.consumedVolume = consumedVolume;
+      this.recordCount = recordCount;
     }
 
-    @Test
-    public void testUpdateDecision() {
-        DefaultLogUploadStrategy strategy = new DefaultLogUploadStrategy();
-        strategy.setBatch(20);
-        strategy.setVolumeThreshold(60);
-        strategy.setTimeout(300);
-
-        TestLogStorageStatus status = new TestLogStorageStatus(60, 3);
-
-        Assert.assertEquals(LogUploadStrategyDecision.UPLOAD, strategy.isUploadNeeded(status));
-
-        status = new TestLogStorageStatus(70, 3);
-        Assert.assertEquals(LogUploadStrategyDecision.UPLOAD, strategy.isUploadNeeded(status));
+    @Override
+    public long getConsumedVolume() {
+      return consumedVolume;
     }
+
+    @Override
+    public long getRecordCount() {
+      return recordCount;
+    }
+  }
 }

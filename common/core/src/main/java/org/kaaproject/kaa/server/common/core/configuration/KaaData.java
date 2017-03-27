@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package org.kaaproject.kaa.server.common.core.configuration;
 
-import java.io.Serializable;
-
 import org.kaaproject.kaa.server.common.core.schema.KaaSchema;
+
+import java.io.Serializable;
 
 public interface KaaData<T extends KaaSchema> extends Serializable {
 
-    T getSchema();
+  T getSchema();
 
-    String getRawData();
+  String getRawData();
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 #include "kaa/KaaDefaults.hpp"
 
-#ifdef KAA_THREADSAFE
+//#ifdef KAA_THREADSAFE
 
 #include <mutex>
 #include <atomic>
@@ -57,7 +57,7 @@ typedef std::atomic_int_fast32_t RequestId;
 
 #define kaa_thread_local thread_local
 
-#else
+#if 0
 
 #define KAA_MUTEX
 #define KAA_R_MUTEX

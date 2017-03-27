@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,7 +127,8 @@ BOOST_AUTO_TEST_CASE(SimpleAvroBinaryDecoding)
     AvroByteArrayConverter<BasicEndpointProfile> converter;
     SharedDataBuffer encodedData = converter.toByteArray(encodingProfile);
 
-    BasicEndpointProfile decodedProfile1 = converter.fromByteArray(encodedData.first.get(), encodedData.second);
+    BasicEndpointProfile decodedProfile1;
+    converter.fromByteArray(encodedData.first.get(), encodedData.second, decodedProfile1);
     BasicEndpointProfile decodedProfile2 = decodeBinaryData<BasicEndpointProfile>(
                                             encodedData.first.get(), encodedData.second);
 

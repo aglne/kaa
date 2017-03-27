@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ package org.kaaproject.kaa.server.common.dao.model;
  */
 public interface ToDto<T> {
 
-    /**
-     * This method convert domain model object to data transfer object.
-     *
-     * @return the dto object
-     */
-    T toDto();
+  /**
+   * This method convert domain model object to data transfer object.
+   *
+   * @return the dto object
+   */
+  T toDto();
 }

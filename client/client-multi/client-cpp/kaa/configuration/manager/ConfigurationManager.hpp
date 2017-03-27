@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,19 @@
 #ifndef CONFIGURATION_MANAGER_HPP_
 #define CONFIGURATION_MANAGER_HPP_
 
-#include "kaa/configuration/IGenericDeltaReceiver.hpp"
-#include "kaa/configuration/IConfigurationProcessedObserver.hpp"
-#include "kaa/configuration/manager/IConfigurationManager.hpp"
 #include "kaa/observer/KaaObservable.hpp"
 
-#include <memory>
+#include "kaa/IKaaClientStateStorage.hpp"
+#include "kaa/configuration/IConfigurationProcessor.hpp"
+#include "kaa/configuration/manager/IConfigurationManager.hpp"
+#include "kaa/configuration/IConfigurationHashContainer.hpp"
+#include "kaa/configuration/gen/ConfigurationDefinitions.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
+
+class IExecutorContext;
+class IConfigurationReceiver;
 
 /**
  * \class ConfigurationManager
@@ -35,28 +40,51 @@ namespace kaa {
  * with root configuration object presented as @link KaaRootConfiguration @endlink.
  */
 class ConfigurationManager : public IConfigurationManager,
-                             public IConfigurationProcessedObserver,
-                             public IGenericDeltaReceiver {
+                             public IConfigurationProcessor,
+                             public IConfigurationHashContainer {
 public:
-    ConfigurationManager() {}
-    ~ConfigurationManager() {}
+    ConfigurationManager(IKaaClientContext &context);
 
-    void onDeltaReceived(int index, const KaaRootConfiguration& datum, bool fullResync);
+    virtual void init();
 
-    /**
-     * @link IConfigurationManager @endlink implementation
-     */
-    void subscribeForConfigurationChanges(IConfigurationReceiver &receiver);
-    void unsubscribeFromConfigurationChanges(IConfigurationReceiver &receiver);
-    const KaaRootConfiguration& getConfiguration();
+    virtual void processConfigurationData(const std::vector<std::uint8_t>& data, bool fullResync);
 
-    /**
-     * @link IConfigurationProcessedObserver @endlink implementation
-     */
-    void onConfigurationProcessed();
+    virtual void addReceiver(IConfigurationReceiver &receiver);
+    virtual void removeReceiver(IConfigurationReceiver &receiver);
+    virtual const KaaRootConfiguration& getConfiguration();
+
+    virtual void setConfigurationStorage(IConfigurationStoragePtr storage);
+
+    virtual IConfigurationProcessor& getConfigurationProcessor()
+    {
+        return *this;
+    }
+
+    virtual IConfigurationHashContainer& getConfigurationHashContainer()
+    {
+        return *this;
+    }
+
+    virtual EndpointObjectHash getConfigurationHash()
+    {
+        return configurationHash_;
+    }
+
+    virtual ~ConfigurationManager() noexcept {}
 
 private:
-    KaaRootConfiguration root_;
+    void updateConfiguration(const std::uint8_t* data, const std::uint32_t dataSize);
+    void loadConfiguration();
+    void notifySubscribers(const KaaRootConfiguration& configuration);
+
+private:
+    bool isConfigurationLoaded_;
+
+    IKaaClientContext &context_;
+    KaaRootConfiguration configuration_;
+
+    IConfigurationStoragePtr storage_;
+    EndpointObjectHash configurationHash_;
 
     KAA_MUTEX_DECLARE(configurationGuard_);
     KaaObservable<void (const KaaRootConfiguration &), IConfigurationReceiver *> configurationReceivers_;

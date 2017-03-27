@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include "kaa/channel/transport/AbstractKaaTransport.hpp"
 #include "kaa/IKaaClientStateStorage.hpp"
 #include "kaa/notification/INotificationProcessor.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
@@ -35,7 +36,7 @@ class NotificationTransport: public AbstractKaaTransport<TransportType::NOTIFICA
                              public INotificationTransport
 {
 public:
-    NotificationTransport(IKaaClientStateStoragePtr status, IKaaChannelManager& manager);
+    NotificationTransport(IKaaChannelManager& manager, IKaaClientContext &context);
 
     virtual NotificationSyncRequestPtr createEmptyNotificationRequest();
 
@@ -58,13 +59,13 @@ public:
 private:
     Notifications getUnicastNotifications(const Notifications & notifications);
     Notifications getMulticastNotifications(const Notifications & notifications);
+    std::vector<TopicState> prepareTopicStatesForRequest();
 
 private:
-    INotificationProcessor*   notificationProcessor_;
+    INotificationProcessor*                         notificationProcessor_;
 
     std::set<std::string>                  acceptedUnicastNotificationIds_;
-    std::map<std::string, std::int32_t>    notificationSubscriptions_;
-    SubscriptionCommands                   subscriptions_;
+    SubscriptionCommands                                    subscriptions_;
 };
 
 } /* namespace kaa */

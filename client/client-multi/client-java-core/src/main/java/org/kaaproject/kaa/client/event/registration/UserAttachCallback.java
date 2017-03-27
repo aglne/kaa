@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,13 @@ import org.kaaproject.kaa.common.endpoint.gen.UserAttachResponse;
  *
  * @author Taras Lemkin
  * @see EndpointRegistrationManager
- *
  */
 public interface UserAttachCallback {
-    /**
-     * Called when auth result is retrieved from operations server.
-     *
-     * @param response Result of user attaching
-     * @see UserAttachResponse
-     */
-    void onAttachResult(UserAttachResponse response);
+  /**
+   * Called when auth result is retrieved from operations service.
+   *
+   * @param response Result of user attaching
+   * @see UserAttachResponse
+   */
+  void onAttachResult(UserAttachResponse response);
 }

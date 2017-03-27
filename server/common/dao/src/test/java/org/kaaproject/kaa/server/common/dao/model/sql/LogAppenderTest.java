@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@
 package org.kaaproject.kaa.server.common.dao.model.sql;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Test;
 
 public class LogAppenderTest {
-
-    @Test
-    public void hashCodeEqualsTest(){
-        EqualsVerifier.forClass(LogAppender.class).suppress(Warning.NONFINAL_FIELDS).withRedefinedSuperclass().verify();
-    }
+  @Test
+  public void hashCodeEqualsTest() {
+    EqualsVerifier.forClass(LogAppender.class).usingGetClass().verify();
+  }
 }

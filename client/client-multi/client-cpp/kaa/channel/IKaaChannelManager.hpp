@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@
 #define IKAACHANNELMANAGER_HPP_
 
 #include <list>
+#include <string>
 
 #include "kaa/channel/IDataChannel.hpp"
 #include "kaa/channel/ITransportConnectionInfo.hpp"
 #include "kaa/channel/connectivity/IConnectivityChecker.hpp"
+#include "kaa/EndpointConnectionInfo.hpp"
 
 namespace kaa {
 
@@ -111,8 +113,18 @@ public:
      * @param server the parameters of server that was not connected.
      * @see ITransportConnectionInfo
      *
+     * @param reason The reason which caused failure.
+     * @see KaaFailoverReason
+     *
      */
-    virtual void onServerFailed(ITransportConnectionInfoPtr connectionInfo) = 0;
+    virtual void onServerFailed(ITransportConnectionInfoPtr connectionInfo, KaaFailoverReason reason) = 0;
+
+    /**
+     * Reports to Channel Manager about successful connection.
+     *
+     * @param connection connection metadata.
+     */
+    virtual void onConnected(const EndpointConnectionInfo& connection) = 0;
 
     /**
      * Reports to Channel Manager about the new server.

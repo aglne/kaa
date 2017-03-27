@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ extern "C" {
 #endif
 
 #define KAA_PLATFORM_PROTOCOL_VERSION        1
-#define KAA_PLATFORM_PROTOCOL_ID             0x3553c66f
+#define KAA_PLATFORM_PROTOCOL_ID             0x0231ad61
 
 #define KAA_ALIGNMENT                        4
 
-/**
+/*
  * All definitions related to a field size specify in bytes.
  */
 #define KAA_PROTOCOL_ID_SIZE                 4
@@ -34,29 +34,13 @@ extern "C" {
 #define KAA_PROTOCOL_EXTENSIONS_COUNT_SIZE   2
 #define KAA_PROTOCOL_MESSAGE_HEADER_SIZE     (KAA_PROTOCOL_ID_SIZE + KAA_PROTOCOL_VERSION_SIZE + KAA_PROTOCOL_EXTENSIONS_COUNT_SIZE)
 
-#define KAA_EXTENSION_TYPE_SIZE              1
-#define KAA_EXTENSION_OPTIONS_SIZE           3
+#define KAA_EXTENSION_TYPE_SIZE              2
+#define KAA_EXTENSION_OPTIONS_SIZE           2
 #define KAA_EXTENSION_PAYLOAD_LENGTH_SIZE    4
 #define KAA_EXTENSION_HEADER_SIZE            (KAA_EXTENSION_TYPE_SIZE + KAA_EXTENSION_OPTIONS_SIZE + KAA_EXTENSION_PAYLOAD_LENGTH_SIZE)
 
-/**
- * Extension ID description
- */
-#define KAA_BOOTSTRAP_EXTENSION_TYPE        0
-#define KAA_META_DATA_EXTENSION_TYPE        1
-#define KAA_PROFILE_EXTENSION_TYPE          2
-#define KAA_USER_EXTENSION_TYPE             3
-#define KAA_LOGGING_EXTENSION_TYPE          4
-#define KAA_CONFIGURATION_EXTENSION_TYPE    5
-#define KAA_EVENT_EXTENSION_TYPE            7
-#define KAA_NOTIFICATION_EXTENSION_TYPE     6
-/*
- * Not yet implemented
- */
-#define KAA_REDIRECT_EXTENSION_TYPE         8
 
-
-#define KAA_SDK_TOKEN_LENGTH    28
+#define KAA_SDK_TOKEN_LENGTH    27
 
 /**
  * Constants used for a meta data extension.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.common.channels.protocols.kaatcp;
 
 /**
  * KaatcpProtocolExeption Class.
  * Used to indicate protocol parsing exceptions.
- * @author Andrey Panasenko <apanasenko@cybervisiontech.com>
  *
+ * @author Andrey Panasenko apanasenko@cybervisiontech.com
  */
 public class KaaTcpProtocolException extends Exception {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4989380711384492851L;
+  private static final long serialVersionUID = 4989380711384492851L;
 
-    /**
-     * Default constructor with error message
-     * @param string
-     */
-    public KaaTcpProtocolException(String string) {
-        super(string);
-    }
+  /**
+   * Default constructor with error message.
+   *
+   * @param string the string
+   */
+  public KaaTcpProtocolException(String string) {
+    super(string);
+  }
 
 }

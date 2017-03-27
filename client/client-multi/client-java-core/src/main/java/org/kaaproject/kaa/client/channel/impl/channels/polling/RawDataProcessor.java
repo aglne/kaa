@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kaaproject.kaa.client.channel.impl.channels.polling;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+package org.kaaproject.kaa.client.channel.impl.channels.polling;
 
 import org.kaaproject.kaa.client.channel.ChannelDirection;
 import org.kaaproject.kaa.client.channel.TransportConnectionInfo;
 import org.kaaproject.kaa.common.TransportType;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public interface RawDataProcessor {
 
-    LinkedHashMap<String, byte[]> createRequest(Map<TransportType, ChannelDirection> types); //NOSONAR
+  LinkedHashMap<String, byte[]> createRequest(Map<TransportType, ChannelDirection> types); //NOSONAR
 
-    void onResponse(byte [] response);
+  void onResponse(byte[] response);
 
-    void onServerError(TransportConnectionInfo info);
+  void onServerError(TransportConnectionInfo info);
 
 }

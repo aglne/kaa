@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "platform/platform.h"
+
+#include "kaa_private.h"
+
+#include <stdint.h>
+#include <string.h>
 #include "platform/sock.h"
 #include <stdbool.h>
 #include "kaa_platform_utils.h"
@@ -21,10 +25,8 @@
 #include "kaa_common.h"
 #include "utilities/kaa_mem.h"
 
-
-
 kaa_error_t kaa_platform_message_writer_create(kaa_platform_message_writer_t** writer_p
-                                             , char *buf
+                                             , uint8_t *buf
                                              , size_t len)
 {
     KAA_RETURN_IF_NIL3(writer_p, buf, len, KAA_ERR_BADPARAM);
@@ -122,14 +124,15 @@ kaa_error_t kaa_platform_message_header_write(kaa_platform_message_writer_t* wri
 }
 
 kaa_error_t kaa_platform_message_write_extension_header(kaa_platform_message_writer_t* writer
-                                                      , uint8_t extension_type
-                                                      , uint32_t options
+                                                      , uint16_t extension_type
+                                                      , uint16_t options
                                                       , uint32_t payload_size)
 {
     KAA_RETURN_IF_NIL(writer, KAA_ERR_BADPARAM);
 
     if ((writer->current + KAA_EXTENSION_HEADER_SIZE) <= writer->end) {
-        options = KAA_HTONL(options) >> 8;
+        extension_type = KAA_HTONS(extension_type);
+        options = KAA_HTONS(options);
         payload_size = KAA_HTONL(payload_size);
 
         memcpy((void *)writer->current, &extension_type, KAA_EXTENSION_TYPE_SIZE);
@@ -146,7 +149,7 @@ kaa_error_t kaa_platform_message_write_extension_header(kaa_platform_message_wri
 }
 
 kaa_error_t kaa_platform_message_reader_create(kaa_platform_message_reader_t **reader_p
-                                             , const char *buffer
+                                             , const uint8_t *buffer
                                              , size_t len)
 {
     KAA_RETURN_IF_NIL3(reader_p, buffer, len, KAA_ERR_BADPARAM);
@@ -218,17 +221,18 @@ kaa_error_t kaa_platform_message_header_read(kaa_platform_message_reader_t* read
 
 
 kaa_error_t kaa_platform_message_read_extension_header(kaa_platform_message_reader_t *reader
-                                                     , uint8_t *extension_type
-                                                     , uint32_t *extension_options
+                                                     , uint16_t *extension_type
+                                                     , uint16_t *extension_options
                                                      , uint32_t *extension_payload_length)
 {
     KAA_RETURN_IF_NIL4(reader, extension_type, extension_options, extension_payload_length, KAA_ERR_BADPARAM);
 
     if (reader->current + KAA_EXTENSION_HEADER_SIZE <= reader->end) {
-        *extension_type = *((const uint8_t *) reader->current);
+        memcpy(extension_type, reader->current, KAA_EXTENSION_OPTIONS_SIZE);
+        *extension_type = KAA_NTOHS(*extension_type);
         reader->current += KAA_EXTENSION_TYPE_SIZE;
         memcpy(extension_options, reader->current, KAA_EXTENSION_OPTIONS_SIZE);
-        *extension_options = KAA_NTOHL(*extension_options) >> 8;
+        *extension_options = KAA_NTOHS(*extension_options);
         reader->current += KAA_EXTENSION_OPTIONS_SIZE;
         *extension_payload_length = KAA_NTOHL(*((const uint32_t *)reader->current));
         reader->current += KAA_EXTENSION_PAYLOAD_LENGTH_SIZE;

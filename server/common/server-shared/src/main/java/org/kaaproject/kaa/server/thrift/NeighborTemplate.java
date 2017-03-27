@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kaaproject.kaa.server.thrift;
 
-import java.util.List;
+package org.kaaproject.kaa.server.thrift;
 
 import org.apache.thrift.TException;
 import org.kaaproject.kaa.server.common.thrift.gen.operations.OperationsThriftService;
 
+import java.util.List;
+
 public interface NeighborTemplate<V> {
 
-    void process(OperationsThriftService.Iface client, List<V> messages) throws TException;
+  void process(OperationsThriftService.Iface client, List<V> messages) throws TException;
 
-    void onServerError(String serverId, Exception e);
+  void onServerError(String serverId, Exception ex);
 
 }

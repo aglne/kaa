@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 /**
- * 
+ *
  */
 package org.kaaproject.kaa.server.transports.http.transport.netty;
 
@@ -25,8 +25,7 @@ import java.util.Map;
 
 /**
  * @author Andrey Panasenko <apanasenko@cybervisiontech.com>
- *
  */
 public interface HttpActivity {
-    public void httpRequestComplete(IOException ioe, Map<String, List<String>> header, String body);
+  public void httpRequestComplete(IOException ioe, Map<String, List<String>> header, String body);
 }

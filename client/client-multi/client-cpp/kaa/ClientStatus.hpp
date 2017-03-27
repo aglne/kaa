@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include "kaa/gen/EndpointGen.hpp"
 #include "kaa/common/EndpointObjectHash.hpp"
 #include "kaa/IKaaClientStateStorage.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
@@ -42,26 +43,17 @@ typedef boost::bimaps::bimap<
 
 class ClientStatus : public IKaaClientStateStorage {
 public:
-    ClientStatus(const std::string& filename);
+    ClientStatus(IKaaClientContext& context);
     ~ClientStatus() { }
 
     std::int32_t getEventSequenceNumber() const;
     void setEventSequenceNumber(std::int32_t sequenceNumber);
 
-    std::int32_t getConfigurationSequenceNumber() const;
-    void setConfigurationSequenceNumber(std::int32_t sequenceNumber);
-
-    std::int32_t getNotificationSequenceNumber() const;
-    void setNotificationSequenceNumber(std::int32_t sequenceNumber);
-
-    SequenceNumber getAppSeqNumber() const;
-    void setAppSeqNumber(SequenceNumber appSeqNumber);
-
     bool isRegistered() const;
     void setRegistered(bool isRegistered);
 
-    DetailedTopicStates getTopicStates() const;
-    void setTopicStates(const DetailedTopicStates& stateContainer);
+    Topics getTopicList() const;
+    void setTopicList(const Topics& topicList);
 
     HashDigest getProfileHash() const;
     void setProfileHash(HashDigest hash);
@@ -79,30 +71,53 @@ public:
     std::string getEndpointKeyHash() const;
     void setEndpointKeyHash(const std::string& keyHash);
 
+    void setTopicListHash(const std::int32_t topicListHash);
+    std::int32_t getTopicListHash();
+
+    void setTopicStates(const TopicStates& subscriptions);
+    TopicStates& getTopicStates();
+
     virtual bool isSDKPropertiesUpdated() const { return isSDKPropertiesForUpdated_; }
+
+    virtual bool isProfileResyncNeeded() const;
+    virtual void setProfileResyncNeeded(bool isNeeded);
 
     void read();
     void save();
 
 private:
     void checkSDKPropertiesForUpdates();
+    /* Helpers */
+    template< ClientParameterT Type, class ParameterData >
+    void setParameterData(const ParameterData& data);
+
+    template< ClientParameterT Type, class ParameterData >
+    void setParameterDataWithEqualCheck(const ParameterData& data);
+
+    template< ClientParameterT Type, class ParameterData >
+    ParameterData getParameterData(const ParameterData& defaultValue) const;
 
 private:
-    std::string filename_;
+    const std::string filename_;
     std::map<ClientParameterT, std::shared_ptr<IPersistentParameter> > parameters_;
 
-    bool isSDKPropertiesForUpdated_;
+    bool            isSDKPropertiesForUpdated_;
+    bool            hasUpdate_;
+    TopicStates    topicStates_;
 
-    KAA_MUTEX_MUTABLE_DECLARE(sequenceNumberGuard_);
+    IKaaClientContext &context_;
+
 
     static const bimap                      parameterToToken_;
-    static const SequenceNumber             appSeqNumberDefault_;
+    static const std::int32_t               eventSeqNumberDefault_;
     static const bool                       isRegisteredDefault_;
     static const HashDigest                 endpointHashDefault_;
-    static const DetailedTopicStates        topicStatesDefault_;
+    static const Topics                     topicListDefault_;
+    static const std::int32_t               topicListHashDefault_;
     static const AttachedEndpoints          attachedEndpoints_;
     static const bool                       endpointDefaultAttachStatus_;
     static const std::string                endpointKeyHashDefault_;
+    static const bool                       isProfileResyncNeededDefault_;
 };
 
 }

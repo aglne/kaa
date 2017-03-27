@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,27 @@
 #include "kaa/bootstrap/BootstrapTransport.hpp"
 #include "kaa/channel/GenericTransportInfo.hpp"
 #include "kaa/utils/KaaTimer.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 namespace kaa {
 
+class IKaaClient;
+
 class BootstrapManager : public IBootstrapManager, public boost::noncopyable {
 public:
-    BootstrapManager() : bootstrapTransport_(nullptr), channelManager_(nullptr), retryTimer_("BootstrapManager retryTimer") { }
-    ~BootstrapManager() { }
+    BootstrapManager(IKaaClientContext& context, IKaaClient *client)
+        : bootstrapTransport_(nullptr)
+        , channelManager_(nullptr)
+        , context_(context)
+        , retryTimer_("BootstrapManager retryTimer")
+        , client_(client)
+    {
+
+    }
 
     virtual void setFailoverStrategy(IFailoverStrategyPtr strategy);
     virtual void receiveOperationsServerList();
-    virtual void useNextOperationsServer(const TransportProtocolId& protocolId);
+    virtual void onOperationsServerFailed(const TransportProtocolId& protocolId, KaaFailoverReason reason);
     virtual void useNextOperationsServerByAccessPointId(std::int32_t id);
     virtual void setTransport(IBootstrapTransport* transport);
     virtual void setChannelManager(IKaaChannelManager* manager);
@@ -44,7 +54,9 @@ private:
     typedef std::vector<ITransportConnectionInfoPtr> OperationsServers;
 
     OperationsServers getOPSByAccessPointId(std::int32_t id);
-    void              notifyChannelManangerAboutServer(const OperationsServers& servers);
+    void notifyChannelManangerAboutServer(const OperationsServers& servers);
+
+    void onCurrentBootstrapServerFailed(KaaFailoverReason reason);
 
 private:
     std::map<TransportProtocolId, OperationsServers > operationServers_;
@@ -53,11 +65,16 @@ private:
     BootstrapTransport *bootstrapTransport_;
     IKaaChannelManager *channelManager_;
 
+    IKaaClientContext& context_;
+
     IFailoverStrategyPtr failoverStrategy_;
 
     std::unique_ptr<std::int32_t> serverToApply;
 
     KaaTimer<void ()>        retryTimer_;
+
+    // Temporary solution to stop app
+    IKaaClient *client_;
 
     KAA_R_MUTEX_MUTABLE_DECLARE(guard_);
 };

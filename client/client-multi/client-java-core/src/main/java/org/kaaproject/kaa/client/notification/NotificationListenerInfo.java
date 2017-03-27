@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,35 +20,32 @@ package org.kaaproject.kaa.client.notification;
  * <p>Wrapper class for a topic subscription stuff.</p>
  *
  * <p><b>This class is deprecated</b>. Use instead:
- * {@link NotificationManager#subscribeToTopic(String, boolean)},
- * {@link NotificationManager#addNotificationListener(String, NotificationListener)},
+ * {@link NotificationManager#subscribeToTopic(Long, boolean)},
+ * {@link NotificationManager#addNotificationListener(Long, NotificationListener)},
  * {@link NotificationManager#subscribeToTopics(java.util.List, boolean)},
  * {@link NotificationManager#addTopicListListener(NotificationTopicListListener)}.</p>
- *
- * @see NotificationManager#updateTopicSubscriptions(java.util.Map)
- *
  */
 @Deprecated
 public class NotificationListenerInfo {
-    @Deprecated
-    public enum Action {
-        ADD,
-        REMOVE
-    }
+  private final NotificationListener listener;
+  private final Action action;
 
-    private final NotificationListener listener;
-    private final Action action;
+  public NotificationListenerInfo(NotificationListener listener, Action action) {
+    this.listener = listener;
+    this.action = action;
+  }
 
-    public NotificationListenerInfo(NotificationListener listener, Action action) {
-        this.listener = listener;
-        this.action = action;
-    }
+  public NotificationListener getListener() {
+    return listener;
+  }
 
-    public NotificationListener getListener() {
-        return listener;
-    }
+  public Action getAction() {
+    return action;
+  }
 
-    public Action getAction() {
-        return action;
-    }
+  @Deprecated
+  public enum Action {
+    ADD,
+    REMOVE
+  }
 }

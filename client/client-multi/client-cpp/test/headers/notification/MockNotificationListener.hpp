@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ namespace kaa {
 
 class MockNotificationListener: public INotificationListener {
 public:
-    virtual void onNotification(const std::string& topicId, const KaaNotification& notification) { ++onNotification_; }
+    virtual void onNotification(const std::int64_t topicId, const KaaNotification& notification) { ++onNotification_; }
 
 public:
     std::size_t onNotification_ = 0;

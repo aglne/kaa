@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,27 +37,12 @@
 #include "kaa_platform_utils.h"
 #include "platform/sock.h"
 
-
-extern kaa_error_t kaa_channel_manager_create(kaa_channel_manager_t **channel_manager_p
-                                            , kaa_context_t *context);
-
-extern void kaa_channel_manager_destroy(kaa_channel_manager_t *self);
-
-extern kaa_transport_channel_interface_t *kaa_channel_manager_get_transport_channel(kaa_channel_manager_t *self
-                                                                                  , kaa_service_t service_type);
-
-extern kaa_error_t kaa_channel_manager_bootstrap_request_get_size(kaa_channel_manager_t *self
-                                                                , size_t *expected_size);
-
-extern kaa_error_t kaa_channel_manager_bootstrap_request_serialize(kaa_channel_manager_t *self
-                                                                 , kaa_platform_message_writer_t* writer);
-
-
+#include "kaa_private.h"
 
 typedef struct {
     kaa_transport_protocol_id_t protocol_info;
     kaa_access_point_t *access_point;
-    kaa_service_t* services;
+    kaa_extension_id* services;
     size_t         services_count;
 } test_channel_context_t;
 
@@ -66,18 +51,21 @@ typedef struct {
 static kaa_context_t kaa_context;
 static kaa_logger_t *logger = NULL;
 
-static kaa_service_t SUPPORTED_SERVICES[] = { KAA_SERVICE_BOOTSTRAP
-                                            , KAA_SERVICE_PROFILE
-                                            , KAA_SERVICE_USER
-                                            , KAA_SERVICE_EVENT
-                                            , KAA_SERVICE_LOGGING };
-static const size_t supported_services_count = sizeof(SUPPORTED_SERVICES) / sizeof(kaa_service_t);
+static kaa_extension_id SUPPORTED_SERVICES[] = { KAA_EXTENSION_BOOTSTRAP
+                                            , KAA_EXTENSION_PROFILE
+                                            , KAA_EXTENSION_USER
+                                            , KAA_EXTENSION_EVENT
+                                            , KAA_EXTENSION_LOGGING };
+static const size_t supported_services_count = sizeof(SUPPORTED_SERVICES) / sizeof(kaa_extension_id);
 
 
 
 static kaa_error_t test_init_channel(void *channel_context
                              , kaa_transport_context_t *transport_context)
 {
+    (void)channel_context;
+    (void)transport_context;
+
     return KAA_ERR_NONE;
 }
 
@@ -102,7 +90,7 @@ static kaa_error_t test_get_protocol_info(void *context, kaa_transport_protocol_
 }
 
 static kaa_error_t test_get_supported_services(void *context
-                                             , kaa_service_t **supported_services
+                                             , const kaa_extension_id **supported_services
                                              , size_t *service_count)
 {
     KAA_RETURN_IF_NIL3(context, supported_services, service_count, KAA_ERR_BADPARAM);
@@ -115,7 +103,7 @@ static kaa_error_t test_get_supported_services(void *context
 }
 
 static kaa_error_t test_sync_handler(void *context
-                                   , const kaa_service_t services[]
+                                   , const kaa_extension_id services[]
                                    , size_t service_count)
 {
     KAA_RETURN_IF_NIL3(context, services, service_count, KAA_ERR_BADPARAM);
@@ -151,14 +139,20 @@ static void compare_channels(kaa_transport_channel_interface_t *actual_channel
     ASSERT_NOT_EQUAL(0, kaa_transport_protocol_id_equals(&actual_info, &expected_info));
 }
 
+static void test_auth_failure_handler(kaa_auth_failure_reason reason, void *context)
+{
+    assert_ptr_not_equal(context, NULL);
+
+    *(kaa_auth_failure_reason *)context = reason;
+}
 
 
 /**
  * UNIT TESTS
  */
-void test_create_channel_manager()
+void test_create_channel_manager(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     kaa_channel_manager_t *channel_manager = NULL;
@@ -176,9 +170,9 @@ void test_create_channel_manager()
     kaa_channel_manager_destroy(channel_manager);
 }
 
-void test_add_channel()
+void test_add_channel(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     kaa_channel_manager_t *channel_manager = NULL;
@@ -211,7 +205,7 @@ void test_add_channel()
     compare_channels(actual_channel, &expected_channel);
 
     error_code = kaa_channel_manager_remove_transport_channel(channel_manager, channel_id);
-    ASSERT_NOT_EQUAL(actual_channel, NULL);
+    assert_int_equal(KAA_ERR_NONE, error_code);
 
     actual_channel = kaa_channel_manager_get_transport_channel(channel_manager
                                                              , rand() % supported_services_count);
@@ -220,9 +214,9 @@ void test_add_channel()
     kaa_channel_manager_destroy(channel_manager);
 }
 
-void test_get_service_specific_channel()
+void test_get_service_specific_channel(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     kaa_channel_manager_t *channel_manager = NULL;
@@ -245,7 +239,7 @@ void test_get_service_specific_channel()
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
     uint32_t logging_channel_protocol_id = 0xAABBCCBB;
-    kaa_service_t logging_channel_service[] = { KAA_SERVICE_LOGGING };
+    kaa_extension_id logging_channel_service[] = { KAA_EXTENSION_LOGGING };
     test_channel_context_t logging_channel_context = { { logging_channel_protocol_id, protocol_version }
                                                       , NULL
                                                       , logging_channel_service
@@ -259,36 +253,36 @@ void test_get_service_specific_channel()
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
     kaa_transport_channel_interface_t *actual_channel =
-            kaa_channel_manager_get_transport_channel(channel_manager, KAA_SERVICE_LOGGING);
+            kaa_channel_manager_get_transport_channel(channel_manager, KAA_EXTENSION_LOGGING);
     ASSERT_NOT_EQUAL(actual_channel, NULL);
 
     compare_channels(actual_channel, &logging_channel);
 
-    actual_channel = kaa_channel_manager_get_transport_channel(channel_manager, KAA_SERVICE_BOOTSTRAP);
+    actual_channel = kaa_channel_manager_get_transport_channel(channel_manager, KAA_EXTENSION_BOOTSTRAP);
     ASSERT_NOT_EQUAL(actual_channel, NULL);
 
     compare_channels(actual_channel, &global_channel);
 
     error_code = kaa_channel_manager_remove_transport_channel(channel_manager, logging_channel_id);
-    ASSERT_NOT_EQUAL(actual_channel, NULL);
+    assert_int_equal(KAA_ERR_NONE, error_code);
 
-    actual_channel = kaa_channel_manager_get_transport_channel(channel_manager, KAA_SERVICE_LOGGING);
+    actual_channel = kaa_channel_manager_get_transport_channel(channel_manager, KAA_EXTENSION_LOGGING);
     ASSERT_NOT_EQUAL(actual_channel, NULL);
 
     compare_channels(actual_channel, &global_channel);
 
     error_code = kaa_channel_manager_remove_transport_channel(channel_manager, global_channel_id);
-    ASSERT_NOT_EQUAL(actual_channel, NULL);
+    assert_int_equal(KAA_ERR_NONE, error_code);
 
-    actual_channel = kaa_channel_manager_get_transport_channel(channel_manager, KAA_SERVICE_LOGGING);
+    actual_channel = kaa_channel_manager_get_transport_channel(channel_manager, KAA_EXTENSION_LOGGING);
     ASSERT_EQUAL(actual_channel, NULL);
 
     kaa_channel_manager_destroy(channel_manager);
 }
 
-void test_get_bootstrap_client_sync_size()
+void test_get_bootstrap_client_sync_size(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     size_t expected_size = 0, actual_size = 0;
@@ -366,9 +360,9 @@ void test_get_bootstrap_client_sync_size()
     kaa_channel_manager_destroy(channel_manager);
 }
 
-void test_get_bootstrap_client_sync_serialize()
+void test_get_bootstrap_client_sync_serialize(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     uint16_t channel_count = 0;
     kaa_error_t error_code;
@@ -406,20 +400,20 @@ void test_get_bootstrap_client_sync_serialize()
     error_code = kaa_channel_manager_bootstrap_request_get_size(channel_manager, &sync_size);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
-    char manual_buffer[sync_size];
-    char auto_buffer[sync_size];
+    uint8_t manual_buffer[sync_size];
+    uint8_t auto_buffer[sync_size];
 
     kaa_platform_message_writer_t *manual_writer;
     kaa_platform_message_writer_t *auto_writer;
 
-    error_code = kaa_platform_message_writer_create(&manual_writer, (char *)manual_buffer, sync_size);
+    error_code = kaa_platform_message_writer_create(&manual_writer, manual_buffer, sync_size);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
-    error_code = kaa_platform_message_writer_create(&auto_writer, (char *)auto_buffer, sync_size);
+    error_code = kaa_platform_message_writer_create(&auto_writer, auto_buffer, sync_size);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
     error_code = kaa_platform_message_write_extension_header(manual_writer
-                                                           , KAA_BOOTSTRAP_EXTENSION_TYPE
+                                                           , KAA_EXTENSION_BOOTSTRAP
                                                            , 0
                                                            , (sync_size - KAA_EXTENSION_HEADER_SIZE));
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
@@ -470,7 +464,24 @@ void test_get_bootstrap_client_sync_serialize()
     kaa_channel_manager_destroy(channel_manager);
 }
 
+void test_process_auth_failure(void **state)
+{
+    (void)state;
 
+    kaa_error_t error_code;
+    kaa_channel_manager_t *channel_manager = NULL;
+    kaa_auth_failure_reason reason;
+
+    error_code = kaa_channel_manager_create(&channel_manager, &kaa_context);
+    assert_int_equal(error_code, KAA_ERR_NONE);
+    kaa_channel_manager_set_auth_failure_handler(channel_manager, test_auth_failure_handler, &reason);
+
+    kaa_channel_manager_process_auth_failure(channel_manager, KAA_AUTH_STATUS_BAD_CREDENTIALS);
+    assert_int_equal(reason, KAA_AUTH_STATUS_BAD_CREDENTIALS);
+
+    kaa_channel_manager_process_auth_failure(channel_manager, KAA_AUTH_STATUS_VERIFICATION_FAILED);
+    assert_int_equal(reason, KAA_AUTH_STATUS_VERIFICATION_FAILED);
+}
 
 int test_init(void)
 {
@@ -498,8 +509,12 @@ int test_deinit(void)
 KAA_SUITE_MAIN(Log, test_init, test_deinit
        ,
        KAA_TEST_CASE(create_channel_manager, test_create_channel_manager)
+       /* KAA-988 */
+       /*
        KAA_TEST_CASE(add_channel, test_add_channel)
        KAA_TEST_CASE(get_service_specific_channel, test_get_service_specific_channel)
        KAA_TEST_CASE(get_bootstrap_client_sync_size, test_get_bootstrap_client_sync_size)
        KAA_TEST_CASE(get_bootstrap_client_sync_serialize, test_get_bootstrap_client_sync_serialize)
+       */
+       KAA_TEST_CASE(process_auth_faliure, test_process_auth_failure)
        )

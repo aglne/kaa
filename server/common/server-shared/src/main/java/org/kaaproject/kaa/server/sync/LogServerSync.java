@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,67 +13,68 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.sync;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class LogServerSync {
-    private List<LogDeliveryStatus> deliveryStatuses;
+  private List<LogDeliveryStatus> deliveryStatuses;
 
-    public LogServerSync() {
-        this(new ArrayList<LogDeliveryStatus>());
-    }
-    
-    public LogServerSync(List<LogDeliveryStatus> deliveryStatuses) {
-        super();
-        this.deliveryStatuses = deliveryStatuses;
-    }
+  public LogServerSync() {
+    this(new ArrayList<LogDeliveryStatus>());
+  }
 
-    public List<LogDeliveryStatus> getDeliveryStatuses() {
-        return deliveryStatuses;
-    }
+  public LogServerSync(List<LogDeliveryStatus> deliveryStatuses) {
+    super();
+    this.deliveryStatuses = deliveryStatuses;
+  }
 
-    public void setDeliveryStatuses(List<LogDeliveryStatus> deliveryStatuses) {
-        this.deliveryStatuses = deliveryStatuses;
-    }
+  public List<LogDeliveryStatus> getDeliveryStatuses() {
+    return deliveryStatuses;
+  }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((deliveryStatuses == null) ? 0 : deliveryStatuses.hashCode());
-        return result;
-    }
+  public void setDeliveryStatuses(List<LogDeliveryStatus> deliveryStatuses) {
+    this.deliveryStatuses = deliveryStatuses;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        LogServerSync other = (LogServerSync) obj;
-        if (deliveryStatuses == null) {
-            if (other.deliveryStatuses != null) {
-                return false;
-            }
-        } else if (!deliveryStatuses.equals(other.deliveryStatuses)) {
-            return false;
-        }
-        return true;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((deliveryStatuses == null) ? 0 : deliveryStatuses.hashCode());
+    return result;
+  }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("LogServerSync [deliveryStatuses=");
-        builder.append(deliveryStatuses);
-        builder.append("]");
-        return builder.toString();
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
     }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    LogServerSync other = (LogServerSync) obj;
+    if (deliveryStatuses == null) {
+      if (other.deliveryStatuses != null) {
+        return false;
+      }
+    } else if (!deliveryStatuses.equals(other.deliveryStatuses)) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("LogServerSync [deliveryStatuses=");
+    builder.append(deliveryStatuses);
+    builder.append("]");
+    return builder.toString();
+  }
 }

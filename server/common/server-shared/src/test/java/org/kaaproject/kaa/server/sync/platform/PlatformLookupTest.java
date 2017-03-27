@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ import java.util.Collections;
 import java.util.Set;
 
 public class PlatformLookupTest {
-    @Test
-    public void lookupPlatformProtocolsInWrongPackageTest() {
-        Assert.assertTrue(PlatformLookup.lookupPlatformProtocols("some.wrong.package").isEmpty());
-    }
+  @Test
+  public void lookupPlatformProtocolsInWrongPackageTest() {
+    Assert.assertTrue(PlatformLookup.lookupPlatformProtocols("some.wrong.package").isEmpty());
+  }
 
-    @Test
-    public void initEmptyPlatformProtocolMap() {
-        Set<String> platformProtocols = Collections.emptySet();
-        Assert.assertTrue(PlatformLookup.initPlatformProtocolMap(platformProtocols).isEmpty());
-    }
+  @Test
+  public void initEmptyPlatformProtocolMap() {
+    Set<String> platformProtocols = Collections.emptySet();
+    Assert.assertTrue(PlatformLookup.initPlatformProtocolMap(platformProtocols).isEmpty());
+  }
 }

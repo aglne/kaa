@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,15 @@
 package org.kaaproject.kaa.client.common;
 
 /**
- * Common fixed interface
+ * Common fixed interface.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface CommonFixed extends SchemaDependent {
 
-    /**
-     * @return fixed bytes
-     */
-    byte [] getBytes();
+  /**
+   * @return fixed bytes.
+   */
+  byte[] getBytes();
 
 }

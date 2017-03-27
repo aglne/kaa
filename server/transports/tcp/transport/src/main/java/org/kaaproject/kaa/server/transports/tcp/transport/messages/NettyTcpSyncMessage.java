@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.transports.tcp.transport.messages;
 
 import org.kaaproject.kaa.common.channels.protocols.kaatcp.messages.SyncRequest;
@@ -24,45 +25,56 @@ import org.kaaproject.kaa.server.transport.session.SessionInfo;
 
 public class NettyTcpSyncMessage extends AbstractMessage implements SessionAwareMessage {
 
-    private final SyncRequest command;
-    private final SessionInfo sessionInfo;
+  private final SyncRequest command;
+  private final SessionInfo sessionInfo;
 
-    public NettyTcpSyncMessage(SyncRequest command, SessionInfo sessionInfo,
-            MessageBuilder responseConverter, ErrorBuilder errorConverter) {
-        super(sessionInfo.getUuid(), sessionInfo.getPlatformId(), sessionInfo.getCtx(), sessionInfo.getChannelType(), responseConverter, errorConverter);
-        this.command = command;
-        this.sessionInfo = sessionInfo;
-    }
+  /**
+   * Create new instance of <code>NettyTcpSyncMessage</code>.
+   *
+   * @param command is instance of <code>SyncRequest</code>
+   * @param sessionInfo is information about session
+   * @param responseConverter convert response
+   * @param errorConverter convert error
+   */
+  public NettyTcpSyncMessage(SyncRequest command, SessionInfo sessionInfo,
+                             MessageBuilder responseConverter, ErrorBuilder errorConverter
+  ) {
+    super(sessionInfo.getUuid(), sessionInfo.getPlatformId(), sessionInfo.getCtx(),
+            sessionInfo.getChannelType(), responseConverter, errorConverter
+    );
+    this.command = command;
+    this.sessionInfo = sessionInfo;
+  }
 
-    @Override
-    public byte[] getEncodedMessageData() {
-        return command.getAvroObject();
-    }
+  @Override
+  public byte[] getEncodedMessageData() {
+    return command.getAvroObject();
+  }
 
-    @Override
-    public SessionInfo getSessionInfo() {
-        return sessionInfo;
-    }
+  @Override
+  public SessionInfo getSessionInfo() {
+    return sessionInfo;
+  }
 
-    @Override
-    public boolean isEncrypted() {
-        return command.isEncrypted();
-    }
+  @Override
+  public boolean isEncrypted() {
+    return command.isEncrypted();
+  }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("NettyTcpSyncMessage [command=");
-        builder.append(command);
-        builder.append(", sessionInfo=");
-        builder.append(sessionInfo);
-        builder.append(", getUuid()=");
-        builder.append(getChannelUuid());
-        builder.append(", getChannelContext()=");
-        builder.append(getChannelContext());
-        builder.append(", getChannelType()=");
-        builder.append(getChannelType());
-        builder.append("]");
-        return builder.toString();
-    }
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("NettyTcpSyncMessage [command=");
+    builder.append(command);
+    builder.append(", sessionInfo=");
+    builder.append(sessionInfo);
+    builder.append(", getUuid()=");
+    builder.append(getChannelUuid());
+    builder.append(", getChannelContext()=");
+    builder.append(getChannelContext());
+    builder.append(", getChannelType()=");
+    builder.append(getChannelType());
+    builder.append("]");
+    return builder.toString();
+  }
 }

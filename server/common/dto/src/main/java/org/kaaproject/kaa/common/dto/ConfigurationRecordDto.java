@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,53 +13,81 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.common.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ConfigurationRecordDto implements Serializable {
+public class ConfigurationRecordDto extends StructureRecordDto<ConfigurationDto>
+        implements Serializable, Comparable<ConfigurationRecordDto> {
 
-    private static final long serialVersionUID = 5838762122987694212L;
-    
-    private ConfigurationDto activeConfiguration; 
-    private ConfigurationDto inactiveConfiguration;
-    
-    public ConfigurationRecordDto() {
-    }
+  private static final long serialVersionUID = 5838762122987694212L;
 
-    public ConfigurationRecordDto(ConfigurationDto activeConfiguration, ConfigurationDto inactiveConfiguration) {
-        this.activeConfiguration = activeConfiguration;
-        this.inactiveConfiguration = inactiveConfiguration;
-    }
-    
-    public ConfigurationDto getActiveConfiguration() {
-        return activeConfiguration;
-    }
+  public ConfigurationRecordDto() {
+    super();
+  }
 
-    public void setActiveConfiguration(ConfigurationDto activeConfiguration) {
-        this.activeConfiguration = activeConfiguration;
-    }
+  public ConfigurationRecordDto(
+          ConfigurationDto activeConfiguration, ConfigurationDto inactiveConfiguration) {
+    super(activeConfiguration, inactiveConfiguration);
+  }
 
-    public ConfigurationDto getInactiveConfiguration() {
-        return inactiveConfiguration;
+  /**
+   * Converts a configuration into a configuration record.
+   *
+   * @param configurations the configurations for converting
+   * @return converted configurations
+   */
+  public static List<ConfigurationRecordDto> convertToConfigurationRecords(
+          Collection<ConfigurationDto> configurations) {
+    Map<String, ConfigurationRecordDto> configurationRecordsMap = new HashMap<>();
+    for (ConfigurationDto configuration : configurations) {
+      ConfigurationRecordDto configurationRecord = configurationRecordsMap
+              .get(configuration.getSchemaId());
+      if (configurationRecord == null) {
+        configurationRecord = new ConfigurationRecordDto();
+        configurationRecordsMap.put(configuration.getSchemaId(), configurationRecord);
+      }
+      if (configuration.getStatus() == UpdateStatus.ACTIVE) {
+        configurationRecord.setActiveStructureDto(configuration);
+      } else if (configuration.getStatus() == UpdateStatus.INACTIVE) {
+        configurationRecord.setInactiveStructureDto(configuration);
+      }
     }
+    return new ArrayList<>(configurationRecordsMap.values());
+  }
 
-    public void setInactiveConfiguration(ConfigurationDto inactiveConfiguration) {
-        this.inactiveConfiguration = inactiveConfiguration;
-    }
+  @JsonIgnore
+  public int getSchemaVersion() {
+    return activeStructureDto != null ? activeStructureDto.getSchemaVersion() :
+            inactiveStructureDto.getSchemaVersion();
+  }
 
-    public static List<ConfigurationRecordDto> formStructureRecords(List<StructureRecordDto<ConfigurationDto>> records) {
-        List<ConfigurationRecordDto> result = new ArrayList<>();
-        for (StructureRecordDto<ConfigurationDto> record : records) {
-            ConfigurationRecordDto configurationRecord = new ConfigurationRecordDto(record.getActiveStructureDto(), record.getInactiveStructureDto());
-            result.add(configurationRecord);
-        }
-        return result;
-    }
-    
-    public static ConfigurationRecordDto fromStructureRecord(StructureRecordDto<ConfigurationDto> record) {
-        return new ConfigurationRecordDto(record.getActiveStructureDto(), record.getInactiveStructureDto());
-    }
+  @JsonIgnore
+  public String getSchemaId() {
+    return activeStructureDto != null ? activeStructureDto.getSchemaId() :
+            inactiveStructureDto.getSchemaId();
+  }
+
+  @Override
+  public int compareTo(ConfigurationRecordDto configurationRecordDto) {
+    return this.getSchemaVersion() - configurationRecordDto.getSchemaVersion();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
 }

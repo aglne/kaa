@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package org.kaaproject.kaa.server.common.core.configuration;
 
 import org.kaaproject.kaa.server.common.core.schema.BaseSchema;
 
-public class BaseData extends AbstractConfigurationData<BaseSchema>{
+public class BaseData extends AbstractConfigurationData<BaseSchema> {
 
-    private static final long serialVersionUID = -8910638116319703572L;
+  private static final long serialVersionUID = -8910638116319703572L;
 
-    public BaseData(BaseSchema schema, String data) {
-        super(schema, data);
-    }
+  public BaseData(BaseSchema schema, String data) {
+    super(schema, data);
+  }
 
 }

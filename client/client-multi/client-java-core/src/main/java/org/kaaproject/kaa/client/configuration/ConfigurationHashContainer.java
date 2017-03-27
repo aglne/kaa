@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,15 @@ import org.kaaproject.kaa.common.hash.EndpointObjectHash;
  * Container for the configuration data hash.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface ConfigurationHashContainer {
 
-    /**
-     * Retrieves configuration data hash.
-     *
-     * @see EndpointObjectHash
-     *
-     */
-    EndpointObjectHash getConfigurationHash();
+  /**
+   * Retrieves configuration data hash.
+   *
+   * @return EndpointObjectHash the endpoint object hash
+   * @see EndpointObjectHash
+   */
+  EndpointObjectHash getConfigurationHash();
 
 }

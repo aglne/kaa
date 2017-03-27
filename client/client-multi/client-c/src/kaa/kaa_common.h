@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,47 +22,48 @@
 #ifndef KAA_COMMON_H_
 #define KAA_COMMON_H_
 
+#include <stdint.h>
 #include "kaa_error.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @brief Kaa extensions.
+ */
+typedef enum {
+    // Don't change numbers. They are critical to platform protocol.
+    KAA_EXTENSION_BOOTSTRAP     = 0,
+    KAA_EXTENSION_META_DATA     = 1,
+    KAA_EXTENSION_PROFILE       = 2,
+    KAA_EXTENSION_USER          = 3,
+    KAA_EXTENSION_LOGGING       = 4,
+    KAA_EXTENSION_CONFIGURATION = 5,
+    KAA_EXTENSION_EVENT         = 7,
+    KAA_EXTENSION_NOTIFICATION  = 6,
+} kaa_extension_id;
 
 /*
  * Standard error handling macros
  */
 #define KAA_RETURN_IF_ERR(E) \
-    { if (E) return E; }
+    do { if (E) return E; } while (0)
 
 #define KAA_RETURN_IF_NIL(p, E) \
-    { if (!(p)) return E; }
+    do { if (!(p)) return E; } while (0)
 
 #define KAA_RETURN_IF_NIL2(p1, p2, E) \
-    { if (!(p1) || !(p2)) return E; }
+    do { if (!(p1) || !(p2)) return E; } while (0)
 
 #define KAA_RETURN_IF_NIL3(p1, p2, p3, E) \
-    { if (!(p1) || !(p2) || !(p3)) return E; }
+    do { if (!(p1) || !(p2) || !(p3)) return E; } while (0)
 
 #define KAA_RETURN_IF_NIL4(p1, p2, p3, p4, E) \
-    { if (!(p1) || !(p2) || !(p3) || !(p4)) return E; }
+    do { if (!(p1) || !(p2) || !(p3) || !(p4)) return E; } while (0)
 
 #define KAA_RETURN_IF_NIL5(p1, p2, p3, p4, p5,E) \
-    { if (!(p1) || !(p2) || !(p3) || !(p4) || !(p5)) return E; }
-
-
-/**
- * @brief Types of Kaa platform services
- */
-typedef enum {
-    KAA_SERVICE_BOOTSTRAP = 0,
-    KAA_SERVICE_PROFILE = 1,
-    KAA_SERVICE_USER = 2,
-    KAA_SERVICE_EVENT = 3,
-    KAA_SERVICE_LOGGING = 4,
-    KAA_SERVICE_CONFIGURATION = 5,
-    KAA_SERVICE_NOTIFICATION = 6
-} kaa_service_t;
+    do { if (!(p1) || !(p2) || !(p3) || !(p4) || !(p5)) return E; } while (0)
 
 /**
  * @brief Identifier used to uniquely represent transport protocol.
@@ -74,8 +75,7 @@ typedef struct {
 
 static inline int kaa_transport_protocol_id_equals(const kaa_transport_protocol_id_t *first, const kaa_transport_protocol_id_t *second)
 {
-    KAA_RETURN_IF_NIL2(first, second, 0);
-    return first->id == second->id && first->version == second->version;
+    return first && second && first->id == second->id && first->version == second->version;
 }
 
 /**
@@ -93,7 +93,7 @@ typedef struct {
  */
 #define KAA_ENDPOINT_ID_LENGTH 20
 typedef uint8_t        kaa_endpoint_id[KAA_ENDPOINT_ID_LENGTH];
-typedef const uint8_t* kaa_endpoint_id_p;
+typedef const uint8_t *kaa_endpoint_id_p;
 
 
 

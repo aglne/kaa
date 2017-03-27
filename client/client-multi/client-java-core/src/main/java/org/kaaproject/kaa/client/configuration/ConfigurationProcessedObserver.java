@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,12 @@ package org.kaaproject.kaa.client.configuration;
 
 /**
  * Interface for configuration processing is finished observers.
- *
  * Receiver can be subscribed/unsubscribed via {@link ConfigurationProcessedObservable}
  */
 public interface ConfigurationProcessedObserver {
 
-    /**
-     * Notify about configuration processing is finished.
-     */
-    void onConfigurationProcessed();
+  /**
+   * Notify about configuration processing is finished.
+   */
+  void onConfigurationProcessed();
 }

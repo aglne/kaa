@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import org.kaaproject.kaa.common.endpoint.gen.BasicEndpointProfile;
 
 public class GenericAvroConverterTest {
 
-    @Test(expected=RuntimeException.class)
-    public void testStaticMethod() throws Exception{
-        GenericAvroConverter.toJson("Expected to fail with this invalid input".getBytes(), BasicEndpointProfile.SCHEMA$.toString());
-    }
-    
-    
+  @Test(expected = RuntimeException.class)
+  public void testStaticMethod() throws Exception {
+    GenericAvroConverter.toJson("Expected to fail with this invalid input".getBytes(), BasicEndpointProfile.SCHEMA$.toString());
+  }
+
+
 }

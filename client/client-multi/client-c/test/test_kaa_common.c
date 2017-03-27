@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@
 
 static kaa_logger_t *logger = NULL;
 
-void test_profile_update()
+void test_profile_update(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     char* pattern = "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3";
 
@@ -39,7 +39,7 @@ void test_profile_update()
     err = ext_calculate_sha_hash(NULL, 50, calculated_hash);
     ASSERT_NOT_EQUAL(err, KAA_ERR_NONE);
     err = ext_calculate_sha_hash(body, 0, calculated_hash);
-    ASSERT_NOT_EQUAL(err, KAA_ERR_NONE);
+    ASSERT_EQUAL(err, KAA_ERR_NONE);
     err = ext_calculate_sha_hash(body, 4, NULL);
     ASSERT_NOT_EQUAL(err, KAA_ERR_NONE);
 

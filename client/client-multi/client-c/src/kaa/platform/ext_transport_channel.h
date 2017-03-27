@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,8 @@
 #ifndef EXT_TRANSPORT_CHANNEL_H_
 #define EXT_TRANSPORT_CHANNEL_H_
 
-#include "../kaa_common.h"
-#include "../kaa_platform_protocol.h"
-#include "../kaa_bootstrap_manager.h"
+#include "kaa_common.h"
+#include "kaa_platform_protocol.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,7 +27,7 @@ extern "C" {
 
 
 /**
- * @brief Uses to initialize transport channel implementation with Kaa specific
+ * @brief Used to initialize transport channel implementation with Kaa specific
  * transport context.
  */
 typedef struct {
@@ -53,7 +52,7 @@ typedef kaa_error_t (*kaa_init_channel_fn)(void *channel_context
 /**
  * @brief Sets transport connection data.
  *
- * @b NOTE: Copy connection data for the local usage.
+ * @note Copy connection data for the local usage.
  *
  * @param[in]   channel_context    Channel context.
  * @param[in]   access_point       Connection data used to establish connection
@@ -70,7 +69,7 @@ typedef kaa_error_t (*kaa_set_access_point_fn)(void *channel_context
  * @brief Retrieves a transport protocol id supported by a transport channel implementation.
  *
  * @param[in]       context          Channel context.
- * @param[in,out]   protocol_info    Transport protocol id instance to be filled in.
+ * @param[out]      protocol_info    Transport protocol id instance to be filled in.
  * @return                           Error code.
  *
  * @see kaa_transport_protocol_id_t
@@ -84,15 +83,15 @@ typedef kaa_error_t (*kaa_get_protocol_id_fn)(void *context
  * @brief Retrieves the list of the supported services.
  *
  * @param[in]       context               Channel context.
- * @param[in,out]   supported_services    List of the supported services.
- * @param[in,out]   service_count         Number of the supported services.
+ * @param[out]      supported_services    List of the supported services.
+ * @param[out]      service_count         Number of the supported services.
  * @return                                Error code.
  *
- * @see kaa_service_t
+ * @see kaa_extension_id
  */
-typedef kaa_error_t (*kaa_get_supported_services_fn)(void *context
-                                                   , kaa_service_t **supported_services
-                                                   , size_t *service_count);
+typedef kaa_error_t (*kaa_get_supported_services_fn)(void *context,
+        const kaa_extension_id **supported_services,
+        size_t *service_count);
 
 
 
@@ -104,10 +103,10 @@ typedef kaa_error_t (*kaa_get_supported_services_fn)(void *context
  * @param[in]   service_count    Number of services.
  * @return                       Error code.
  *
- * @see kaa_service_t
+ * @see kaa_extension_id
  */
 typedef kaa_error_t (*kaa_sync_handler_fn)(void *context
-                                         , const kaa_service_t services[]
+                                         , const kaa_extension_id services[]
                                          , size_t service_count);
 
 

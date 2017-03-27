@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,11 @@ import org.kaaproject.kaa.common.endpoint.gen.SyncResponseResultType;
  */
 public interface OnDetachEndpointOperationCallback {
 
-    /**
-     * Callback on endpoint detach response<br>
-     *
-     * @param result The enum value [{@code SUCCESS, FAILURE}]
-     * @see org.kaaproject.kaa.common.endpoint.gen.SyncResponseResultType
-     */
-    void onDetach(SyncResponseResultType result);
+  /**
+   * Callback on endpoint detach response<br>
+   *
+   * @param result The enum value [{@code SUCCESS, FAILURE}]
+   * @see org.kaaproject.kaa.common.endpoint.gen.SyncResponseResultType
+   */
+  void onDetach(SyncResponseResultType result);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +18,34 @@ package org.kaaproject.kaa.client.util;
 
 public class AndroidBase64 implements Base64 {
 
-    private static AndroidBase64 instance;
-    
-    public static AndroidBase64 getInstance() {
-        if (instance == null) {
-            instance = new AndroidBase64();
-        }
-        return instance;
-    }
-    
-    @Override
-    public byte[] decodeBase64(byte[] base64Data) {
-        return android.util.Base64.decode(base64Data,  android.util.Base64.DEFAULT);
-    }
+  private static AndroidBase64 instance;
 
-    @Override
-    public byte[] encodeBase64(byte[] binaryData) {
-        return android.util.Base64.encode(binaryData, android.util.Base64.DEFAULT);
+  /**
+   * Get instantiates of AndroidBase64.
+   *
+   * @return the instance of AndroidBase64
+   */
+  public static AndroidBase64 getInstance() {
+    if (instance == null) {
+      instance = new AndroidBase64();
     }
+    return instance;
+  }
 
-    @Override
-    public byte[] decodeBase64(String base64String) {
-        return android.util.Base64.decode(base64String, android.util.Base64.DEFAULT);
-    }
+  @Override
+  public byte[] decodeBase64(byte[] base64Data) {
+    return android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT);
+  }
+
+  @Override
+  public byte[] decodeBase64(String base64String) {
+    return android.util.Base64.decode(base64String, android.util.Base64.DEFAULT);
+  }
+
+  @Override
+  public byte[] encodeBase64(byte[] binaryData) {
+    return android.util.Base64.encode(binaryData, android.util.Base64.DEFAULT);
+  }
+
 
 }

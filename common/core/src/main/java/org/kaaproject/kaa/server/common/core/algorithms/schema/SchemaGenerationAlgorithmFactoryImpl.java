@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ package org.kaaproject.kaa.server.common.core.algorithms.schema;
 import org.kaaproject.kaa.server.common.core.schema.DataSchema;
 
 public class SchemaGenerationAlgorithmFactoryImpl implements
-        SchemaGenerationAlgorithmFactory {
+    SchemaGenerationAlgorithmFactory {
 
-    @Override
-    public SchemaGenerationAlgorithm createSchemaGenerator(DataSchema schema) {
-        return new SchemaGenerationAlgorithmImpl(schema);
-    }
+  @Override
+  public SchemaGenerationAlgorithm createSchemaGenerator(DataSchema schema) {
+    return new SchemaGenerationAlgorithmImpl(schema);
+  }
 
 }

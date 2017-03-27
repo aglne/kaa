@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 
 namespace kaa {
 
-UserTransport::UserTransport(IRegistrationProcessor& manager, IKaaChannelManager& channelManager)
-    : AbstractKaaTransport(channelManager)
+UserTransport::UserTransport(IRegistrationProcessor& manager, IKaaChannelManager& channelManager, IKaaClientContext &context)
+    : AbstractKaaTransport(channelManager, context)
     , manager_(manager)
 {
 

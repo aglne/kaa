@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.client.configuration.base;
 
-import javax.annotation.Generated;
-
 import org.kaaproject.kaa.schema.base.Configuration;
+
+import javax.annotation.Generated;
 
 /**
  * Interface for the configuration manager.<br>
@@ -27,18 +28,17 @@ import org.kaaproject.kaa.schema.base.Configuration;
  * Configuration manager can be used to fetch current configuration at any time.
  * If there were no configuration updates, default configuration will be returned.
  * Default configuration is built-in to the sdk. <br>
- * 
+ *
  * @author Yaroslav Zeygerman
  * @author Andrew Shvayka
- * 
  */
 @Generated("ConfigurationManager.java.template")
 public interface ConfigurationManager extends GenericConfigurationManager {
 
-    /**
-     * Always returns latest configuration
-     * 
-     * @return configuration
-     */
-    Configuration getConfiguration();
+  /**
+   * Always returns latest configuration.
+   *
+   * @return configuration
+   */
+  Configuration getConfiguration();
 }

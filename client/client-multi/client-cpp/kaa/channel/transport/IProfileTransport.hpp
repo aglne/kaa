@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,11 +51,6 @@ public:
      *
      */
     virtual void onProfileResponse(const ProfileSyncResponse& response) = 0;
-
-    /**
-     * Processes the profile resync request received the Operations server.
-     */
-    virtual void onProfileResync() = 0;
 
     /**
      * Sets the given Profile manager.

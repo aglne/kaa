@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,8 @@ typedef struct {
     uint32_t                 message_length;
     uint32_t                 processed_payload_length;
     uint32_t                 length_multiplier;
-    char                     payload[KAATCP_PARSER_MAX_MESSAGE_LENGTH];
+    uint32_t                 payload_buffer_size;
+    char                    *payload;
 
     kaatcp_parser_handlers_t handlers;
 } kaatcp_parser_t;

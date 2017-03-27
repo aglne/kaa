@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 #ifndef KAA_MEM_H_
 #define KAA_MEM_H_
 
-#include "../platform/mem.h"
+#include <platform/mem.h>
 
 #ifdef KAA_TRACE_MEMORY_ALLOCATIONS
 
-#include "../utilities/kaa_log.h"
+#include "utilities/kaa_log.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,9 +43,10 @@ void    kaa_trace_memory_allocs_set_logger(kaa_logger_t *logger);
 #else // defined KAA_TRACE_MEMORY_ALLOCATIONS
 
 
-#define KAA_MALLOC(S)   __KAA_MALLOC(S)
-#define KAA_CALLOC(N,S) __KAA_CALLOC(N,S)
-#define KAA_FREE(P)     __KAA_FREE(P)
+#define KAA_MALLOC(S)    __KAA_MALLOC(S)
+#define KAA_CALLOC(N,S)  __KAA_CALLOC(N,S)
+#define KAA_REALLOC(P,S) __KAA_REALLOC(P,S)
+#define KAA_FREE(P)      __KAA_FREE(P)
 
 
 #endif // defined KAA_TRACE_MEMORY_ALLOCATIONS

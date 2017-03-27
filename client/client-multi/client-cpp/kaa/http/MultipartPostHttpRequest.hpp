@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 
 #include "kaa/http/IHttpRequest.hpp"
 #include "kaa/http/HttpUrl.hpp"
+#include "kaa/IKaaClientContext.hpp"
 
 #include <map>
 #include <vector>
@@ -29,7 +30,7 @@ namespace kaa {
 
 class MultipartPostHttpRequest : public IHttpRequest {
 public:
-    MultipartPostHttpRequest(const HttpUrl& url);
+    MultipartPostHttpRequest(const HttpUrl& url, IKaaClientContext &context);
     virtual ~MultipartPostHttpRequest();
 
     virtual std::string getHost() const;
@@ -48,6 +49,8 @@ private:
     HttpUrl url_;
     std::map<std::string, std::string> headerFields_;
     std::map<std::string, std::vector<std::uint8_t>> bodyFields_;
+
+    IKaaClientContext &context_;
 };
 
 }

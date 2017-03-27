@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  */
 
 #include "kaa/security/RsaEncoderDecoder.hpp"
-#include <botan/look_pk.h>
-#include <botan/pk_keys.h>
 #include <botan/pubkey.h>
+#include <botan/pkcs8.h>
+#include <botan/pipe.h>
+#include <botan/key_filt.h>
 #include <sstream>
 
 #include "kaa/logging/Log.hpp"
@@ -25,11 +26,10 @@
 
 namespace kaa {
 
-RsaEncoderDecoder::RsaEncoderDecoder(
-        const PublicKey& pubKey,
+RsaEncoderDecoder::RsaEncoderDecoder(const PublicKey& pubKey,
         const PrivateKey& privKey,
-        const PublicKey& remoteKey)
-    : pubKey_(nullptr), privKey_(nullptr), remoteKey_(nullptr), sessionKey_(KeyUtils().generateSessionKey(16))
+        const PublicKey& remoteKey, IKaaClientContext &context)
+    : pubKey_(nullptr), privKey_(nullptr), remoteKey_(nullptr), sessionKey_(KeyUtils().generateSessionKey(16)), context_(context)
 {
     KAA_LOG_TRACE("Creating MessageEncoderDecoder with following parameters: ");
 
@@ -38,8 +38,8 @@ RsaEncoderDecoder::RsaEncoderDecoder(
         pubKey_.reset(Botan::X509::load_key(pubMem));
     }
 
-    KAA_LOG_TRACE(boost::format("PublicKey: %1%") % ( pubKey_ ? LoggingUtils::ByteArrayToString(
-        pubKey_->x509_subject_public_key().begin(), pubKey_->x509_subject_public_key().size()) : "empty"));
+    KAA_LOG_TRACE(boost::format("PublicKey: %1%") % ( pubKey_ ? LoggingUtils::toString(
+        pubKey_->x509_subject_public_key().data(), pubKey_->x509_subject_public_key().size()) : "empty"));
 
     if (!privKey.empty()) {
         Botan::DataSource_Memory privMem(privKey);
@@ -51,14 +51,15 @@ RsaEncoderDecoder::RsaEncoderDecoder(
         remoteKey_.reset(Botan::X509::load_key(remoteMem));
     }
 
-    KAA_LOG_TRACE(boost::format("RemotePublicKey: %1%") % ( remoteKey_ ? LoggingUtils::ByteArrayToString(
-            remoteKey_->x509_subject_public_key().begin(), remoteKey_->x509_subject_public_key().size()) : "empty"));
+    KAA_LOG_TRACE(boost::format("RemotePublicKey: %1%") % ( remoteKey_ ? LoggingUtils::toString(
+            remoteKey_->x509_subject_public_key().data(), remoteKey_->x509_subject_public_key().size()) : "empty"));
 }
 
-Botan::SecureVector<std::uint8_t> RsaEncoderDecoder::getEncodedSessionKey()
+EncodedSessionKey RsaEncoderDecoder::getEncodedSessionKey()
 {
     Botan::PK_Encryptor_EME enc(*remoteKey_, "EME-PKCS1-v1_5");
-    return enc.encrypt(sessionKey_.bits_of(), rng_);
+    auto &&v = enc.encrypt(sessionKey_.bits_of(), rng_);
+    return Botan::secure_vector<std::uint8_t>(v.begin(), v.end());
 }
 
 std::string RsaEncoderDecoder::cipherPipe(const std::uint8_t *data, std::size_t size, Botan::Cipher_Dir dir)
@@ -80,10 +81,11 @@ std::string RsaEncoderDecoder::decodeData(const std::uint8_t *data, std::size_t 
     return cipherPipe(data, size, Botan::DECRYPTION);
 }
 
-Botan::SecureVector<std::uint8_t> RsaEncoderDecoder::signData(const std::uint8_t *data, std::size_t size)
+Signature RsaEncoderDecoder::signData(const std::uint8_t *data, std::size_t size)
 {
     Botan::PK_Signer signer(*privKey_, "EMSA3(SHA-1)");
-    return signer.sign_message(data, size, rng_);
+    auto &&sgn = signer.sign_message(data, size, rng_);
+    return Botan::secure_vector<std::uint8_t>(sgn.begin(), sgn.end());
 }
 
 bool RsaEncoderDecoder::verifySignature(const std::uint8_t *data, std::size_t len, const std::uint8_t *sig, std::size_t sigLen)

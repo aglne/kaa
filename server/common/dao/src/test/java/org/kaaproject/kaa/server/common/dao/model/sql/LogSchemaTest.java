@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.common.dao.model.sql;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class LogSchemaTest {
 
-    private static final long TEST_ID = 1L;
+  private static final long TEST_ID = 1L;
 
-    @Test
-    public void hashCodeEqualsTest(){
-        EqualsVerifier.forClass(LogSchema.class).suppress(Warning.NONFINAL_FIELDS).withRedefinedSuperclass().verify();
-        }
+  @Test
+  public void hashCodeEqualsTest() {
+    EqualsVerifier.forClass(LogSchema.class).usingGetClass().verify();
+  }
 
-    @Test
-    public void basicLogSchemaTest() {
-        LogSchema logSchema = new LogSchema(TEST_ID);
-        Assert.assertEquals((Long) TEST_ID, logSchema.getId());
-    }
+  @Test
+  public void basicLogSchemaTest() {
+    LogSchema logSchema = new LogSchema(TEST_ID);
+    Assert.assertEquals((Long) TEST_ID, logSchema.getId());
+  }
 }

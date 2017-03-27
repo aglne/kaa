@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.common.dao.model;
+
+import org.kaaproject.kaa.common.dto.EndpointUserDto;
+import org.kaaproject.kaa.common.dto.HasVersion;
 
 import java.util.List;
 
-import org.kaaproject.kaa.common.dto.EndpointUserDto;
+public interface EndpointUser extends ToDto<EndpointUserDto>, HasVersion {
 
-public interface EndpointUser extends ToDto<EndpointUserDto>{
+  List<String> getEndpointIds();
 
-    List<String> getEndpointIds();
+  void setEndpointIds(List<String> endpointIds);
 
-    void setEndpointIds(List<String> endpointIds);
-
-    String getId();
+  String getId();
 
 }

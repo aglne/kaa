@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #ifndef EXT_LOG_UPLOAD_STRATEGY_H_
 #define EXT_LOG_UPLOAD_STRATEGY_H_
 
-#include "../platform/ext_log_storage.h"
+#include "platform/ext_log_storage.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +50,16 @@ typedef enum {
     REMOTE_INTERNAL_ERROR   = 0x03
 } logging_delivery_error_code_t;
 
-
+/**
+ * @brief Creates the new instance of the log upload strategy based on volume and count of collected logs.
+ *
+ * @param   context       The Kaa context.
+ * @param   strategy_p    The pointer to a new strategy instance.
+ * @param   type          The strategy type.
+ * @return Error code.
+ */
+struct kaa_context_s;
+kaa_error_t ext_log_upload_strategy_create(struct kaa_context_s *context, void **strategy_p, uint8_t type);
 
 /**
  * @brief Makes a decision whether to upload logs or cleanup the storage.
@@ -62,18 +71,6 @@ typedef enum {
  */
 ext_log_upload_decision_t ext_log_upload_strategy_decide(void *context, const void *log_storage_context);
 
-
-
-/**
- * @brief Retrieves the maximum size of a report pack that will be delivered in a single request to the Operations server.
- *
- * @param[in]   context    Log upload strategy context.
- * @return                 The size of a batch in bytes.
- */
-size_t ext_log_upload_strategy_get_bucket_size(void *context);
-
-
-
 /**
  * @brief The maximum time to wait a log delivery response.
  *
@@ -81,6 +78,16 @@ size_t ext_log_upload_strategy_get_bucket_size(void *context);
  * @return                 Time in seconds.
  */
 size_t ext_log_upload_strategy_get_timeout(void *context);
+
+
+
+/**
+ * @brief Max amount of log batches allowed to be uploaded parallel.
+ *
+ * @param[in]   context    Log upload strategy context.
+ * @return                 Amount of batches.
+ */
+size_t ext_log_upload_strategy_get_max_parallel_uploads(void *context);
 
 
 

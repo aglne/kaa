@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kaaproject.kaa.client.channel.impl.sync;
 
-import java.util.Collections;
+package org.kaaproject.kaa.client.channel.impl.sync;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,47 +23,49 @@ import org.kaaproject.kaa.common.TransportType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
+
 public class SyncTaskTest {
 
-    public static final Logger LOG = LoggerFactory // NOSONAR
-            .getLogger(DefaultChannelManager.class);
+  public static final Logger LOG = LoggerFactory // NOSONAR
+      .getLogger(DefaultChannelManager.class);
 
-    @Test
-    public void mergeTest() {
-        SyncTask task1 = new SyncTask(TransportType.CONFIGURATION, true, false);
-        SyncTask task2 = new SyncTask(TransportType.NOTIFICATION, false, false);
+  @Test
+  public void mergeTest() {
+    SyncTask task1 = new SyncTask(TransportType.CONFIGURATION, true, false);
+    SyncTask task2 = new SyncTask(TransportType.NOTIFICATION, false, false);
 
-        SyncTask merged = SyncTask.merge(task1, Collections.singletonList(task2));
-        LOG.info(merged.toString());
-        
-        Assert.assertEquals(2, merged.getTypes().size());
-        Assert.assertFalse(merged.isAckOnly());
-        Assert.assertFalse(merged.isAll());
-    }
+    SyncTask merged = SyncTask.merge(task1, Collections.singletonList(task2));
+    LOG.info(merged.toString());
 
-    @Test
-    public void mergeAcksTest() {
-        SyncTask task1 = new SyncTask(TransportType.CONFIGURATION, true, false);
-        SyncTask task2 = new SyncTask(TransportType.NOTIFICATION, true, false);
+    Assert.assertEquals(2, merged.getTypes().size());
+    Assert.assertFalse(merged.isAckOnly());
+    Assert.assertFalse(merged.isAll());
+  }
 
-        SyncTask merged = SyncTask.merge(task1, Collections.singletonList(task2));
-        LOG.info(merged.toString());
-        
-        Assert.assertEquals(2, merged.getTypes().size());
-        Assert.assertTrue(merged.isAckOnly());
-        Assert.assertFalse(merged.isAll());
-    }
+  @Test
+  public void mergeAcksTest() {
+    SyncTask task1 = new SyncTask(TransportType.CONFIGURATION, true, false);
+    SyncTask task2 = new SyncTask(TransportType.NOTIFICATION, true, false);
 
-    @Test
-    public void mergeAllTest() {
-        SyncTask task1 = new SyncTask(TransportType.CONFIGURATION, true, false);
-        SyncTask task2 = new SyncTask(TransportType.NOTIFICATION, false, true);
+    SyncTask merged = SyncTask.merge(task1, Collections.singletonList(task2));
+    LOG.info(merged.toString());
 
-        SyncTask merged = SyncTask.merge(task1, Collections.singletonList(task2));
-        LOG.info(merged.toString());
-        
-        Assert.assertEquals(2, merged.getTypes().size());
-        Assert.assertFalse(merged.isAckOnly());
-        Assert.assertTrue(merged.isAll());
-    }
+    Assert.assertEquals(2, merged.getTypes().size());
+    Assert.assertTrue(merged.isAckOnly());
+    Assert.assertFalse(merged.isAll());
+  }
+
+  @Test
+  public void mergeAllTest() {
+    SyncTask task1 = new SyncTask(TransportType.CONFIGURATION, true, false);
+    SyncTask task2 = new SyncTask(TransportType.NOTIFICATION, false, true);
+
+    SyncTask merged = SyncTask.merge(task1, Collections.singletonList(task2));
+    LOG.info(merged.toString());
+
+    Assert.assertEquals(2, merged.getTypes().size());
+    Assert.assertFalse(merged.isAckOnly());
+    Assert.assertTrue(merged.isAll());
+  }
 }

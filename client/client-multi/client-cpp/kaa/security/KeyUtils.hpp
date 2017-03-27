@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,15 @@ public:
      * @return the pair of key and initialization vector
      */
     SessionKey generateSessionKey(std::size_t length);
+
+    /**
+     * Checks consistency of the key pair.
+     *
+     * @param[in] keys     Target key pair
+     * @retval    true     Keys are valid
+     * @retval    false    Keys are invalid
+     */
+    bool checkKeyPair(const KeyPair &keys);
 
     static PublicKey loadPublicKey(const std::string& fileName);
 

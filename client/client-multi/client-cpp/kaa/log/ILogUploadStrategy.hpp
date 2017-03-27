@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,17 +61,6 @@ public:
     virtual LogUploadStrategyDecision isUploadNeeded(ILogStorageStatus& status) = 0;
 
     /**
-     * @brief Retrieves the maximum size of the report pack that will be delivered in the single request
-     * to the Operations server.
-     *
-     * @return    The size of the log batch in bytes.
-     */
-    virtual std::size_t getBatchSize() = 0;
-
-
-    virtual std::size_t getRecordsBatchCount() = 0;
-
-    /**
      * @brief Maximum time to wait the log delivery response.
      *
      * @param[in] controller
@@ -83,6 +72,13 @@ public:
     virtual std::size_t getTimeoutCheckPeriod() = 0;
 
     virtual std::size_t getLogUploadCheckPeriod() = 0;
+
+    /**
+     * @brief Max amount of log batches allowed to be uploaded parallel.
+     *
+     * @return Amount of batches.
+     */
+    virtual std::size_t getMaxParallelUploads() = 0;
 
     /**
      * @brief Callback is used when the log delivery timeout detected.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,40 +16,23 @@
 
 #include "kaa/Kaa.hpp"
 
+#include <memory>
+
+#include "kaa/KaaClient.hpp"
+#include "kaa/common/exception/KaaException.hpp"
+#include "kaa/KaaClientPlatformContext.hpp"
+
 namespace kaa {
 
 Botan::LibraryInitializer Kaa::botanInit_("thread_safe=true");
-std::unique_ptr<KaaClient> Kaa::client_;
 
-void Kaa::init(int options)
+std::shared_ptr<IKaaClient> Kaa::newClient(IKaaClientPlatformContextPtr context
+                                         , KaaClientStateListenerPtr listener)
 {
-    client_.reset(new KaaClient);
-    client_->init(options);
-}
-
-void Kaa::start()
-{
-    client_->start();
-}
-
-void Kaa::stop()
-{
-    client_->stop();
-}
-
-IKaaClient& Kaa::getKaaClient()
-{
-    return *client_;
-}
-
-void Kaa::pause()
-{
-    client_->pause();
-}
-
-void Kaa::resume()
-{
-    client_->resume();
+    if (!context) {
+        throw KaaException("Kaa client platform context is null");
+    }
+    return std::shared_ptr<IKaaClient>(new KaaClient(context, listener));
 }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,13 @@ package org.kaaproject.kaa.server.common.dao.exception;
 
 public class DatabaseProcessingException extends RuntimeException {
 
-    private static final long serialVersionUID = -8831450820365135073L;
+  private static final long serialVersionUID = -8831450820365135073L;
 
-    public DatabaseProcessingException(String message) {
-        super(message);
-    }
+  public DatabaseProcessingException(String message) {
+    super(message);
+  }
+
+  public DatabaseProcessingException(Exception ex) {
+    super(ex);
+  }
 }

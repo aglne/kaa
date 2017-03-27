@@ -1,25 +1,17 @@
-<!--
-  Copyright 2014 CyberVision, Inc.
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
+<!-- Copyright 2014-2016 CyberVision, Inc. Licensed under the Apache License, 
+    Version 2.0 (the "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software distributed
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for
+    the specific language governing permissions and limitations under the License. -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.kaaproject.kaa.server</groupId>
-        <version>0.7.1-SNAPSHOT</version>
+        <version>0.11.0-SNAPSHOT</version>
         <artifactId>common</artifactId>
     </parent>
     <groupId>org.kaaproject.kaa.server.common</groupId>
@@ -56,6 +48,10 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
@@ -82,6 +78,10 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -128,13 +128,8 @@
             <artifactId>hibernate-entitymanager</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -145,31 +140,45 @@
             <artifactId>commons-pool</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-         <resources>
-             <resource>
+        <resources>
+            <resource>
                 <directory>src/main/resources</directory>
-             </resource>
-             <resource>
-                 <directory>../../../common/endpoint-shared/src/main/avro</directory>
-                 <includes>
-                     <include>default_profile_schema.avsc</include>
-                     <include>default_notification_schema.avsc</include>
-                     <include>default_configuration_schema.avsc</include>
-                     <include>default_log_schema.avsc</include>
-                 </includes>
-             </resource>
+            </resource>
+            <resource>
+                <directory>../../../common/endpoint-shared/src/main/avro</directory>
+                <includes>
+                    <include>default_system_empty_schema.avsc</include>
+                    <include>default_notification_schema.avsc</include>
+                    <include>default_configuration_schema.avsc</include>
+                    <include>default_log_schema.avsc</include>
+                </includes>
+            </resource>
         </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
                 <configuration>
                     <systemPropertyVariables>
                         <server_log_dir>./logs</server_log_dir>
@@ -213,6 +222,23 @@
 
     <profiles>
         <profile>
+            <id>license</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.mycila.maven-license-plugin</groupId>
+                        <artifactId>maven-license-plugin</artifactId>
+                        <version>1.8.0</version>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*.template</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>mongo-dao</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -224,17 +250,17 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>prepare-properties</id>
+                                <id>prepare-properties-mongo-dao</id>
                                 <phase>generate-resources</phase>
                                 <goals>
                                     <goal>run</goal>
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <copy file="src/main/resources/dao.properties.template"
-                                              tofile="src/main/resources/dao.properties" />
-                                        <replace file="src/main/resources/dao.properties"
-                                                 token="#nosql_provider_name#" value="mongodb" />
+                                        <copy file="src/main/resources/nosql-dao.properties.template"
+                                            tofile="src/main/resources/nosql-dao.properties" overwrite="true" />
+                                        <replace file="src/main/resources/nosql-dao.properties"
+                                            token="#nosql_provider_name#" value="mongodb" />
                                     </tasks>
                                 </configuration>
                             </execution>
@@ -252,17 +278,72 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>prepare-properties</id>
+                                <id>prepare-properties-cassandra-dao</id>
                                 <phase>generate-resources</phase>
                                 <goals>
                                     <goal>run</goal>
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <copy file="src/main/resources/dao.properties.template"
-                                              tofile="src/main/resources/dao.properties" />
-                                        <replace file="src/main/resources/dao.properties"
-                                                 token="#nosql_provider_name#" value="cassandra" />
+                                        <copy file="src/main/resources/nosql-dao.properties.template"
+                                            tofile="src/main/resources/nosql-dao.properties" overwrite="true" />
+                                        <replace file="src/main/resources/nosql-dao.properties"
+                                            token="#nosql_provider_name#" value="cassandra" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mariadb-dao</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-properties-mariadb-dao</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="src/main/resources/maria-dao.properties.template"
+                                            tofile="src/main/resources/sql-dao.properties" overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>postgresql-dao</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-properties-postgresql-dao</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="src/main/resources/postgre-dao.properties.template"
+                                            tofile="src/main/resources/sql-dao.properties" overwrite="true" />
                                     </tasks>
                                 </configuration>
                             </execution>

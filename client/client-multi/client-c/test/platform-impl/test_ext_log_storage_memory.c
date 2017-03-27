@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
+#include <kaa_private.h>
+
+#include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <string.h>
 
-#include "../kaa_test.h"
+#include "kaa_test.h"
 
 #include "utilities/kaa_mem.h"
 #include "utilities/kaa_log.h"
@@ -29,24 +33,17 @@
 #include "platform/ext_log_storage.h"
 #include "platform/ext_log_upload_strategy.h"
 
+#include "kaa_logging_private.h"
 
-
-extern kaa_error_t ext_unlimited_log_storage_create(void **log_storage_context_p, kaa_logger_t *logger);
-extern kaa_error_t ext_limited_log_storage_create(void **log_storage_context_p
-                                                , kaa_logger_t *logger
-                                                , size_t storage_size
-                                                , size_t percent_to_delete);
-extern kaa_error_t ext_log_storage_destroy(void *context);
-
-
+#define TEST_RECORD_BUCKET_ID 1
 
 static kaa_logger_t *logger = NULL;
 
 
 
-void test_create_unlimited_storage()
+void test_create_unlimited_storage(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     void *storage;
@@ -64,15 +61,13 @@ void test_create_unlimited_storage()
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
     ext_log_storage_destroy(storage);
-
-    KAA_TRACE_OUT(logger);
 }
 
 
 
-void test_create_limited_storage()
+void test_create_limited_storage(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     void *storage;
@@ -104,15 +99,13 @@ void test_create_limited_storage()
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
     ext_log_storage_destroy(storage);
-
-    KAA_TRACE_OUT(logger);
 }
 
 
 
-void test_allocate_log_record_buffer()
+void test_allocate_log_record_buffer(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     void *storage;
@@ -123,20 +116,18 @@ void test_allocate_log_record_buffer()
     error_code = ext_log_storage_allocate_log_record_buffer(storage, NULL);
     ASSERT_NOT_EQUAL(error_code, KAA_ERR_NONE);
 
-    kaa_log_record_t record1 = { NULL, 0 };
+    kaa_log_record_t record1 = { NULL, 0, 0, };
     error_code = ext_log_storage_allocate_log_record_buffer(storage, &record1);
     ASSERT_NOT_EQUAL(error_code, KAA_ERR_NONE);
     ASSERT_NULL(record1.data);
 
-    kaa_log_record_t record2 = { NULL, 256 };
+    kaa_log_record_t record2 = { NULL, 256, 0, };
     error_code = ext_log_storage_allocate_log_record_buffer(storage, &record2);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     ASSERT_NOT_NULL(record2.data);
 
     ext_log_storage_deallocate_log_record_buffer(storage, &record2);
     ext_log_storage_destroy(storage);
-
-    KAA_TRACE_OUT(logger);
 }
 
 
@@ -150,16 +141,19 @@ static char* copy_data(const char* data, size_t data_size)
     return new_data;
 }
 
-static kaa_error_t add_log_record(void *storage, const char *data, size_t data_size)
+static kaa_error_t add_log_record(void *storage,
+                                  const char *data,
+                                  size_t data_size,
+                                  uint16_t bucket_id)
 {
     KAA_RETURN_IF_NIL3(storage, data, data_size, KAA_ERR_BADPARAM);
-    kaa_log_record_t record = { copy_data(data, data_size), data_size };
+    kaa_log_record_t record = { copy_data(data, data_size), data_size, bucket_id };
     return ext_log_storage_add_log_record(storage, &record);
 }
 
-void test_add_log_record()
+void test_add_log_record(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     void *storage;
@@ -171,13 +165,13 @@ void test_add_log_record()
     const char *data = "DATA";
     size_t data_size = strlen("DATA");
 
-    error_code = add_log_record(storage, data, data_size);
+    error_code = add_log_record(storage, data, data_size, TEST_RECORD_BUCKET_ID);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     ++record_count;
 
     ASSERT_EQUAL(ext_log_storage_get_records_count(storage), record_count);
 
-    error_code = add_log_record(storage, data, data_size);
+    error_code = add_log_record(storage, data, data_size, TEST_RECORD_BUCKET_ID);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     ++record_count;
 
@@ -185,15 +179,13 @@ void test_add_log_record()
     ASSERT_EQUAL(ext_log_storage_get_total_size(storage), record_count * data_size);
 
     ext_log_storage_destroy(storage);
-
-    KAA_TRACE_OUT(logger);
 }
 
 
 
-void test_write_next_log_record()
+void test_write_next_log_record(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     void *storage;
@@ -201,7 +193,7 @@ void test_write_next_log_record()
     error_code = ext_unlimited_log_storage_create(&storage, logger);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
-    size_t bucket_id = 0;
+    uint16_t bucket_id = 0;
     size_t record_len = 0;
 
     error_code = ext_log_storage_write_next_record(storage, NULL, 0, 0, NULL);
@@ -210,39 +202,38 @@ void test_write_next_log_record()
     error_code = ext_log_storage_write_next_record(storage, NULL, 33, 0, NULL);
     ASSERT_NOT_EQUAL(error_code, KAA_ERR_NONE);
 
-    error_code = ext_log_storage_write_next_record(storage, NULL, 33, bucket_id, NULL);
+    error_code = ext_log_storage_write_next_record(storage, NULL, 33, &bucket_id, NULL);
     ASSERT_NOT_EQUAL(error_code, KAA_ERR_NONE);
 
-    error_code = ext_log_storage_write_next_record(storage, NULL, 33, bucket_id, &record_len);
+    error_code = ext_log_storage_write_next_record(storage, NULL, 33, &bucket_id, &record_len);
     ASSERT_NOT_EQUAL(error_code, KAA_ERR_NONE);
 
     size_t record_count = 0;
     const char *data = "DATA";
     size_t data_size = strlen("DATA");
 
-    error_code = add_log_record(storage, data, data_size);
+    error_code = add_log_record(storage, data, data_size, TEST_RECORD_BUCKET_ID);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     ++record_count;
-    error_code = add_log_record(storage, data, data_size);
+    error_code = add_log_record(storage, data, data_size, TEST_RECORD_BUCKET_ID);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     ++record_count;
 
     size_t buffer_size = (record_count + 1) * data_size;
     char buffer[buffer_size];
 
-    bucket_id = 1;
-    error_code = ext_log_storage_write_next_record(storage, buffer, 1, bucket_id, &record_len);
+    error_code = ext_log_storage_write_next_record(storage, buffer, 1, &bucket_id, &record_len);
     ASSERT_EQUAL(error_code, KAA_ERR_INSUFFICIENT_BUFFER);
 
-    error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, bucket_id, &record_len);
+    error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, &bucket_id, &record_len);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     ASSERT_EQUAL(record_len, data_size);
 
-    error_code = ext_log_storage_write_next_record(storage, buffer + record_len, buffer_size - record_len, bucket_id, &record_len);
+    error_code = ext_log_storage_write_next_record(storage, buffer + record_len, buffer_size - record_len, &bucket_id, &record_len);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     ASSERT_EQUAL(record_len, data_size);
 
-    error_code = ext_log_storage_write_next_record(storage, buffer + 2 * record_len, buffer_size - 2 * record_len, bucket_id, &record_len);
+    error_code = ext_log_storage_write_next_record(storage, buffer + 2 * record_len, buffer_size - 2 * record_len, &bucket_id, &record_len);
     ASSERT_EQUAL(error_code, KAA_ERR_NOT_FOUND);
 
     int res = memcmp(buffer, data, data_size);
@@ -251,15 +242,13 @@ void test_write_next_log_record()
     ASSERT_EQUAL(res, 0);
 
     ext_log_storage_destroy(storage);
-
-    KAA_TRACE_OUT(logger);
 }
 
 
 
-void test_remove_by_bucket_id()
+void test_remove_by_bucket_id(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     void *storage;
@@ -269,12 +258,14 @@ void test_remove_by_bucket_id()
 
     size_t record_len = 0;
     size_t TEST_RECORD_COUNT = 10;
+    size_t DIVIDER = TEST_RECORD_COUNT / 2;
     size_t record_count = 0;
     const char *data = "DATA";
     size_t data_size = strlen("DATA");
 
     while (record_count < TEST_RECORD_COUNT) {
-        error_code = add_log_record(storage, data, data_size);
+        // Half of items with bucket #1, other half - bucket #2
+        error_code = add_log_record(storage, data, data_size, record_count / DIVIDER + 1);
         ASSERT_EQUAL(error_code, KAA_ERR_NONE);
         ++record_count;
     }
@@ -285,24 +276,24 @@ void test_remove_by_bucket_id()
     size_t buffer_size = data_size;
     char buffer[buffer_size];
 
-    size_t bucket_id_1 = 1;
+    uint16_t bucket_id_1 = 1;
     size_t i;
     for (i = 0; i < record_count / 2; ++i) {
-        error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, bucket_id_1, &record_len);
+        error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, &bucket_id_1, &record_len);
         ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     }
 
     ASSERT_EQUAL(ext_log_storage_get_records_count(storage), record_count / 2);
     ASSERT_EQUAL(ext_log_storage_get_total_size(storage), (record_count / 2) * data_size);
 
-    size_t bucket_id_2 = 2;
+    uint16_t bucket_id_2 = 2;
     for (i = 0; i < record_count / 2; ++i) {
-        error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, bucket_id_2, &record_len);
+        error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, &bucket_id_2, &record_len);
         ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     }
 
-    size_t bucket_id_3 = 3;
-    error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, bucket_id_3, &record_len);
+    uint16_t bucket_id_3 = 3;
+    error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, &bucket_id_3, &record_len);
     ASSERT_EQUAL(error_code, KAA_ERR_NOT_FOUND);
 
     error_code = ext_log_storage_remove_by_bucket_id(storage, bucket_id_2);
@@ -315,15 +306,13 @@ void test_remove_by_bucket_id()
     ASSERT_EQUAL(ext_log_storage_get_total_size(storage), 0);
 
     ext_log_storage_destroy(storage);
-
-    KAA_TRACE_OUT(logger);
 }
 
 
 
-void test_unmark_by_bucket_id()
+void test_unmark_by_bucket_id(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     void *storage;
@@ -333,12 +322,14 @@ void test_unmark_by_bucket_id()
 
     size_t record_len = 0;
     size_t TEST_RECORD_COUNT = 10;
+    size_t DIVIDER = TEST_RECORD_COUNT / 2;
     size_t record_count = 0;
     const char *data = "DATA";
     size_t data_size = strlen("DATA");
 
     while (record_count < TEST_RECORD_COUNT) {
-        error_code = add_log_record(storage, data, data_size);
+        // Half of items with bucket #1, other half - bucket #2
+        error_code = add_log_record(storage, data, data_size, record_count / DIVIDER + 1);
         ASSERT_EQUAL(error_code, KAA_ERR_NONE);
         ++record_count;
     }
@@ -346,39 +337,39 @@ void test_unmark_by_bucket_id()
     size_t buffer_size = data_size;
     char buffer[buffer_size];
 
-    size_t bucket_id_1 = 1;
+    uint16_t bucket_id_1 = 1;
     size_t i;
     for (i = 0; i < record_count / 2; ++i) {
-        error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, bucket_id_1, &record_len);
+        error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, &bucket_id_1, &record_len);
         ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     }
 
-    size_t bucket_id_2 = 2;
+    uint16_t bucket_id_2 = 2;
     for (i = 0; i < record_count / 2; ++i) {
-        error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, bucket_id_2, &record_len);
+        error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, &bucket_id_2, &record_len);
         ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     }
 
-    size_t bucket_id_3 = 3;
-    error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, bucket_id_3, &record_len);
+    uint16_t bucket_id_3 = 3;
+    error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, &bucket_id_3, &record_len);
     ASSERT_EQUAL(error_code, KAA_ERR_NOT_FOUND);
 
     error_code = ext_log_storage_remove_by_bucket_id(storage, bucket_id_2);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
-    error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, bucket_id_3, &record_len);
+    error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, &bucket_id_3, &record_len);
     ASSERT_EQUAL(error_code, KAA_ERR_NOT_FOUND);
 
     error_code = ext_log_storage_unmark_by_bucket_id(storage, bucket_id_1);
     ASSERT_EQUAL(error_code, KAA_ERR_NONE);
 
-    size_t bucket_id_4 = 4;
+    uint16_t bucket_id_4 = 4;
     for (i = 0; i < record_count / 2; ++i) {
-        error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, bucket_id_4, &record_len);
+        error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, &bucket_id_4, &record_len);
         ASSERT_EQUAL(error_code, KAA_ERR_NONE);
     }
 
-    error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, bucket_id_3, &record_len);
+    error_code = ext_log_storage_write_next_record(storage, buffer, buffer_size, &bucket_id_3, &record_len);
     ASSERT_EQUAL(error_code, KAA_ERR_NOT_FOUND);
 
     error_code = ext_log_storage_remove_by_bucket_id(storage, bucket_id_4);
@@ -388,15 +379,13 @@ void test_unmark_by_bucket_id()
     ASSERT_EQUAL(ext_log_storage_get_total_size(storage), 0);
 
     ext_log_storage_destroy(storage);
-
-    KAA_TRACE_OUT(logger);
 }
 
 
 
-void test_shrink_to_size()
+void test_shrink_to_size(void **state)
 {
-    KAA_TRACE_IN(logger);
+    (void)state;
 
     kaa_error_t error_code;
     void *storage;
@@ -415,7 +404,7 @@ void test_shrink_to_size()
     size_t record_count = 0;
 
     while (record_count <= TEST_RECORD_COUNT) {
-        error_code = add_log_record(storage, data, data_size);
+        error_code = add_log_record(storage, data, data_size, TEST_RECORD_BUCKET_ID);
         ASSERT_EQUAL(error_code, KAA_ERR_NONE);
         ++record_count;
     }
@@ -431,13 +420,11 @@ void test_shrink_to_size()
     ASSERT_EQUAL(ext_log_storage_get_total_size(storage), occupied_size_after_removal + data_size);
 
     ext_log_storage_destroy(storage);
-
-    KAA_TRACE_OUT(logger);
 }
 
 
 
-int test_init()
+int test_init(void)
 {
     kaa_error_t error = kaa_log_create(&logger, KAA_MAX_LOG_MESSAGE_LENGTH, KAA_MAX_LOG_LEVEL, NULL);
     if (error || !logger) {
@@ -447,7 +434,7 @@ int test_init()
     return 0;
 }
 
-int test_deinit()
+int test_deinit(void)
 {
     kaa_log_destroy(logger);
     return 0;

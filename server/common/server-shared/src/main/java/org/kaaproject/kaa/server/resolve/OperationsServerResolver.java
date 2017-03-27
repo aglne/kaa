@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kaaproject.kaa.server.resolve;
 
 import org.kaaproject.kaa.server.common.zk.gen.OperationsNodeInfo;
 import org.kaaproject.kaa.server.common.zk.operations.OperationsNodeListener;
 
 /**
- * Resolves {@link OperationsNodeInfo operations server node} for given entities
- * 
- * @author Andrew Shvayka
+ * Resolves {@link OperationsNodeInfo operations service node} for given entities.
  *
+ * @author Andrew Shvayka
  */
-public interface OperationsServerResolver extends OperationsNodeListener{
+public interface OperationsServerResolver extends OperationsNodeListener {
 
-    OperationsNodeInfo getNode(String user);
+  OperationsNodeInfo getNode(String user);
 
 }

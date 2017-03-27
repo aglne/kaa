@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,18 +27,18 @@ import java.io.Serializable;
  */
 public interface RawBinaryDelta extends Serializable {
 
-    /**
-     * Gets the data.
-     *
-     * @return the data or null if there is no changes
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    byte[] getData() throws IOException;
+  /**
+   * Gets the data.
+   *
+   * @return the data or null if there is no changes
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  byte[] getData() throws IOException;
 
-    /**
-     * Tells if the delta has any changes.
-     *
-     * @return true if there is any changes, false otherwise.
-     */
-    boolean hasChanges();
+  /**
+   * Tells if the delta has any changes.
+   *
+   * @return true if there is any changes, false otherwise.
+   */
+  boolean hasChanges();
 }

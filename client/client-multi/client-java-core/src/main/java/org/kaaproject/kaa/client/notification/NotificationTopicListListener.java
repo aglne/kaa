@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,22 @@
 
 package org.kaaproject.kaa.client.notification;
 
-import java.util.List;
-
 import org.kaaproject.kaa.common.endpoint.gen.Topic;
+
+import java.util.List;
 
 /**
  * The listener for topics' list updates.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface NotificationTopicListListener {
 
-    /**
-     * Called on topics' list updates.
-     *
-     * @param list the new list of topic.
-     * @see Topic
-     */
-    void onListUpdated(List<Topic> list);
+  /**
+   * Called on topics' list updates.
+   *
+   * @param list the new list of topic.
+   * @see Topic
+   */
+  void onListUpdated(List<Topic> list);
 }

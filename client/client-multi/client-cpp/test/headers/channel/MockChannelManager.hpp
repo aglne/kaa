@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,46 +18,51 @@
 #define MOCKCHANNELMANAGER_HPP_
 
 #include "kaa/channel/IKaaChannelManager.hpp"
-
+#include "kaa/failover/IFailoverStrategy.hpp"
 #include "headers/channel/MockDataChannel.hpp"
 
 namespace kaa {
 
 class MockChannelManager: public IKaaChannelManager {
 public:
-    virtual void setChannel(TransportType type, IDataChannelPtr channel) { ++onSetChannel_; }
-    virtual void addChannel(IDataChannelPtr channel) { ++onAddChannel_; }
-    virtual void removeChannel(IDataChannelPtr channel) { ++onRemoveChannel_; }
-    virtual void removeChannel(const std::string& id) { ++onRemoveChannelById_; }
+    virtual void setChannel(TransportType type, IDataChannelPtr channel) override { ++onSetChannel_; }
+    virtual void addChannel(IDataChannelPtr channel) override { ++onAddChannel_; }
+    virtual void removeChannel(IDataChannelPtr channel) override { ++onRemoveChannel_; }
+    virtual void removeChannel(const std::string& id) override { ++onRemoveChannelById_; }
 
-    virtual std::list<IDataChannelPtr> getChannels() {
+    virtual std::list<IDataChannelPtr> getChannels() override {
         static std::list<IDataChannelPtr> channels;
         ++onGetChannels_;
         return channels;
     }
 
-    virtual IDataChannelPtr getChannelByTransportType(TransportType type) {
+    virtual IDataChannelPtr getChannelByTransportType(TransportType type) override {
         static IDataChannelPtr channel(new MockDataChannel);
         ++onGetChannelByTransportType_;
         return channel;
     }
 
-    virtual IDataChannelPtr getChannel(const std::string& channelId) {
+    virtual IDataChannelPtr getChannel(const std::string& channelId) override {
         static IDataChannelPtr channel(new MockDataChannel);
         ++onGetChannel_;
         return channel;
     }
 
-    virtual void onTransportConnectionInfoUpdated(ITransportConnectionInfoPtr server) { ++onGetChannelByTransportType_; }
-    virtual void onServerFailed(ITransportConnectionInfoPtr server) { ++onServerFailed_; }
-    virtual void setFailoverStrategy(IFailoverStrategyPtr strategy) { ++onFailOverStrategyChange_;}
-    virtual void clearChannelList() { ++onClearChannelList_; }
+    virtual void onTransportConnectionInfoUpdated(ITransportConnectionInfoPtr server) override { ++onGetChannelByTransportType_; }
+    virtual void onServerFailed(ITransportConnectionInfoPtr server,
+                                KaaFailoverReason reason = KaaFailoverReason::NO_CONNECTIVITY)
+    {
+        ++onServerFailed_;
+    }
+    virtual void setFailoverStrategy(IFailoverStrategyPtr strategy) override { ++onFailOverStrategyChange_;}
+    virtual void clearChannelList() override { ++onClearChannelList_; }
 
-    virtual void setConnectivityChecker(ConnectivityCheckerPtr checker) { ++onSetConnectivityChecker_; }
+    virtual void setConnectivityChecker(ConnectivityCheckerPtr checker) override { ++onSetConnectivityChecker_; }
 
-    virtual void shutdown() { ++onShutdown_; }
-    virtual void pause() { ++onPause_; }
-    virtual void resume() { ++onResume; }
+    virtual void onConnected(const EndpointConnectionInfo& connection)  override {}
+    virtual void shutdown() override { ++onShutdown_; }
+    virtual void pause() override { ++onPause_; }
+    virtual void resume() override { ++onResume; }
 
 public:
     std::size_t onSetChannel_ = 0;

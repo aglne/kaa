@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,35 +16,109 @@
 
 package org.kaaproject.kaa.common.dto;
 
-
 public class ProfileFilterDto extends AbstractStructureDto {
 
-    private static final long serialVersionUID = 3068910692262107362L;
+  private static final long serialVersionUID = 3068910692262107362L;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ProfileFilterDto)) {
-            return false;
-        }
+  private String endpointProfileSchemaId;
+  private Integer endpointProfileSchemaVersion;
 
-        return super.equals(o);
+  private String serverProfileSchemaId;
+  private Integer serverProfileSchemaVersion;
+
+  public String getEndpointProfileSchemaId() {
+    return endpointProfileSchemaId;
+  }
+
+  public void setEndpointProfileSchemaId(String endpointProfileSchemaId) {
+    this.endpointProfileSchemaId = endpointProfileSchemaId;
+  }
+
+  public Integer getEndpointProfileSchemaVersion() {
+    return endpointProfileSchemaVersion;
+  }
+
+  public void setEndpointProfileSchemaVersion(Integer endpointProfileSchemaVersion) {
+    this.endpointProfileSchemaVersion = endpointProfileSchemaVersion;
+  }
+
+  public String getServerProfileSchemaId() {
+    return serverProfileSchemaId;
+  }
+
+  public void setServerProfileSchemaId(String serverProfileSchemaId) {
+    this.serverProfileSchemaId = serverProfileSchemaId;
+  }
+
+  public Integer getServerProfileSchemaVersion() {
+    return serverProfileSchemaVersion;
+  }
+
+  public void setServerProfileSchemaVersion(Integer serverProfileSchemaVersion) {
+    this.serverProfileSchemaVersion = serverProfileSchemaVersion;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((endpointProfileSchemaId == null) ? 0 :
+                                       endpointProfileSchemaId.hashCode());
+    result = prime * result + ((endpointProfileSchemaVersion == null) ? 0 :
+                                       endpointProfileSchemaVersion.hashCode());
+    result = prime * result + ((serverProfileSchemaId == null) ? 0 :
+                                       serverProfileSchemaId.hashCode());
+    result = prime * result + ((serverProfileSchemaVersion == null) ? 0 :
+                                       serverProfileSchemaVersion.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
     }
-
-//    public ProfileData getProfileData(DataSchema schema) {
-//        return new ProfileData(schema, body);
-//    }
-
-    @Override
-    public int hashCode() { //NOSONAR
-        return super.hashCode();
+    if (!super.equals(obj)) {
+      return false;
     }
-
-    @Override
-    public String toString() {
-        return "ProfileFilterDto{" + super.toString() + "}";
+    if (getClass() != obj.getClass()) {
+      return false;
     }
+    ProfileFilterDto other = (ProfileFilterDto) obj;
+    if (endpointProfileSchemaId == null) {
+      if (other.endpointProfileSchemaId != null) {
+        return false;
+      }
+    } else if (!endpointProfileSchemaId.equals(other.endpointProfileSchemaId)) {
+      return false;
+    }
+    if (endpointProfileSchemaVersion == null) {
+      if (other.endpointProfileSchemaVersion != null) {
+        return false;
+      }
+    } else if (!endpointProfileSchemaVersion.equals(other.endpointProfileSchemaVersion)) {
+      return false;
+    }
+    if (serverProfileSchemaId == null) {
+      if (other.serverProfileSchemaId != null) {
+        return false;
+      }
+    } else if (!serverProfileSchemaId.equals(other.serverProfileSchemaId)) {
+      return false;
+    }
+    if (serverProfileSchemaVersion == null) {
+      if (other.serverProfileSchemaVersion != null) {
+        return false;
+      }
+    } else if (!serverProfileSchemaVersion.equals(other.serverProfileSchemaVersion)) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "ProfileFilterDto{" + super.toString() + "}";
+  }
 
 }

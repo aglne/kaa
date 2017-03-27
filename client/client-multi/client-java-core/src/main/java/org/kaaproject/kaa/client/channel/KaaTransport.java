@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,30 +23,26 @@ import org.kaaproject.kaa.client.persistence.KaaClientState;
  * and response for the specific service.
  *
  * @author Yaroslav Zeygerman
- *
  */
 public interface KaaTransport {
 
-    /**
-     * Sets the specific {@link KaaChannelManager} for the current transport.
-     *
-     * @param channelManager manager to be set.
-     *
-     */
-    void setChannelManager(KaaChannelManager channelManager);
+  /**
+   * Sets the specific {@link KaaChannelManager} for the current transport.
+   *
+   * @param channelManager manager to be set.
+   */
+  void setChannelManager(KaaChannelManager channelManager);
 
-    /**
-     * Sets the client's state object.
-     *
-     * @param state state object to be set.
-     *
-     */
-    void setClientState(KaaClientState state);
+  /**
+   * Sets the client's state object.
+   *
+   * @param state state object to be set.
+   */
+  void setClientState(KaaClientState state);
 
-    /**
-     * Sends the update request to the server.
-     *
-     */
-    void sync();
+  /**
+   * Sends the update request to the server.
+   */
+  void sync();
 
 }

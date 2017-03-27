@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "kaa_mem.h"
-#include "../kaa_common.h"
+#include "kaa_common.h"
 #include "kaa_base64.h"
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #ifndef KAA_BUFFER_H_
 #define KAA_BUFFER_H_
 
-#include "../kaa_error.h"
+#include "kaa_error.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,6 +36,14 @@ kaa_error_t kaa_buffer_destroy(kaa_buffer_t *buffer_p);
 kaa_error_t kaa_buffer_allocate_space(kaa_buffer_t *buffer_p
                                     , char **buffer
                                     , size_t *free_size);
+
+kaa_error_t kaa_buffer_reallocate_space(kaa_buffer_t *buffer_p, size_t size);
+
+kaa_error_t kaa_buffer_get_locked_space(kaa_buffer_t *buffer_p, size_t *size);
+
+kaa_error_t kaa_buffer_get_size(kaa_buffer_t *buffer_p, size_t *size);
+
+kaa_error_t kaa_buffer_get_free_space(kaa_buffer_t *buffer_p, size_t *size);
 
 kaa_error_t kaa_buffer_lock_space(kaa_buffer_t *buffer_p
                                 , size_t lock_size);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 CyberVision, Inc.
+ * Copyright 2014-2016 CyberVision, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class HibernateTenantDaoTest extends HibernateAbstractTest {
 
-    @Test
-    public void testRemoveTenantByName() {
-        Tenant tenant = generateTenant();
-        Tenant found = tenantDao.findByName(tenant.getName());
-        Assert.assertNotNull(found);
-        tenantDao.removeByName(tenant.getName());
-        found = tenantDao.findByName(tenant.getName());
-        Assert.assertNull(found);
-    }
+  @Test
+  public void testRemoveTenantByName() {
+    Tenant tenant = generateTenant();
+    Tenant found = tenantDao.findByName(tenant.getName());
+    Assert.assertNotNull(found);
+    tenantDao.removeByName(tenant.getName());
+    found = tenantDao.findByName(tenant.getName());
+    Assert.assertNull(found);
+  }
 }
